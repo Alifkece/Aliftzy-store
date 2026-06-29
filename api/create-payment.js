@@ -9,12 +9,21 @@
 
  try {
 
- const body = typeof req.body === "string"
- ? JSON.parse(req.body)
- : req.body;
+ const body = req.body || {};
+
+ console.log("BODY:", body);
 
 
- const {amount, username} = body;
+ const amount = body.amount;
+ const username = body.username;
+
+
+ if(!amount || !username){
+  return res.status(400).json({
+   error:"amount atau username kosong",
+   body:body
+  });
+ }
 
 
  const response = await fetch(
@@ -27,11 +36,8 @@
   body:JSON.stringify({
 
    key: process.env.SITRANSFER_KEY,
-
    channel:"QRIS",
-
    amount:amount,
-
    player_username:username
 
   })
