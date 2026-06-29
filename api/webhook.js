@@ -6,38 +6,47 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 🔥 FIX VERCEL BODY ISSUE
+    // 🔥 FIX VERCEL: ambil raw body biar gak undefined
     const raw = await req.text();
     const body = JSON.parse(raw || "{}");
 
-    console.log("WEBHOOK INCOMING:", body);
+    console.log("WEBHOOK RECEIVED:", body);
 
-    // 🔥 CEK STATUS PAYMENT
-    if (
+    // 🔥 VALIDASI DATA DARI SITRANSFER
+    const isSuccess =
       body?.success === true &&
-      body?.data?.status === "success"
-    ) {
-      const trx = body?.data?.transaction_id;
+      body?.data?.status === "success";
 
-      if (!trx) {
-        return res.status(400).json({
-          error: "transaction_id tidak ada"
-        });
-      }
-
-      // 🔥 UPDATE FIREBASE ORDER
-      await db.collection("orders")
-        .doc(trx)
-        .update({
-          status: "PAID",
-          payment: body.data.type || "unknown",
-          paidAt: new Date()
-        });
-
-      console.log("ORDER SUCCESS:", trx);
+    if (!isSuccess) {
+      return res.status(200).json({
+        message: "Not paid or invalid payload"
+      });
     }
 
-    return res.status(200).json({ ok: true });
+    const trx = body?.data?.transaction_id;
+    const paymentType = body?.data?.type || "unknown";
+
+    if (!trx) {
+      return res.status(400).json({
+        error: "transaction_id tidak ditemukan"
+      });
+    }
+
+    // 🔥 UPDATE ORDER DI FIREBASE
+    await db.collection("orders")
+      .doc(trx)
+      .update({
+        status: "PAID",
+        payment: paymentType,
+        paidAt: new Date()
+      });
+
+    console.log("ORDER UPDATED TO PAID:", trx);
+
+    return res.status(200).json({
+      status: "ok",
+      message: "payment processed"
+    });
 
   } catch (error) {
     console.error("WEBHOOK ERROR:", error);
@@ -46,14 +55,4 @@ export default async function handler(req, res) {
       error: error.message
     });
   }
-}
-    console.log("ORDER LUNAS:", trx);
-
-  }
-
-
-  res.status(200).json({
-    status:"ok"
-  });
-
 }
