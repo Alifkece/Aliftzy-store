@@ -46,8 +46,7 @@ headers:{
 
 body:JSON.stringify({
 
-key: process.env.SITRANSFER_KEY,
-
+key: process.env.SITRANSFER_KEY || "TEST_KOSONG",
 channel:"QRIS",
 
 amount:Number(amount),
