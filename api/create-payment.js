@@ -7,13 +7,13 @@ export default async function handler(req, res) {
   }
 
 
-  try {
+  let body = {};
 
-    let body = req.body;
-
-    if (typeof body === "string") {
-      body = JSON.parse(body);
-    }
+try {
+  body = JSON.parse(req.body);
+} catch {
+  body = req.body || {};
+}
 
 
     const {
