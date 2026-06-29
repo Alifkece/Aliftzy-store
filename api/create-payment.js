@@ -63,11 +63,12 @@ try {
 
   } catch (error) {
 
+    console.error(error);
 
     return res.status(500).json({
-      error: error.message
+      error: error.message,
+      stack: error.stack
     });
-
 
   }
 
