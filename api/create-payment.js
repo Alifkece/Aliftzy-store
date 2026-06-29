@@ -1,6 +1,5 @@
 export default async function handler(req, res) {
 
-
   if (req.method !== "POST") {
     return res.status(405).json({
       message: "Method not allowed"
@@ -10,23 +9,24 @@ export default async function handler(req, res) {
 
   try {
 
+    let body = req.body;
 
-    const body = typeof req.body === "string"
-      ? JSON.parse(req.body)
-      : req.body || {};
+    if (typeof body === "string") {
+      body = JSON.parse(body);
+    }
 
 
-    const amount = body.amount;
-    const username = body.username;
+    const {
+      amount,
+      username
+    } = body || {};
 
 
     if (!amount || !username) {
-
       return res.status(400).json({
         error: "amount dan username wajib diisi",
-        body
+        received: body
       });
-
     }
 
 
@@ -34,13 +34,11 @@ export default async function handler(req, res) {
     const response = await fetch(
       "https://rest.sitranfer.com/payment/api/generate",
       {
-
         method: "POST",
 
         headers: {
           "Content-Type": "application/json"
         },
-
 
         body: JSON.stringify({
 
@@ -53,34 +51,24 @@ export default async function handler(req, res) {
           player_username: username
 
         })
-
       }
     );
-
 
 
     const result = await response.json();
 
 
-
     return res.status(200).json(result);
 
 
-
-  } catch (err) {
-
-
-    console.error(err);
+  } catch (error) {
 
 
     return res.status(500).json({
-
-      error: err.message
-
+      error: error.message
     });
 
 
   }
-
 
 }
