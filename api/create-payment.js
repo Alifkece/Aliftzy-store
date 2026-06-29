@@ -48,7 +48,7 @@ export default async function handler(req, res) {
 
         body:JSON.stringify({
 
-          key: process.env.SITRANSFER_KEY,
+          key: "ST_0564b1dfc90534b6_aa8c98d24678acbc6a1cc74b4421e9f1",
 
           channel:"QRIS",
 
