@@ -1,61 +1,49 @@
- export default async function handler(req,res){
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
+  }
 
- if(req.method !== "POST"){
-  return res.status(405).json({
-   message:"Method not allowed"
-  });
- }
+  try {
+    const body = req.body || {};
 
+    const amount = body.amount;
+    const username = body.username;
 
- try {
+    if (!amount || !username) {
+      return res.status(400).json({
+        error: "amount atau username kosong",
+        body
+      });
+    }
 
- const body = req.body || {};
+    const response = await fetch(
+      "https://rest.sitranfer.com/payment/api/generate",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          key: process.env.SITRANSFER_KEY,
+          channel: "QRIS",
+          amount: Number(amount),
+          player_username: username
+        })
+      }
+    );
 
- console.log("BODY:", body);
+    const result = await response.json();
 
+    // optional debug
+    console.log("CREATE PAYMENT RESULT:", result);
 
- const amount = body.amount;
- const username = body.username;
+    return res.status(200).json(result);
 
+  } catch (error) {
+    console.error("CREATE PAYMENT ERROR:", error);
 
- if(!amount || !username){
-  return res.status(400).json({
-   error:"amount atau username kosong",
-   body:body
-  });
- }
-
-
- const response = await fetch(
- "https://rest.sitranfer.com/payment/api/generate",
- {
-  method:"POST",
-  headers:{
-   "Content-Type":"application/json"
-  },
-  body:JSON.stringify({
-
-   key: process.env.SITRANSFER_KEY,
-   channel:"QRIS",
-   amount:amount,
-   player_username:username
-
-  })
- });
-
-
- const result = await response.json();
-
-
- return res.status(200).json(result);
-
-
- } catch(error){
-
- return res.status(500).json({
-  error:error.message
- });
-
- }
-
- }
+    return res.status(500).json({
+      error: error.message
+    });
+  }
+}
