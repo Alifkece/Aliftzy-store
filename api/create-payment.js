@@ -35,7 +35,11 @@ if (!amount || !username) {
   });  
 }  
 
-
+console.log(
+  "KEY ADA:",
+  process.env.SITRANSFER_KEY ? "YES" : "NO"
+);
+  
 const response = await fetch(  
   "https://rest.sitranfer.com/payment/api/generate",  
   {  
