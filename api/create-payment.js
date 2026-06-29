@@ -1,50 +1,55 @@
  export default async function handler(req,res){
 
-  if(req.method !== "POST"){
-    return res.status(405).json({
-      message:"Method not allowed"
-    });
-  }
-
-  try {
-
-    const {amount, username} = req.body;
+ if(req.method !== "POST"){
+  return res.status(405).json({
+   message:"Method not allowed"
+  });
+ }
 
 
-    const response = await fetch(
-      "https://rest.sitranfer.com/payment/api/generate",
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
+ try {
 
-          key: process.env.SITRANSFER_KEY,
-
-          channel:"QRIS",
-
-          amount: amount,
-
-          player_username: username
-
-        })
-      }
-    );
+ const body = typeof req.body === "string"
+ ? JSON.parse(req.body)
+ : req.body;
 
 
-    const result = await response.json();
+ const {amount, username} = body;
 
 
-    return res.status(200).json(result);
+ const response = await fetch(
+ "https://rest.sitranfer.com/payment/api/generate",
+ {
+  method:"POST",
+  headers:{
+   "Content-Type":"application/json"
+  },
+  body:JSON.stringify({
+
+   key: process.env.SITRANSFER_KEY,
+
+   channel:"QRIS",
+
+   amount:amount,
+
+   player_username:username
+
+  })
+ });
 
 
-  } catch(error){
+ const result = await response.json();
 
-    return res.status(500).json({
-      error: error.message
-    });
 
-  }
+ return res.status(200).json(result);
 
-}
+
+ } catch(error){
+
+ return res.status(500).json({
+  error:error.message
+ });
+
+ }
+
+ }
