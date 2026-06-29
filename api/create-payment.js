@@ -1,80 +1,60 @@
 export default async function handler(req, res) {
 
-if (req.method !== "POST") {
-return res.status(405).json({
-message: "Method not allowed"
-});
-}
+  if (req.method !== "POST") {
+    return res.status(405).json({
+      message: "Method not allowed"
+    });
+  }
 
-try {
+  try {
 
-let raw = "";  
+    let body = req.body;
 
-await new Promise((resolve) => {  
+    if (typeof body === "string") {
+      body = JSON.parse(body);
+    }
 
-  req.on("data", chunk => {  
-    raw += chunk;  
-  });  
+    console.log("BODY MASUK:", body);
 
-  req.on("end", resolve);  
-
-});  
-
-
-const body = JSON.parse(raw);  
+    const amount = body?.amount;
+    const username = body?.username;
 
 
-const amount = body.amount;  
-const username = body.username;  
+    if (!amount || !username) {
+      return res.status(400).json({
+        error: "amount dan username wajib diisi",
+        body
+      });
+    }
 
 
-if (!amount || !username) {  
-  return res.status(400).json({  
-    error:"amount dan username wajib diisi",  
-    raw  
-  });  
-}  
-
-console.log(
-  "KEY ADA:",
-  process.env.SITRANSFER_KEY ? "YES" : "NO"
-);
-  
-const response = await fetch(  
-  "https://rest.sitranfer.com/payment/api/generate",  
-  {  
-    method:"POST",  
-
-    headers:{  
-      "Content-Type":"application/json"  
-    },  
-
-    body:JSON.stringify({  
-
-    key: process.env.SITRANSFER_KEY,  
-
-      channel:"QRIS",  
-
-      amount:Number(amount),  
-
-      player_username:username  
-
-    })  
-  }  
-);  
+    const response = await fetch(
+      "https://rest.sitranfer.com/payment/api/generate",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          key: process.env.SITRANSFER_KEY,
+          channel: "QRIS",
+          amount: Number(amount),
+          player_username: username
+        })
+      }
+    );
 
 
-const result = await response.json();  
+    const result = await response.json();
+
+    return res.status(200).json(result);
 
 
-return res.status(200).json(result);
+  } catch(err) {
 
-} catch(err) {
+    return res.status(500).json({
+      error: err.message
+    });
 
-return res.status(500).json({  
-  error:err.message  
-});
-
-}
-
+  }
 }
