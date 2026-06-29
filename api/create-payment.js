@@ -6,33 +6,18 @@ export default async function handler(req, res) {
     });
   }
 
-
   try {
 
-    let raw = "";
-
-    await new Promise((resolve) => {
-
-      req.on("data", chunk => {
-        raw += chunk;
-      });
-
-      req.on("end", resolve);
-
-    });
-
-
-    const body = JSON.parse(raw);
-
-
-    const amount = body.amount;
-    const username = body.username;
+    const {
+      amount,
+      username
+    } = req.body || {};
 
 
     if (!amount || !username) {
       return res.status(400).json({
-        error:"amount dan username wajib diisi",
-        raw
+        error: "amount dan username wajib diisi",
+        body: req.body
       });
     }
 
@@ -40,22 +25,17 @@ export default async function handler(req, res) {
     const response = await fetch(
       "https://rest.sitranfer.com/payment/api/generate",
       {
-        method:"POST",
+        method: "POST",
 
-        headers:{
-          "Content-Type":"application/json"
+        headers: {
+          "Content-Type": "application/json"
         },
 
-        body:JSON.stringify({
-
-        key: process.env.SITRANSFER_KEY,
-
-          channel:"QRIS",
-
-          amount:Number(amount),
-
-          player_username:username
-
+        body: JSON.stringify({
+          key: process.env.SITRANSFER_KEY,
+          channel: "QRIS",
+          amount: Number(amount),
+          player_username: username
         })
       }
     );
@@ -63,17 +43,14 @@ export default async function handler(req, res) {
 
     const result = await response.json();
 
-
     return res.status(200).json(result);
 
 
-  } catch(err) {
-
+  } catch (err) {
 
     return res.status(500).json({
-      error:err.message
+      error: err.message
     });
-
 
   }
 
