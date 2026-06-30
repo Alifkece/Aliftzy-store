@@ -11,11 +11,13 @@ export default async function handler(req, res) {
     let raw = "";
 
     await new Promise((resolve) => {
+
       req.on("data", chunk => {
         raw += chunk;
       });
 
       req.on("end", resolve);
+
     });
 
 
@@ -27,7 +29,7 @@ export default async function handler(req, res) {
 
     if (!amount || !username) {
       return res.status(400).json({
-        error:"amount dan username wajib diisi"
+        error: "amount dan username wajib diisi"
       });
     }
 
@@ -35,19 +37,19 @@ export default async function handler(req, res) {
     const response = await fetch(
       "https://rest.sitranfer.com/payment/api/generate",
       {
-        method:"POST",
+        method: "POST",
 
-        headers:{
-          "Content-Type":"application/json"
+        headers: {
+          "Content-Type": "application/json"
         },
 
-        body:JSON.stringify({
+        body: JSON.stringify({
 
-          channel:"QRIS",
+          channel: "QRIS",
 
-          amount:Number(amount),
+          amount: Number(amount),
 
-          player_username:username,
+          player_username: username,
 
           key: process.env.SITRANSFER_KEY
 
@@ -58,13 +60,14 @@ export default async function handler(req, res) {
 
     const result = await response.json();
 
+
     return res.status(200).json(result);
 
 
-  } catch(err){
+  } catch (err) {
 
     return res.status(500).json({
-      error:err.message
+      error: err.message
     });
 
   }
