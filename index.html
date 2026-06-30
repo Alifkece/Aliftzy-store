@@ -2426,6 +2426,11 @@
     </div>
 
     <div class="form-field">
+      <label>Paket / Varian (opsional — satu baris per paket, format: Nama:Harga)</label>
+      <textarea id="product-packages" placeholder="Individual Plan:8000&#10;Family Plan:12000"></textarea>
+    </div>
+
+    <div class="form-field">
       <label>Link Order (WhatsApp / Telegram)</label>
       <input type="text" id="product-link" placeholder="https://wa.me/6285122108079">
     </div>
@@ -2465,6 +2470,7 @@
     <div id="modal-order-body" style="font-size:13.5px;color:var(--text2);line-height:1.7;margin-bottom:20px;"></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('modal-order')">Tutup</button>
+      <button class="btn btn-danger" id="btn-order-cancel" style="display:none;" onclick="closeModal('modal-order')">Batalkan Pembelian</button>
       <button class="btn btn-primary" id="btn-order-go" onclick="goOrder()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         Hubungi Sekarang
@@ -2569,6 +2575,10 @@ let storeProfile = { avatarUrl: "" };
 let pendingImgDataUrl = "";
 let pendingProductImgDataUrl = "";
 let currentOrderLink = "";
+let currentOrderPayment = null; // { amount, username } - untuk QRIS Railway
+let currentOrderProduct = null;
+let currentOrderPackages = [];
+let currentSelectedPackageIndex = 0;
 let currentTrackIdx = 0;
 let audioPlayer = null;
 let isPlaying = false;
@@ -2974,21 +2984,72 @@ function orderProduct(id) {
   const p = products.find(x => x.id === id);
   if (!p) return;
   if (!currentUser) { showNotif('Silakan masuk terlebih dahulu', 'error'); showPage('auth', 'login'); return; }
+
   document.getElementById('modal-order-title').textContent = p.name;
-  document.getElementById('modal-order-body').innerHTML = `
-    <div style="margin-bottom:10px;">Anda akan memesan:</div>
-    <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;margin-bottom:14px;">
-      <div style="font-size:15px;font-weight:600;color:var(--text);font-family:'Syne',sans-serif;">${p.name}</div>
-      <div style="font-size:12.5px;color:var(--text2);margin-top:3px;">${p.desc || ''}</div>
-      <div style="font-size:18px;font-weight:800;color:var(--accent);font-family:'Syne',sans-serif;margin-top:8px;">Rp${Number(p.price||0).toLocaleString('id-ID')}<span style="font-size:11px;font-weight:400;font-family:'DM Sans';color:var(--text2);margin-left:3px;">/bulan</span></div>
-    </div>
-    Klik tombol di bawah untuk menghubungi admin dan menyelesaikan pemesanan.
-  `;
+  currentOrderProduct = p;
+  // Jika produk punya banyak paket, pakai itu. Kalau tidak, fallback ke 1 paket dari harga utama (perilaku lama tetap jalan).
+  currentOrderPackages = (Array.isArray(p.packages) && p.packages.length > 0)
+    ? p.packages
+    : [{ name: p.name, price: Number(p.price || 0) }];
+  currentSelectedPackageIndex = 0;
   currentOrderLink = p.link || '#';
+
+  renderOrderModalBody();
   openModal('modal-order');
 }
 
+function renderOrderModalBody() {
+  const p = currentOrderProduct;
+  const pkgs = currentOrderPackages;
+  const selected = pkgs[currentSelectedPackageIndex];
+
+  currentOrderPayment = {
+    amount: Number(selected.price || 0),
+    username: (currentUser && (currentUser.displayName || currentUser.email)) || 'guest'
+  };
+
+  const pkgListHtml = pkgs.length > 1 ? `
+    <div style="margin-bottom:14px;">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">Pilih Paket:</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${pkgs.map((pkg, i) => `
+          <div onclick="selectPackage(${i})" style="cursor:pointer;border:1px solid ${i===currentSelectedPackageIndex?'var(--accent)':'var(--border)'};background:${i===currentSelectedPackageIndex?'rgba(79,140,255,0.08)':'var(--surface2)'};border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:13px;color:var(--text);font-weight:${i===currentSelectedPackageIndex?'700':'500'};">${escHtml(pkg.name)}</span>
+            <span style="font-size:13px;color:var(--accent);font-weight:700;">Rp${Number(pkg.price||0).toLocaleString('id-ID')}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  document.getElementById('modal-order-body').innerHTML = `
+    <div style="margin-bottom:10px;">Anda akan memesan:</div>
+    <div style="background:var(--surface2);border-radius:10px;padding:12px 14px;margin-bottom:14px;">
+      <div style="font-size:15px;font-weight:600;color:var(--text);font-family:'Syne',sans-serif;">${escHtml(p.name)}</div>
+      <div style="font-size:12.5px;color:var(--text2);margin-top:3px;">${escHtml(p.desc || '')}</div>
+      <div style="font-size:18px;font-weight:800;color:var(--accent);font-family:'Syne',sans-serif;margin-top:8px;">Rp${Number(selected.price||0).toLocaleString('id-ID')}<span style="font-size:11px;font-weight:400;font-family:'DM Sans';color:var(--text2);margin-left:3px;">/bulan</span></div>
+    </div>
+    ${pkgListHtml}
+    <div id="order-qris-wrap"></div>
+    Klik tombol di bawah untuk membayar via QRIS.
+  `;
+
+  const btn = document.getElementById('btn-order-go');
+  btn.style.display = '';
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Bayar Sekarang';
+  document.getElementById('btn-order-cancel').style.display = 'none';
+}
+
+function selectPackage(i) {
+  currentSelectedPackageIndex = i;
+  renderOrderModalBody();
+}
+
 function orderMembership(type) {
+  currentOrderPayment = null;
+  currentOrderProduct = null;
+  currentOrderPackages = [];
   if (!currentUser) { showNotif('Silakan masuk terlebih dahulu', 'error'); showPage('auth', 'login'); return; }
   const data = {
     reseller: { title:'Daftar Reseller', price:'Rp10.000', desc:'Paket Reseller ALIFTZY STORE — dapatkan stok app premium, bahan jualan, dan dukungan penuh.', link:'https://wa.me/6285122108079' },
@@ -3002,11 +3063,79 @@ function orderMembership(type) {
     ${data.desc}<br><br>Klik tombol untuk menghubungi admin.
   `;
   currentOrderLink = data.link;
+  const btn = document.getElementById('btn-order-go');
+  btn.style.display = '';
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Hubungi Sekarang';
+  document.getElementById('btn-order-cancel').style.display = 'none';
   openModal('modal-order');
 }
 
 function goOrder() {
+  // Jika ini order produk (punya data pembayaran), generate QRIS via backend Railway
+  if (currentOrderPayment && currentOrderPayment.amount > 0) {
+    generateQrisPayment();
+    return;
+  }
+  // Selain itu (membership dll), perilaku lama: buka link WhatsApp
   if (currentOrderLink && currentOrderLink !== '#') window.open(currentOrderLink, '_blank');
+}
+
+async function generateQrisPayment() {
+  const btn = document.getElementById('btn-order-go');
+  const cancelBtn = document.getElementById('btn-order-cancel');
+  const wrap = document.getElementById('order-qris-wrap');
+  const originalBtnHtml = btn.innerHTML;
+  const paymentToSend = currentOrderPayment;
+  btn.disabled = true;
+  btn.innerHTML = 'Memproses...';
+
+  try {
+    const res = await fetch('https://aliftzy-backend-production.up.railway.app/create-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: paymentToSend.amount,
+        username: paymentToSend.username
+      })
+    });
+
+    const result = await res.json();
+
+    // Backend Railway membungkus hasil SiTransfer di { success, data: { qris_image, transaction_id, amount } }
+    if (!res.ok || result.success === false || result.error) {
+      showNotif(result.error || 'Gagal membuat pembayaran QRIS', 'error');
+      btn.disabled = false;
+      btn.innerHTML = originalBtnHtml;
+      return;
+    }
+
+    const data = result.data || result; // jaga-jaga kalau suatu saat backend kirim tanpa wrapper "data"
+
+    if (!data.qris_image) {
+      showNotif('Respons backend tidak berisi data QRIS', 'error');
+      btn.disabled = false;
+      btn.innerHTML = originalBtnHtml;
+      return;
+    }
+
+    wrap.innerHTML = `
+      <div style="margin-top:6px;margin-bottom:14px;background:var(--surface2);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-size:13px;color:var(--text2);margin-bottom:10px;">Scan QRIS untuk membayar</div>
+        <img src="${data.qris_image}" alt="QRIS" style="max-width:220px;width:100%;border-radius:8px;background:#fff;padding:8px;" onerror="this.alt='Gagal memuat gambar QRIS';this.style.border='1px solid var(--danger)';">
+        <div style="font-size:18px;font-weight:800;color:var(--accent);font-family:'Syne',sans-serif;margin-top:10px;">Rp${Number(data.amount || paymentToSend.amount).toLocaleString('id-ID')}</div>
+        <div style="font-size:11.5px;color:var(--text2);margin-top:6px;">ID Transaksi: ${data.transaction_id || '-'}</div>
+      </div>
+    `;
+
+    btn.style.display = 'none';
+    cancelBtn.style.display = '';
+    currentOrderPayment = null; // cegah generate ulang ganda selagi QR masih tampil
+  } catch (err) {
+    showNotif('Gagal terhubung ke server pembayaran', 'error');
+    btn.disabled = false;
+    btn.innerHTML = originalBtnHtml;
+  }
 }
 
 // ===== ADMIN PRODUCTS =====
@@ -3047,6 +3176,7 @@ function openAddProduct() {
   document.getElementById('product-name').value = '';
   document.getElementById('product-desc').value = '';
   document.getElementById('product-price').value = '';
+  document.getElementById('product-packages').value = '';
   document.getElementById('product-badge').value = '';
   document.getElementById('product-link').value = '';
   document.getElementById('product-img-file').value = '';
@@ -3064,6 +3194,9 @@ function editProduct(id) {
   document.getElementById('product-name').value = p.name || '';
   document.getElementById('product-desc').value = p.desc || '';
   document.getElementById('product-price').value = p.price || '';
+  document.getElementById('product-packages').value = (Array.isArray(p.packages) && p.packages.length > 0)
+    ? p.packages.map(pkg => `${pkg.name}:${pkg.price}`).join('\n')
+    : '';
   document.getElementById('product-badge').value = p.badge || '';
   document.getElementById('product-link').value = p.link || '';
   document.getElementById('product-cat').value = p.category || 'lainnya';
@@ -3082,6 +3215,16 @@ async function saveProduct() {
   const name = document.getElementById('product-name').value.trim();
   const desc = document.getElementById('product-desc').value.trim();
   const price = Number(document.getElementById('product-price').value);
+  const packagesRaw = document.getElementById('product-packages').value.trim();
+  const packages = packagesRaw
+    ? packagesRaw.split('\n').map(line => line.trim()).filter(Boolean).map(line => {
+        const idx = line.lastIndexOf(':');
+        if (idx === -1) return null;
+        const name = line.slice(0, idx).trim();
+        const pkgPrice = Number(line.slice(idx + 1).trim());
+        return name && !isNaN(pkgPrice) ? { name, price: pkgPrice } : null;
+      }).filter(Boolean)
+    : [];
   const badge = document.getElementById('product-badge').value.trim();
   const link = document.getElementById('product-link').value.trim();
   const category = document.getElementById('product-cat').value;
@@ -3095,7 +3238,7 @@ async function saveProduct() {
       : (id ? (products.find(x => x.id === id)?.img || '') : '');
   const btn = document.getElementById('btn-save-product');
   btn.innerHTML = '<div class="spinner"></div>'; btn.disabled = true;
-  const data = { name, desc, price, badge, link, category, img: imgFinal };
+  const data = { name, desc, price, badge, link, category, img: imgFinal, packages };
   try {
     if (id) {
       await updateDoc(doc(db, "products", id), data);
@@ -3424,7 +3567,28 @@ document.addEventListener('click', e => {
 
 // ===== MODAL =====
 function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  if (id === 'modal-order') resetOrderModalState();
+}
+
+function resetOrderModalState() {
+  currentOrderPayment = null;
+  currentOrderProduct = null;
+  currentOrderPackages = [];
+  currentSelectedPackageIndex = 0;
+  currentOrderLink = '';
+  const wrap = document.getElementById('order-qris-wrap');
+  if (wrap) wrap.innerHTML = '';
+  const btn = document.getElementById('btn-order-go');
+  if (btn) {
+    btn.style.display = '';
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Hubungi Sekarang';
+  }
+  const cancelBtn = document.getElementById('btn-order-cancel');
+  if (cancelBtn) cancelBtn.style.display = 'none';
+}
 
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
   overlay.addEventListener('click', e => {
