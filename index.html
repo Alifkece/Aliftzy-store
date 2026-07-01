@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ALIFTZY STORE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="bg-particles" id="bg-particles"></div>
+
+<div class="notif" id="notif"><span id="notif-text"></span></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a class="nav-logo" href="#" onclick="isAdmin ? showPage('admin') : showPage('home')">ALIFTZY STORE</a>
+  <ul class="nav-links">
+    <li><a href="#products">Produk</a></li>
+    <li><a href="#reseller">Reseller</a></li>
+  </ul>
+  <div class="nav-spacer"></div>
+  <div class="nav-auth" id="nav-auth" style="display:none;"></div>
+  <div class="nav-bell hidden" id="nav-bell" onclick="openAnnPopup()" title="Pemberitahuan">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <div class="nav-bell-dot" id="nav-bell-dot"></div>
+  </div>
+  <div class="nav-user hidden" id="nav-user">
+    <div class="avatar-sm" id="nav-avatar" onclick="toggleUserMenu()">A</div>
+    <div id="user-menu" style="position:relative; display:none;">
+      <div style="position:absolute;top:38px;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:150px;z-index:200;">
+        <button class="sidebar-item" id="admin-menu-btn" style="display:none" onclick="showPage('admin')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Admin Panel
+        </button>
+        <button class="sidebar-item" onclick="handleLogout()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Keluar
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- ===== HOME PAGE ===== -->
+<div id="page-home">
+
+  <!-- HOME DASHBOARD NAV TABS -->
+  <div class="home-dashboard-nav" id="home-dashboard-nav">
+    <div class="home-nav-tabs">
+      <button class="home-nav-tab active" id="hntab-0" onclick="switchHomeTab(0)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        Produk
+      </button>
+      <button class="home-nav-tab" id="hntab-1" onclick="switchHomeTab(1)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        Pesanan Saya
+      </button>
+      <button class="home-nav-tab" id="hntab-2" onclick="switchHomeTab(2)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Reseller
+      </button>
+      <button class="home-nav-tab" id="hntab-3" onclick="switchHomeTab(3)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </button>
+    </div>
+  </div>
+
+  <!-- HOME SECTIONS SLIDER WRAPPER -->
+  <div class="home-sections-wrap" id="home-sections-wrap">
+  <div class="home-sections-slider" id="home-sections-slider">
+
+  <!-- PANEL 0: STORE (produk + hero) -->
+  <div class="home-section-panel" id="home-panel-0">
+
+  <!-- HERO BANNER -->
+  <div class="hero-banner">
+    <div class="banner-ratio" id="banner-bg">
+      <div class="banner-grid"></div>
+      <div class="banner-glow-left"></div>
+      <div class="banner-glow-right"></div>
+      <div class="banner-content">
+        <div class="banner-inner">
+          
+          <div class="store-avatar" id="-wrap" onclick="openModal('modal-avatar-admin')">
+            
+            <video autoplay loop muted playsinline style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1;">
+              <source src="https://smail.my.id/cloud/mOXyBUbl1" type="video/mp4">
+            </video>
+
+            <div class="avatar-placeholder" id="avatar-placeholder" style="display:none; z-index:0;">
+              <svg width="40%" height="40%" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.5">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <img id="avatar-img" src="" alt="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;">
+            <div class="store-avatar-upload" id="avatar-upload-overlay" style="display:none; z-index:2;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Ganti Foto</span>
+            </div>
+          </div>
+          <input type="file" id="avatar-file-input" accept="image/*" style="display:none">
+
+
+          <div class="store-info reveal-left">
+            <div class="store-name">WELCOME MY STORE</div>
+            <div class="store-tagline">Premium App Subscription — Terpercaya dan Bergaransi</div>
+            <div class="store-badges">
+              <span class="badge badge-blue">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Bergaransi
+              </span>
+              <span class="badge badge-purple">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Terpercaya
+              </span>
+              <span class="badge badge-gold">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Open Reseller
+              </span>
+            </div>
+            <div class="social-btns">
+              <!-- GANTI LINK WA DAN IG DI SINI -->
+              <a class="social-btn social-btn-wa" href="https://whatsapp.com/channel/0029VbAbqrkBvvseV1Cpk73p" target="_blank" rel="noopener">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.555 4.122 1.524 5.855L0 24l6.335-1.508A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.891 0-3.659-.498-5.191-1.371l-.372-.22-3.861.919.976-3.768-.242-.388A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+                Saluran WA
+              </a>
+              <a class="social-btn social-btn-ig" href="https://instagram.com/stwrbry20" target="_blank" rel="noopener">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                Instagram
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MUSIC PLAYER -->
+  <div class="music-section">
+    <div class="music-label">MUSIK</div>
+
+    <!-- EQUALIZER — animasi dikontrol JS via class "playing" -->
+    <div class="equalizer" id="equalizer">
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+    </div>
+
+    <div class="music-track-info">
+      <div class="music-title" id="music-title">Pilih lagu</div>
+      <div class="music-artist" id="music-artist">—</div>
+    </div>
+
+    <div class="music-controls">
+      <button class="music-btn" onclick="prevTrack()" title="Sebelumnya">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/></svg>
+      </button>
+      <button class="music-btn music-btn-play" id="play-btn" onclick="togglePlay()">
+        <svg id="play-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <svg id="pause-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      </button>
+      <button class="music-btn" onclick="nextTrack()" title="Berikutnya">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>
+      </button>
+    </div>
+
+    <div class="music-progress-wrap">
+      <div class="progress-bar-wrap" onclick="seekAudio(event)" id="progress-wrap">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-times">
+        <span id="time-current">0:00</span>
+        <span id="time-total">0:00</span>
+      </div>
+    </div>
+
+    <div class="volume-wrap">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      </svg>
+      <input type="range" class="volume-slider" id="volume-slider" min="0" max="1" step="0.01" value="0.7" oninput="setVolume(this.value)">
+    </div>
+
+    <div class="music-track-select">
+      <button class="track-select-btn" onclick="toggleTrackMenu(event)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Lagu
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+      </button>
+      <div class="track-dropdown" id="track-dropdown"></div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- PRODUCTS -->
+  <section class="section" id="products">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-title reveal">Produk Premium</div>
+          <div class="section-subtitle">Berlangganan aplikasi favorit dengan harga terjangkau</div>
+        </div>
+      </div>
+
+      <div class="cat-tabs" id="cat-tabs">
+        <button class="cat-tab active" data-cat="all" onclick="filterProducts('all', this)">Semua</button>
+        <button class="cat-tab" data-cat="streaming" onclick="filterProducts('streaming', this)">Streaming</button>
+        <button class="cat-tab" data-cat="musik" onclick="filterProducts('musik', this)">Musik</button>
+        <button class="cat-tab" data-cat="produktivitas" onclick="filterProducts('produktivitas', this)">Produktivitas</button>
+        <button class="cat-tab" data-cat="kreatif" onclick="filterProducts('kreatif', this)">Kreatif</button>
+        <button class="cat-tab" data-cat="edukasi" onclick="filterProducts('edukasi', this)">Edukasi</button>
+        <button class="cat-tab" data-cat="lainnya" onclick="filterProducts('lainnya', this)">Lainnya</button>
+      </div>
+
+      <div class="product-grid" id="product-grid"></div>
+    </div>
+  </section>
+
+  </div><!-- end home-panel-0 -->
+
+  <!-- PANEL 1: PESANAN SAYA -->
+  <div class="home-section-panel" id="home-panel-1">
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <div class="section-title reveal">Pesanan Saya</div>
+            <div class="section-subtitle">Riwayat pesanan dan akun yang dikirim</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="loadMyOrders()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.08-4.36"/></svg>
+            Refresh
+          </button>
+        </div>
+        <div id="my-orders-list">
+          <div class="orders-empty">
+            <div class="orders-empty-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div>Belum ada pesanan</div>
+            <div style="font-size:12px;margin-top:6px;">Pesanan akan muncul setelah pembayaran dikonfirmasi</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div><!-- end home-panel-1 -->
+
+  <!-- PANEL 2: RESELLER (pindah dari section lama) -->
+  <div class="home-section-panel" id="home-panel-2">
+
+  <!-- RESELLER / OWNER -->
+  <section class="section" id="reseller" style="background: var(--bg2); border-top: 1px solid var(--border);">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Open Reseller dan Owner</div>
+          <div class="section-subtitle">Bergabung dan mulai penghasilan bersama ALIFTZY STORE</div>
+        </div>
+      </div>
+      <div class="membership-grid">
+
+        <div class="membership-card membership-card-reseller">
+          <div class="membership-glow-reseller"></div>
+          <div class="membership-icon membership-icon-reseller">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <div class="membership-tier membership-tier-reseller">Paket Reseller</div>
+          <div class="membership-title">Reseller</div>
+          <div class="membership-price membership-price-reseller">Rp10.000<small>/ sekali</small></div>
+          <ul class="membership-benefits">
+            <li><svg class="benefit-check" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Mendapatkan stok aplikasi premium seperti Canva dan Alight Motion</li>
+            <li><svg class="benefit-check" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Mendapatkan bahan lengkap untuk menjual aplikasi premium</li>
+            <li><svg class="benefit-check" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Diajari cara mendapatkan pembeli secara efektif</li>
+            <li><svg class="benefit-check" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Dipromosikan secara aktif selama 24/7</li>
+            <li><svg class="benefit-check" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Selalu dibantu jika ada kendala</li>
+          </ul>
+          <button class="btn btn-primary full-btn" onclick="orderMembership('reseller')">Daftar Reseller</button>
+        </div>
+
+        <div class="membership-card membership-card-owner">
+          <div class="membership-glow-owner"></div>
+          <div class="membership-icon membership-icon-owner">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.8">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+          <div class="membership-tier membership-tier-owner">Paket Owner</div>
+          <div class="membership-title">Owner</div>
+          <div class="membership-price membership-price-owner">Rp20.000<small>/ sekali</small></div>
+          <ul class="membership-benefits">
+            <li><svg class="benefit-check" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Bisa membuka paket reseller premium sendiri</li>
+            <li><svg class="benefit-check" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Mendapatkan semua bahan dan akses group reseller</li>
+            <li><svg class="benefit-check" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Masuk group reseller aplikasi premium di Telegram dengan role Presiden</li>
+            <li><svg class="benefit-check" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Mendapatkan akses semua group LPM</li>
+            <li><svg class="benefit-check" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Mendapatkan akses jaseb dan free admin GB reseller di WhatsApp dan Telegram</li>
+            <li><svg class="benefit-check" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Free partner pribadi Aliftzycrt</li>
+          </ul>
+          <button class="btn btn-gold full-btn" onclick="orderMembership('owner')">Daftar Owner</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  </div><!-- end home-panel-2 -->
+
+  <!-- PANEL 3: SETTINGS -->
+  <div class="home-section-panel" id="home-panel-3">
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <div class="section-title reveal">Settings</div>
+            <div class="section-subtitle">Pengaturan akun dan preferensi</div>
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-width:480px;">
+          <div id="settings-user-info" style="padding:20px 20px 16px;border-bottom:1px solid var(--border);">
+            <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;" id="settings-username">—</div>
+            <div style="font-size:12.5px;color:var(--text2);" id="settings-email">—</div>
+          </div>
+          <div style="padding:12px 8px;">
+            <button class="sidebar-item" style="width:100%;" onclick="switchHomeTab(1)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Pesanan Saya
+            </button>
+            <button class="sidebar-item" style="width:100%;" onclick="switchHomeTab(0)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              Lihat Produk
+            </button>
+            <button class="sidebar-item" id="settings-admin-btn" style="width:100%;display:none;" onclick="showPage('admin')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              Admin Panel
+            </button>
+            <button class="sidebar-item" style="width:100%;color:var(--danger);" onclick="handleLogout()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Keluar
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div><!-- end home-panel-3 -->
+
+  </div><!-- end home-sections-slider -->
+  </div><!-- end home-sections-wrap -->
+
+  <footer class="footer">
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;letter-spacing:0.08em;margin-bottom:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ALIFTZY STORE</div>
+    <div>Premium App Subscription — Terpercaya dan Bergaransi</div>
+    <div style="margin-top:4px;font-size:11px;">Semua hak dilindungi &copy; 2025 ALIFTZY STORE</div>
+  </footer>
+
+</div><!-- end page-home -->
+
+
+<!-- ===== AUTH PAGE ===== -->
+<div id="page-auth" style="min-height:100vh;align-items:center;justify-content:center;padding:80px 16px 40px;">
+  <div class="auth-card">
+    <div class="auth-logo">ALIFTZY STORE</div>
+    <div class="auth-subtitle">Akun diperlukan untuk melakukan pemesanan</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Masuk</button>
+      <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Daftar</button>
+    </div>
+
+    <div id="auth-login">
+      <div class="field-group">
+        <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="nama@email.com" autocomplete="email"></div>
+        <div class="field"><label>Kata Sandi</label><input type="password" id="login-password" placeholder="Masukkan kata sandi" autocomplete="current-password"></div>
+      </div>
+      <div class="auth-error" id="login-error"></div>
+      <button class="btn btn-primary full-btn" id="btn-login" onclick="handleLogin()">
+        <span id="login-btn-text">Masuk</span>
+      </button>
+    </div>
+
+    <div id="auth-register" style="display:none;">
+      <div class="field-group">
+        <div class="field"><label>Nama</label><input type="text" id="reg-name" placeholder="Nama lengkap" autocomplete="name"></div>
+        <div class="field"><label>Email</label><input type="email" id="reg-email" placeholder="nama@email.com" autocomplete="email"></div>
+        <div class="field"><label>Kata Sandi</label><input type="password" id="reg-password" placeholder="Minimal 6 karakter" autocomplete="new-password"></div>
+      </div>
+      <div class="auth-error" id="reg-error"></div>
+      <div class="auth-success" id="reg-success"></div>
+      <button class="btn btn-primary full-btn" id="btn-register" onclick="handleRegister()">
+        <span id="reg-btn-text">Buat Akun</span>
+      </button>
+    </div>
+
+    <div class="auth-back" id="auth-back-home" style="display:none;">
+      <a href="#" onclick="showPage('home')">Kembali ke Toko</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== ADMIN PAGE ===== -->
+<div id="page-admin" style="display:none;">
+  <div class="admin-layout">
+
+    <div class="admin-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Panel Admin</div>
+        <button class="sidebar-item active" id="sadm-dashboard" onclick="showAdminPanel('dashboard',this)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </button>
+        <button class="sidebar-item" id="sadm-products" onclick="showAdminPanel('products',this)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          Produk
+        </button>
+        <button class="sidebar-item" id="sadm-music" onclick="showAdminPanel('music',this)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          Musik
+        </button>
+        <button class="sidebar-item" id="sadm-profile" onclick="showAdminPanel('profile',this)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profil Toko
+        </button>
+        <button class="sidebar-item" id="sadm-announcements" onclick="showAdminPanel('announcements',this)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Notifikasi
+        </button>
+        <button class="sidebar-item" id="sadm-stock" onclick="showAdminPanel('stock',this)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+          Stock
+        </button>
+      </div>
+      <div class="sidebar-section" style="margin-top: auto;">
+        <button class="sidebar-item" onclick="showPage('home')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Lihat Toko
+        </button>
+        <button class="sidebar-item" onclick="handleLogout()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Keluar
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom Nav Mobile -->
+    <nav class="admin-bottom-nav" id="admin-bottom-nav">
+      <button id="bnav-dashboard" onclick="showAdminPanel('dashboard',this)" class="active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+      <button id="bnav-products" onclick="showAdminPanel('products',this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        Produk
+      </button>
+      <button id="bnav-music" onclick="showAdminPanel('music',this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        Musik
+      </button>
+      <button id="bnav-profile" onclick="showAdminPanel('profile',this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profil
+      </button>
+      <button id="bnav-announcements" onclick="showAdminPanel('announcements',this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Notif
+      </button>
+      <button id="bnav-stock" onclick="showAdminPanel('stock',this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+        Stock
+      </button>
+      <button onclick="showPage('home')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Toko
+      </button>
+    </nav>
+
+    <div class="admin-main">
+
+      <!-- DASHBOARD -->
+      <div class="admin-panel active" id="panel-dashboard">
+        <div class="admin-header">
+          <div class="admin-title">Dashboard</div>
+          <div class="admin-subtitle">Selamat datang di admin panel ALIFTZY STORE</div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Total Produk</div>
+            <div class="stat-value" id="stat-products">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Lagu</div>
+            <div class="stat-value" id="stat-songs">0</div>
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">Akses Cepat</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="showAdminPanel('products',document.getElementById('sadm-products'));openAddProduct()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Tambah Produk
+            </button>
+            <button class="btn btn-ghost" onclick="showAdminPanel('music',document.getElementById('sadm-music'))">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/></svg>
+              Kelola Musik
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRODUCTS PANEL -->
+      <div class="admin-panel" id="panel-products">
+        <div class="admin-header">
+          <div class="admin-title">Manajemen Produk</div>
+          <div class="admin-subtitle">Tambah, edit, dan hapus produk toko</div>
+        </div>
+        <div class="admin-table">
+          <div class="admin-table-header">
+            <div class="admin-table-title">Semua Produk</div>
+            <button class="btn btn-primary btn-sm" onclick="openAddProduct()">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Tambah
+            </button>
+          </div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Produk</th>
+                  <th>Kategori</th>
+                  <th>Harga</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="products-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MUSIC PANEL -->
+      <div class="admin-panel" id="panel-music">
+        <div class="admin-header">
+          <div class="admin-title">Manajemen Musik</div>
+          <div class="admin-subtitle">Kelola daftar lagu di pemutar musik toko</div>
+        </div>
+        <div class="admin-table">
+          <div class="admin-table-header">
+            <div class="admin-table-title">Daftar Lagu (maks. 50)</div>
+            <button class="btn btn-primary btn-sm" onclick="openAddSong()" id="btn-add-song">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Tambah Lagu
+            </button>
+          </div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead>
+                <tr><th>No</th><th>Judul</th><th>Artis</th><th>URL</th><th>Aksi</th></tr>
+              </thead>
+              <tbody id="songs-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE PANEL -->
+      <div class="admin-panel" id="panel-profile">
+        <div class="admin-header">
+          <div class="admin-title">Profil Toko</div>
+          <div class="admin-subtitle">Edit foto profil dan informasi toko</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:480px;">
+          <div class="form-field">
+            <label>Foto Profil Toko</label>
+            <div class="img-tabs">
+              <button class="img-tab active" id="ptab-upload" onclick="switchProfileImgTab('upload')">Upload File</button>
+              <button class="img-tab" id="ptab-url" onclick="switchProfileImgTab('url')">URL Gambar</button>
+            </div>
+            <div id="pimg-upload-wrap">
+              <div class="img-upload-area" onclick="document.getElementById('admin-avatar-file').click()">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5" style="margin-bottom:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <div style="font-size:13px;color:var(--text2);">Klik untuk upload gambar</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:3px;">JPG, PNG, WEBP</div>
+              </div>
+              <input type="file" id="admin-avatar-file" accept="image/*" style="display:none" onchange="previewAdminAvatar(event)">
+            </div>
+            <div id="pimg-url-wrap" style="display:none;">
+              <input type="text" id="admin-avatar-url" placeholder="https://..." style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-size:13px;outline:none;width:100%;" oninput="previewAdminAvatarUrl(this.value)">
+            </div>
+            <img id="admin-avatar-preview" class="img-preview" alt="Preview">
+          </div>
+          <button class="btn btn-primary" onclick="saveStoreProfile()">Simpan Profil</button>
+        </div>
+      </div>
+
+
+      <!-- ANNOUNCEMENTS PANEL -->
+      <div class="admin-panel" id="panel-announcements">
+        <div class="admin-header">
+          <div class="admin-title">Manajemen Notifikasi</div>
+          <div class="admin-subtitle">Tambah, edit, dan hapus notifikasi yang ditampilkan ke user</div>
+        </div>
+        <div class="admin-table">
+          <div class="admin-table-header">
+            <div class="admin-table-title">Daftar Notifikasi</div>
+            <button class="btn btn-primary btn-sm" onclick="openAddAnn()">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Tambah
+            </button>
+          </div>
+          <div style="padding:16px;">
+            <div class="ann-admin-list" id="ann-admin-list">
+              <div class="ann-empty">
+                <div class="ann-empty-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </div>
+                Belum ada notifikasi
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-top:16px;display:flex;gap:10px;align-items:flex-start;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div style="font-size:12.5px;color:var(--text2);line-height:1.6;">
+            Notifikasi aktif akan ditampilkan sebagai pop-up kepada user setiap kali login. User juga bisa melihatnya kembali lewat ikon 🔔 di navbar.
+          </div>
+        </div>
+      </div>
+
+      <!-- STOCK PANEL -->
+      <div class="admin-panel" id="panel-stock">
+        <div class="admin-header">
+          <div class="admin-title">Manajemen Stock</div>
+          <div class="admin-subtitle">Kelola akun digital yang dikirim otomatis setelah pembayaran</div>
+        </div>
+
+        <!-- Stats Stock -->
+        <div class="stats-row" style="margin-bottom:16px;">
+          <div class="stat-card">
+            <div class="stat-label">Total Stock</div>
+            <div class="stat-value" id="stat-stock-total">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Tersedia</div>
+            <div class="stat-value" id="stat-stock-available" style="color:var(--success);">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Terjual</div>
+            <div class="stat-value" id="stat-stock-sold" style="color:var(--danger);">0</div>
+          </div>
+        </div>
+
+        <div class="admin-table">
+          <div class="admin-table-header">
+            <div class="admin-table-title">Daftar Stock</div>
+            <button class="btn btn-primary btn-sm" onclick="openAddStock()">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Tambah Stock
+            </button>
+          </div>
+          <div style="padding:16px 16px 8px;">
+            <div class="stock-filter-tabs">
+              <button class="stock-filter-tab active" onclick="filterStock('all',this)">Semua</button>
+              <button class="stock-filter-tab" onclick="filterStock('available',this)">Tersedia</button>
+              <button class="stock-filter-tab" onclick="filterStock('sold',this)">Terjual</button>
+            </div>
+            <div id="stock-admin-list">
+              <div class="stock-empty">
+                <div class="stock-empty-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                </div>
+                Belum ada stock. Klik Tambah untuk menambahkan akun digital.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div><!-- end page-admin -->
+
+</div><!-- end main -->
+
+
+<!-- MODALS -->
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="modal-product">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-product')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="modal-title" id="modal-product-title">Tambah Produk</div>
+    <input type="hidden" id="product-id">
+
+    <div class="form-field">
+      <label>Foto Produk (Thumbnail)</label>
+      <div class="img-tabs">
+        <button class="img-tab active" id="ptab-prd-upload" onclick="switchProductImgTab('upload')">Upload File</button>
+        <button class="img-tab" id="ptab-prd-url" onclick="switchProductImgTab('url')">URL Gambar</button>
+      </div>
+      <div id="prd-upload-wrap">
+        <div class="img-upload-area" onclick="document.getElementById('product-img-file').click()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5" style="margin-bottom:5px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div style="font-size:12.5px;color:var(--text2);">Upload thumbnail produk</div>
+        </div>
+        <input type="file" id="product-img-file" accept="image/*" style="display:none" onchange="previewProductImg(event)">
+      </div>
+      <div id="prd-url-wrap" style="display:none;">
+        <input type="text" id="product-img-url" placeholder="https://..." style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;width:100%;" oninput="previewProductImgUrl(this.value)">
+      </div>
+      <img id="product-img-preview" class="img-preview" alt="Preview">
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label>Nama Produk</label>
+        <input type="text" id="product-name" placeholder="mis. Spotify Premium">
+      </div>
+      <div class="form-field">
+        <label>Kategori</label>
+        <select id="product-cat">
+          <option value="streaming">Streaming</option>
+          <option value="musik">Musik</option>
+          <option value="produktivitas">Produktivitas</option>
+          <option value="kreatif">Kreatif</option>
+          <option value="edukasi">Edukasi</option>
+          <option value="lainnya">Lainnya</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label>Deskripsi</label>
+      <textarea id="product-desc" placeholder="Deskripsi singkat produk..."></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-field">
+        <label>Harga (Rp)</label>
+        <input type="text" inputmode="numeric" id="product-price" placeholder="mis. 15000 (angka saja, tanpa titik)">
+      </div>
+      <div class="form-field">
+        <label>Label Badge (opsional)</label>
+        <input type="text" id="product-badge" placeholder="mis. PROMO">
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label>Paket / Varian (opsional — satu baris per paket, format: Nama:Harga)</label>
+      <textarea id="product-packages" placeholder="Individual Plan:8000&#10;Family Plan:12000"></textarea>
+    </div>
+
+    <div class="form-field">
+      <label>Link Order (WhatsApp / Telegram)</label>
+      <input type="text" id="product-link" placeholder="https://wa.me/6285122108079">
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-product')">Batal</button>
+      <button class="btn btn-primary" id="btn-save-product" onclick="saveProduct()">Simpan Produk</button>
+    </div>
+  </div>
+</div>
+
+<!-- SONG MODAL -->
+<div class="modal-overlay" id="modal-song">
+  <div class="modal" style="max-width:400px;">
+    <button class="modal-close" onclick="closeModal('modal-song')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="modal-title" id="modal-song-title">Tambah Lagu</div>
+    <input type="hidden" id="song-id">
+    <div class="form-field"><label>Judul Lagu</label><input type="text" id="song-title" placeholder="mis. Blinding Lights"></div>
+    <div class="form-field"><label>Artis</label><input type="text" id="song-artist" placeholder="mis. The Weeknd"></div>
+    <div class="form-field"><label>URL Audio (MP3 / langsung)</label><input type="text" id="song-url" placeholder="https://..."></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-song')">Batal</button>
+      <button class="btn btn-primary" onclick="saveSong()">Simpan Lagu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER MODAL -->
+<div class="modal-overlay" id="modal-order">
+  <div class="modal" style="max-width:400px;">
+    <button class="modal-close" onclick="closeModal('modal-order')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="modal-title" id="modal-order-title">Pesan Produk</div>
+    <div id="modal-order-body" style="font-size:13.5px;color:var(--text2);line-height:1.7;margin-bottom:20px;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-order')">Tutup</button>
+      <button class="btn btn-danger" id="btn-order-cancel" style="display:none;" onclick="closeModal('modal-order')">Batalkan Pembelian</button>
+      <button class="btn btn-primary" id="btn-order-go" onclick="goOrder()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Hubungi Sekarang
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- STOCK MODAL ADD/EDIT -->
+<div class="modal-overlay" id="modal-stock">
+  <div class="modal" style="max-width:480px;">
+    <button class="modal-close" onclick="closeModal('modal-stock')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="modal-title" id="modal-stock-title">Tambah Stock</div>
+    <input type="hidden" id="stock-id">
+    <div class="form-row">
+      <div class="form-field">
+        <label>Produk</label>
+        <select id="stock-product-id" onchange="onStockProductChange(this)">
+          <option value="">Pilih Produk</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Nama Produk</label>
+        <input type="text" id="stock-product-name" placeholder="Otomatis dari produk">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field">
+        <label>Email Akun</label>
+        <input type="text" id="stock-email" placeholder="akun@gmail.com">
+      </div>
+      <div class="form-field">
+        <label>Password</label>
+        <input type="text" id="stock-password" placeholder="password akun">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field">
+        <label>Login URL</label>
+        <input type="text" id="stock-login-url" placeholder="https://netflix.com">
+      </div>
+      <div class="form-field">
+        <label>Password URL (opsional)</label>
+        <input type="text" id="stock-password-url" placeholder="https://...">
+      </div>
+    </div>
+    <div class="form-field">
+      <label>Catatan</label>
+      <textarea id="stock-note" placeholder="mis. Jangan ubah password" style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;width:100%;resize:vertical;min-height:70px;-webkit-appearance:none;"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-stock')">Batal</button>
+      <button class="btn btn-primary" id="btn-save-stock" onclick="saveStock()">Simpan Stock</button>
+    </div>
+  </div>
+</div>
+
+<!-- STOCK DETAIL MODAL (Admin lihat detail lengkap) -->
+<div class="modal-overlay" id="modal-stock-detail">
+  <div class="modal" style="max-width:440px;">
+    <button class="modal-close" onclick="closeModal('modal-stock-detail')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="modal-title">Detail Stock</div>
+    <div id="modal-stock-detail-body" style="font-size:13px;"></div>
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-stock-detail')">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- Logic aplikasi dipisah ke js/ — lihat js/firebase-config.js dan js/app.js -->
+<script type="module" src="js/app.js"></script>
+
+
+<!-- ===== ANNOUNCEMENT POPUP ===== -->
+<div class="ann-overlay" id="ann-overlay">
+  <div class="ann-popup" id="ann-popup">
+    <div class="ann-popup-header">
+      <div class="ann-icon ann-icon-info" id="ann-main-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7ab0ff" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div class="ann-header-text">
+        <div class="ann-badge ann-badge-info" id="ann-main-badge">
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Pemberitahuan
+        </div>
+        <div class="ann-popup-title" id="ann-main-title">Selamat Datang!</div>
+        <div class="ann-popup-meta" id="ann-main-meta">ALIFTZY STORE</div>
+      </div>
+      <button class="ann-close-btn" onclick="closeAnnPopup()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="ann-divider"></div>
+    <div class="ann-list" id="ann-list"></div>
+    <div class="ann-popup-footer">
+      <button class="btn btn-primary full-btn" onclick="closeAnnPopup()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Mengerti
+      </button>
+      <div class="ann-footer-note">Klik bell di navbar untuk buka kembali</div>
+    </div>
+  </div>
+</div>
+
+<!-- ANNOUNCEMENT FORM MODAL (Admin) -->
+<div class="modal-overlay" id="modal-ann">
+  <div class="modal" style="max-width:440px;">
+    <button class="modal-close" onclick="closeModal('modal-ann')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="modal-title" id="modal-ann-title">Tambah Notifikasi</div>
+    <input type="hidden" id="ann-id">
+    <div class="form-field">
+      <label>Tipe Notifikasi</label>
+      <select class="ann-form-select" id="ann-type">
+        <option value="info">ℹ️ Info — Informasi umum</option>
+        <option value="warning">⚠️ Peringatan — Maintenance / gangguan</option>
+        <option value="success">✅ Sukses — Update / fitur baru</option>
+        <option value="danger">🚨 Penting — Notifikasi mendesak</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>Judul Notifikasi</label>
+      <input type="text" id="ann-title-input" placeholder="mis. Sistem sedang dalam perbaikan">
+    </div>
+    <div class="form-field">
+      <label>Pesan</label>
+      <textarea class="ann-form-textarea" id="ann-msg-input" placeholder="Tulis pesan notifikasi di sini..."></textarea>
+    </div>
+    <div class="form-field">
+      <div class="ann-toggle-wrap">
+        <span class="ann-toggle-label">Aktif (tampil ke user)</span>
+        <button class="ann-toggle on" id="ann-active-toggle" onclick="toggleAnnActive()"></button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-ann')">Batal</button>
+      <button class="btn btn-primary" onclick="saveAnn()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
+</body>
+</html>
