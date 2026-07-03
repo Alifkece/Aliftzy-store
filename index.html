@@ -18,7 +18,7 @@
 
 <!-- NAVBAR -->
 <nav class="navbar">
-  <a class="nav-logo" href="#" onclick="isAdmin ? showPage('admin') : showPage('home')">ALIFTZY STORE</a>
+  <a class="nav-logo" href="#" onclick="showPage('home')">ALIFTZY STORE</a>
   <ul class="nav-links">
     <li><a href="#products">Produk</a></li>
     <li><a href="#reseller">Reseller</a></li>
@@ -33,10 +33,6 @@
     <div class="avatar-sm" id="nav-avatar" onclick="toggleUserMenu()">A</div>
     <div id="user-menu" style="position:relative; display:none;">
       <div style="position:absolute;top:38px;right:0;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:150px;z-index:200;">
-        <button class="sidebar-item" id="admin-menu-btn" style="display:none" onclick="showPage('admin')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-          Admin Panel
-        </button>
         <button class="sidebar-item" onclick="handleLogout()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           Keluar
@@ -90,7 +86,7 @@
       <div class="banner-content">
         <div class="banner-inner">
           
-          <div class="store-avatar" id="-wrap" onclick="openModal('modal-avatar-admin')">
+          <div class="store-avatar" id="-wrap">
             
             <video autoplay loop muted playsinline style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1;">
               <source src="https://smail.my.id/cloud/mOXyBUbl1" type="video/mp4">
@@ -102,12 +98,7 @@
               </svg>
             </div>
             <img id="avatar-img" src="" alt="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;">
-            <div class="store-avatar-upload" id="avatar-upload-overlay" style="display:none; z-index:2;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              <span>Ganti Foto</span>
-            </div>
           </div>
-          <input type="file" id="avatar-file-input" accept="image/*" style="display:none">
 
 
           <div class="store-info reveal-left">
@@ -346,10 +337,6 @@
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
               Lihat Produk
             </button>
-            <button class="sidebar-item" id="settings-admin-btn" style="width:100%;display:none;" onclick="showPage('admin')">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-              Admin Panel
-            </button>
             <button class="sidebar-item" style="width:100%;color:var(--danger);" onclick="handleLogout()">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
               Keluar
@@ -413,391 +400,12 @@
 </div>
 
 
-<!-- ===== ADMIN PAGE ===== -->
-<div id="page-admin" style="display:none;">
-  <div class="admin-layout">
-
-    <div class="admin-sidebar">
-      <div class="sidebar-section">
-        <div class="sidebar-label">Panel Admin</div>
-        <button class="sidebar-item active" id="sadm-dashboard" onclick="showAdminPanel('dashboard',this)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          Dashboard
-        </button>
-        <button class="sidebar-item" id="sadm-products" onclick="showAdminPanel('products',this)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-          Produk
-        </button>
-        <button class="sidebar-item" id="sadm-music" onclick="showAdminPanel('music',this)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-          Musik
-        </button>
-        <button class="sidebar-item" id="sadm-profile" onclick="showAdminPanel('profile',this)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          Profil Toko
-        </button>
-        <button class="sidebar-item" id="sadm-announcements" onclick="showAdminPanel('announcements',this)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          Notifikasi
-        </button>
-        <button class="sidebar-item" id="sadm-stock" onclick="showAdminPanel('stock',this)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-          Stock
-        </button>
-      </div>
-      <div class="sidebar-section" style="margin-top: auto;">
-        <button class="sidebar-item" onclick="showPage('home')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-          Lihat Toko
-        </button>
-        <button class="sidebar-item" onclick="handleLogout()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Keluar
-        </button>
-      </div>
-    </div>
-
-    <!-- Bottom Nav Mobile -->
-    <nav class="admin-bottom-nav" id="admin-bottom-nav">
-      <button id="bnav-dashboard" onclick="showAdminPanel('dashboard',this)" class="active">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Dashboard
-      </button>
-      <button id="bnav-products" onclick="showAdminPanel('products',this)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        Produk
-      </button>
-      <button id="bnav-music" onclick="showAdminPanel('music',this)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        Musik
-      </button>
-      <button id="bnav-profile" onclick="showAdminPanel('profile',this)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Profil
-      </button>
-      <button id="bnav-announcements" onclick="showAdminPanel('announcements',this)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        Notif
-      </button>
-      <button id="bnav-stock" onclick="showAdminPanel('stock',this)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-        Stock
-      </button>
-      <button onclick="showPage('home')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Toko
-      </button>
-    </nav>
-
-    <div class="admin-main">
-
-      <!-- DASHBOARD -->
-      <div class="admin-panel active" id="panel-dashboard">
-        <div class="admin-header">
-          <div class="admin-title">Dashboard</div>
-          <div class="admin-subtitle">Selamat datang di admin panel ALIFTZY STORE</div>
-        </div>
-        <div class="stats-row">
-          <div class="stat-card">
-            <div class="stat-label">Total Produk</div>
-            <div class="stat-value" id="stat-products">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Total Lagu</div>
-            <div class="stat-value" id="stat-songs">0</div>
-          </div>
-        </div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
-          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">Akses Cepat</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn btn-primary" onclick="showAdminPanel('products',document.getElementById('sadm-products'));openAddProduct()">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Tambah Produk
-            </button>
-            <button class="btn btn-ghost" onclick="showAdminPanel('music',document.getElementById('sadm-music'))">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/></svg>
-              Kelola Musik
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- PRODUCTS PANEL -->
-      <div class="admin-panel" id="panel-products">
-        <div class="admin-header">
-          <div class="admin-title">Manajemen Produk</div>
-          <div class="admin-subtitle">Tambah, edit, dan hapus produk toko</div>
-        </div>
-        <div class="admin-table">
-          <div class="admin-table-header">
-            <div class="admin-table-title">Semua Produk</div>
-            <button class="btn btn-primary btn-sm" onclick="openAddProduct()">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Tambah
-            </button>
-          </div>
-          <div style="overflow-x:auto;">
-            <table>
-              <thead>
-                <tr>
-                  <th>Produk</th>
-                  <th>Kategori</th>
-                  <th>Harga</th>
-                  <th>Status</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="products-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- MUSIC PANEL -->
-      <div class="admin-panel" id="panel-music">
-        <div class="admin-header">
-          <div class="admin-title">Manajemen Musik</div>
-          <div class="admin-subtitle">Kelola daftar lagu di pemutar musik toko</div>
-        </div>
-        <div class="admin-table">
-          <div class="admin-table-header">
-            <div class="admin-table-title">Daftar Lagu (maks. 50)</div>
-            <button class="btn btn-primary btn-sm" onclick="openAddSong()" id="btn-add-song">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Tambah Lagu
-            </button>
-          </div>
-          <div style="overflow-x:auto;">
-            <table>
-              <thead>
-                <tr><th>No</th><th>Judul</th><th>Artis</th><th>URL</th><th>Aksi</th></tr>
-              </thead>
-              <tbody id="songs-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- PROFILE PANEL -->
-      <div class="admin-panel" id="panel-profile">
-        <div class="admin-header">
-          <div class="admin-title">Profil Toko</div>
-          <div class="admin-subtitle">Edit foto profil dan informasi toko</div>
-        </div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:480px;">
-          <div class="form-field">
-            <label>Foto Profil Toko</label>
-            <div class="img-tabs">
-              <button class="img-tab active" id="ptab-upload" onclick="switchProfileImgTab('upload')">Upload File</button>
-              <button class="img-tab" id="ptab-url" onclick="switchProfileImgTab('url')">URL Gambar</button>
-            </div>
-            <div id="pimg-upload-wrap">
-              <div class="img-upload-area" onclick="document.getElementById('admin-avatar-file').click()">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5" style="margin-bottom:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                <div style="font-size:13px;color:var(--text2);">Klik untuk upload gambar</div>
-                <div style="font-size:11px;color:var(--text3);margin-top:3px;">JPG, PNG, WEBP</div>
-              </div>
-              <input type="file" id="admin-avatar-file" accept="image/*" style="display:none" onchange="previewAdminAvatar(event)">
-            </div>
-            <div id="pimg-url-wrap" style="display:none;">
-              <input type="text" id="admin-avatar-url" placeholder="https://..." style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-size:13px;outline:none;width:100%;" oninput="previewAdminAvatarUrl(this.value)">
-            </div>
-            <img id="admin-avatar-preview" class="img-preview" alt="Preview">
-          </div>
-          <button class="btn btn-primary" onclick="saveStoreProfile()">Simpan Profil</button>
-        </div>
-      </div>
-
-
-      <!-- ANNOUNCEMENTS PANEL -->
-      <div class="admin-panel" id="panel-announcements">
-        <div class="admin-header">
-          <div class="admin-title">Manajemen Notifikasi</div>
-          <div class="admin-subtitle">Tambah, edit, dan hapus notifikasi yang ditampilkan ke user</div>
-        </div>
-        <div class="admin-table">
-          <div class="admin-table-header">
-            <div class="admin-table-title">Daftar Notifikasi</div>
-            <button class="btn btn-primary btn-sm" onclick="openAddAnn()">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Tambah
-            </button>
-          </div>
-          <div style="padding:16px;">
-            <div class="ann-admin-list" id="ann-admin-list">
-              <div class="ann-empty">
-                <div class="ann-empty-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                </div>
-                Belum ada notifikasi
-              </div>
-            </div>
-          </div>
-        </div>
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-top:16px;display:flex;gap:10px;align-items:flex-start;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <div style="font-size:12.5px;color:var(--text2);line-height:1.6;">
-            Notifikasi aktif akan ditampilkan sebagai pop-up kepada user setiap kali login. User juga bisa melihatnya kembali lewat ikon 🔔 di navbar.
-          </div>
-        </div>
-      </div>
-
-      <!-- STOCK PANEL -->
-      <div class="admin-panel" id="panel-stock">
-        <div class="admin-header">
-          <div class="admin-title">Manajemen Stock</div>
-          <div class="admin-subtitle">Kelola akun digital yang dikirim otomatis setelah pembayaran</div>
-        </div>
-
-        <!-- Stats Stock -->
-        <div class="stats-row" style="margin-bottom:16px;">
-          <div class="stat-card">
-            <div class="stat-label">Total Stock</div>
-            <div class="stat-value" id="stat-stock-total">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Tersedia</div>
-            <div class="stat-value" id="stat-stock-available" style="color:var(--success);">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Terjual</div>
-            <div class="stat-value" id="stat-stock-sold" style="color:var(--danger);">0</div>
-          </div>
-        </div>
-
-        <div class="admin-table">
-          <div class="admin-table-header">
-            <div class="admin-table-title">Daftar Stock</div>
-            <button class="btn btn-primary btn-sm" onclick="openAddStock()">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Tambah Stock
-            </button>
-          </div>
-          <div style="padding:16px 16px 8px;">
-            <div class="stock-filter-tabs">
-              <button class="stock-filter-tab active" onclick="filterStock('all',this)">Semua</button>
-              <button class="stock-filter-tab" onclick="filterStock('available',this)">Tersedia</button>
-              <button class="stock-filter-tab" onclick="filterStock('sold',this)">Terjual</button>
-            </div>
-            <div id="stock-admin-list">
-              <div class="stock-empty">
-                <div class="stock-empty-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-                </div>
-                Belum ada stock. Klik Tambah untuk menambahkan akun digital.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div><!-- end page-admin -->
 
 </div><!-- end main -->
 
 
 <!-- MODALS -->
 
-<!-- PRODUCT MODAL -->
-<div class="modal-overlay" id="modal-product">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-product')">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <div class="modal-title" id="modal-product-title">Tambah Produk</div>
-    <input type="hidden" id="product-id">
-
-    <div class="form-field">
-      <label>Foto Produk (Thumbnail)</label>
-      <div class="img-tabs">
-        <button class="img-tab active" id="ptab-prd-upload" onclick="switchProductImgTab('upload')">Upload File</button>
-        <button class="img-tab" id="ptab-prd-url" onclick="switchProductImgTab('url')">URL Gambar</button>
-      </div>
-      <div id="prd-upload-wrap">
-        <div class="img-upload-area" onclick="document.getElementById('product-img-file').click()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5" style="margin-bottom:5px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <div style="font-size:12.5px;color:var(--text2);">Upload thumbnail produk</div>
-        </div>
-        <input type="file" id="product-img-file" accept="image/*" style="display:none" onchange="previewProductImg(event)">
-      </div>
-      <div id="prd-url-wrap" style="display:none;">
-        <input type="text" id="product-img-url" placeholder="https://..." style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;width:100%;" oninput="previewProductImgUrl(this.value)">
-      </div>
-      <img id="product-img-preview" class="img-preview" alt="Preview">
-    </div>
-
-    <div class="form-row">
-      <div class="form-field">
-        <label>Nama Produk</label>
-        <input type="text" id="product-name" placeholder="mis. Spotify Premium">
-      </div>
-      <div class="form-field">
-        <label>Kategori</label>
-        <select id="product-cat">
-          <option value="streaming">Streaming</option>
-          <option value="musik">Musik</option>
-          <option value="produktivitas">Produktivitas</option>
-          <option value="kreatif">Kreatif</option>
-          <option value="edukasi">Edukasi</option>
-          <option value="lainnya">Lainnya</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="form-field">
-      <label>Deskripsi</label>
-      <textarea id="product-desc" placeholder="Deskripsi singkat produk..."></textarea>
-    </div>
-
-    <div class="form-row">
-      <div class="form-field">
-        <label>Harga (Rp)</label>
-        <input type="text" inputmode="numeric" id="product-price" placeholder="mis. 15000 (angka saja, tanpa titik)">
-      </div>
-      <div class="form-field">
-        <label>Label Badge (opsional)</label>
-        <input type="text" id="product-badge" placeholder="mis. PROMO">
-      </div>
-    </div>
-
-    <div class="form-field">
-      <label>Paket / Varian (opsional — satu baris per paket, format: Nama:Harga)</label>
-      <textarea id="product-packages" placeholder="Individual Plan:8000&#10;Family Plan:12000"></textarea>
-    </div>
-
-    <div class="form-field">
-      <label>Link Order (WhatsApp / Telegram)</label>
-      <input type="text" id="product-link" placeholder="https://wa.me/6285122108079">
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal('modal-product')">Batal</button>
-      <button class="btn btn-primary" id="btn-save-product" onclick="saveProduct()">Simpan Produk</button>
-    </div>
-  </div>
-</div>
-
-<!-- SONG MODAL -->
-<div class="modal-overlay" id="modal-song">
-  <div class="modal" style="max-width:400px;">
-    <button class="modal-close" onclick="closeModal('modal-song')">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <div class="modal-title" id="modal-song-title">Tambah Lagu</div>
-    <input type="hidden" id="song-id">
-    <div class="form-field"><label>Judul Lagu</label><input type="text" id="song-title" placeholder="mis. Blinding Lights"></div>
-    <div class="form-field"><label>Artis</label><input type="text" id="song-artist" placeholder="mis. The Weeknd"></div>
-    <div class="form-field"><label>URL Audio (MP3 / langsung)</label><input type="text" id="song-url" placeholder="https://..."></div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal('modal-song')">Batal</button>
-      <button class="btn btn-primary" onclick="saveSong()">Simpan Lagu</button>
-    </div>
-  </div>
-</div>
-
-<!-- ORDER MODAL -->
 <div class="modal-overlay" id="modal-order">
   <div class="modal" style="max-width:400px;">
     <button class="modal-close" onclick="closeModal('modal-order')">
@@ -816,71 +424,6 @@
   </div>
 </div>
 
-
-<!-- STOCK MODAL ADD/EDIT -->
-<div class="modal-overlay" id="modal-stock">
-  <div class="modal" style="max-width:480px;">
-    <button class="modal-close" onclick="closeModal('modal-stock')">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <div class="modal-title" id="modal-stock-title">Tambah Stock</div>
-    <input type="hidden" id="stock-id">
-    <div class="form-row">
-      <div class="form-field">
-        <label>Produk</label>
-        <select id="stock-product-id" onchange="onStockProductChange(this)">
-          <option value="">Pilih Produk</option>
-        </select>
-      </div>
-      <div class="form-field">
-        <label>Nama Produk</label>
-        <input type="text" id="stock-product-name" placeholder="Otomatis dari produk">
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-field">
-        <label>Email Akun</label>
-        <input type="text" id="stock-email" placeholder="akun@gmail.com">
-      </div>
-      <div class="form-field">
-        <label>Password</label>
-        <input type="text" id="stock-password" placeholder="password akun">
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-field">
-        <label>Login URL</label>
-        <input type="text" id="stock-login-url" placeholder="https://netflix.com">
-      </div>
-      <div class="form-field">
-        <label>Password URL (opsional)</label>
-        <input type="text" id="stock-password-url" placeholder="https://...">
-      </div>
-    </div>
-    <div class="form-field">
-      <label>Catatan</label>
-      <textarea id="stock-note" placeholder="mis. Jangan ubah password" style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;width:100%;resize:vertical;min-height:70px;-webkit-appearance:none;"></textarea>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal('modal-stock')">Batal</button>
-      <button class="btn btn-primary" id="btn-save-stock" onclick="saveStock()">Simpan Stock</button>
-    </div>
-  </div>
-</div>
-
-<!-- STOCK DETAIL MODAL (Admin lihat detail lengkap) -->
-<div class="modal-overlay" id="modal-stock-detail">
-  <div class="modal" style="max-width:440px;">
-    <button class="modal-close" onclick="closeModal('modal-stock-detail')">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <div class="modal-title">Detail Stock</div>
-    <div id="modal-stock-detail-body" style="font-size:13px;"></div>
-    <div class="modal-actions" style="margin-top:16px;">
-      <button class="btn btn-ghost" onclick="closeModal('modal-stock-detail')">Tutup</button>
-    </div>
-  </div>
-</div>
 
 <!-- Logic aplikasi dipisah ke js/ — lihat js/firebase-config.js dan js/app.js -->
 <script type="module" src="js/app.js"></script>
@@ -917,45 +460,5 @@
   </div>
 </div>
 
-<!-- ANNOUNCEMENT FORM MODAL (Admin) -->
-<div class="modal-overlay" id="modal-ann">
-  <div class="modal" style="max-width:440px;">
-    <button class="modal-close" onclick="closeModal('modal-ann')">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <div class="modal-title" id="modal-ann-title">Tambah Notifikasi</div>
-    <input type="hidden" id="ann-id">
-    <div class="form-field">
-      <label>Tipe Notifikasi</label>
-      <select class="ann-form-select" id="ann-type">
-        <option value="info">ℹ️ Info — Informasi umum</option>
-        <option value="warning">⚠️ Peringatan — Maintenance / gangguan</option>
-        <option value="success">✅ Sukses — Update / fitur baru</option>
-        <option value="danger">🚨 Penting — Notifikasi mendesak</option>
-      </select>
-    </div>
-    <div class="form-field">
-      <label>Judul Notifikasi</label>
-      <input type="text" id="ann-title-input" placeholder="mis. Sistem sedang dalam perbaikan">
-    </div>
-    <div class="form-field">
-      <label>Pesan</label>
-      <textarea class="ann-form-textarea" id="ann-msg-input" placeholder="Tulis pesan notifikasi di sini..."></textarea>
-    </div>
-    <div class="form-field">
-      <div class="ann-toggle-wrap">
-        <span class="ann-toggle-label">Aktif (tampil ke user)</span>
-        <button class="ann-toggle on" id="ann-active-toggle" onclick="toggleAnnActive()"></button>
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal('modal-ann')">Batal</button>
-      <button class="btn btn-primary" onclick="saveAnn()">Simpan</button>
-    </div>
-  </div>
-</div>
-
-</body>
-</html>
 </body>
 </html>
