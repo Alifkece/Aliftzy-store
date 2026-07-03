@@ -73,6 +73,7 @@ async function loadPublicData() {
   renderTrackDropdown();
   updateBellDot();
   showBellIcon(true);
+  resizeHomeSlider();
   // Show announcement popup after login
   const active = announcements.filter(a => a.active !== false);
   if (active.length) {
@@ -182,6 +183,7 @@ function showPage(page, sub) {
     if (!currentUser) { showPage('auth', 'login'); return; }
     document.getElementById('page-home').style.display = 'block';
     updateSettingsPanel();
+    resizeHomeSlider();
   }
   if (page === 'auth') {
     document.getElementById('page-auth').style.display = 'flex';
@@ -1023,9 +1025,28 @@ function switchHomeTab(idx) {
   const slider = document.getElementById('home-sections-slider');
   if (slider) slider.style.transform = `translateX(-${idx * 25}%)`;
   document.querySelectorAll('.home-nav-tab').forEach((t,i) => t.classList.toggle('active', i === idx));
+  resizeHomeSlider();
   // Load orders on demand
   if (idx === 1) loadMyOrders();
 }
+
+// Keeps the visible height of the swipe carousel matched to the ACTIVE panel only,
+// instead of every panel sharing the height of the tallest one (which caused
+// Pesanan Saya / Reseller / Settings to look empty or not scroll to their real end).
+function resizeHomeSlider() {
+  const wrap = document.getElementById('home-sections-wrap');
+  const panels = document.querySelectorAll('.home-section-panel');
+  const active = panels[currentHomeTab];
+  if (!wrap || !active) return;
+  wrap.style.height = active.offsetHeight + 'px';
+}
+window.resizeHomeSlider = resizeHomeSlider;
+
+let _homeSliderResizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(_homeSliderResizeTimer);
+  _homeSliderResizeTimer = setTimeout(resizeHomeSlider, 150);
+});
 
 // Touch swipe support for home sections
 (function() {
@@ -1064,6 +1085,7 @@ async function loadMyOrders() {
     renderMyOrders();
   } catch(e) {
     container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2);font-size:13px;">Gagal memuat pesanan. Coba lagi.</div>';
+    resizeHomeSlider();
   }
 }
 
@@ -1078,6 +1100,7 @@ function renderMyOrders() {
       <div>Belum ada pesanan</div>
       <div style="font-size:12px;margin-top:6px;">Pesanan akan muncul setelah pembayaran dikonfirmasi</div>
     </div>`;
+    resizeHomeSlider();
     return;
   }
   container.innerHTML = myOrders.map(o => {
@@ -1102,6 +1125,7 @@ function renderMyOrders() {
       </div>` : ''}
     </div>`;
   }).join('');
+  resizeHomeSlider();
 }
 
 // ===== STOCK SYSTEM =====
