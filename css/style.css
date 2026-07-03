@@ -1219,9 +1219,11 @@
   .home-sections-wrap {
     overflow: hidden;
     width: 100%;
+    transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .home-sections-slider {
     display: flex;
+    align-items: flex-start; /* each panel keeps its own natural height instead of stretching to match the tallest panel */
     width: 400%; /* 4 sections */
     transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
   }
