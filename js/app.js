@@ -1,10 +1,8 @@
-import { auth, db, storage } from "./firebase-config.js";
+import { auth, db } from "./firebase-config.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, doc, setDoc, getDoc, getDocs, deleteDoc, addDoc, updateDoc, query, where, orderBy, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { collection, doc, getDoc, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let currentUser = null;
-let isAdmin = false;
 let products = [];
 let songs = [];
 let storeProfile = { avatarUrl: "" };
@@ -28,23 +26,15 @@ let myOrders = [];
 let stockUnsubscribe = null;
 let currentHomeTab = 0;
 
-// Expose globals
+// Expose globals — HANYA fungsi untuk Store/User. Tidak ada satupun
+// fungsi/CRUD Admin yang di-expose ke window pada repository ini.
 window.showPage = showPage;
 window.switchAuthTab = switchAuthTab;
 window.handleLogin = handleLogin;
 window.handleRegister = handleRegister;
 window.handleLogout = handleLogout;
 window.toggleUserMenu = toggleUserMenu;
-window.showAdminPanel = showAdminPanel;
 window.filterProducts = filterProducts;
-window.openAddProduct = openAddProduct;
-window.saveProduct = saveProduct;
-window.editProduct = editProduct;
-window.deleteProduct = deleteProduct;
-window.openAddSong = openAddSong;
-window.saveSong = saveSong;
-window.editSong = editSong;
-window.deleteSong = deleteSong;
 window.closeModal = closeModal;
 window.orderProduct = orderProduct;
 window.orderMembership = orderMembership;
@@ -55,62 +45,23 @@ window.nextTrack = nextTrack;
 window.setVolume = setVolume;
 window.seekAudio = seekAudio;
 window.toggleTrackMenu = toggleTrackMenu;
-window.switchProductImgTab = switchProductImgTab;
-window.switchProfileImgTab = switchProfileImgTab;
-window.previewAdminAvatar = previewAdminAvatar;
-window.previewAdminAvatarUrl = previewAdminAvatarUrl;
-window.previewProductImg = previewProductImg;
-window.previewProductImgUrl = previewProductImgUrl;
-window.saveStoreProfile = saveStoreProfile;
-window.isAdmin = false;
 window.switchHomeTab = switchHomeTab;
 window.loadMyOrders = loadMyOrders;
-window.openAddStock = openAddStock;
-window.saveStock = saveStock;
-window.editStock = editStock;
-window.deleteStock = deleteStock;
-window.viewStockDetail = viewStockDetail;
-window.filterStock = filterStock;
-window.onStockProductChange = onStockProductChange;
 window.selectPackage = selectPackage;
 window.downloadQris = downloadQris;
 
 onAuthStateChanged(auth, async user => {
   currentUser = user;
   if (user) {
-    isAdmin = await checkAdminStatus(user);
-    window.isAdmin = isAdmin;
     updateNavUI();
-    if (isAdmin) {
-      showPage('admin');
-      loadAllData();
-    } else {
-      showPage('home');
-      loadPublicData();
-    }
+    showPage('home');
+    loadPublicData();
   } else {
-    isAdmin = false;
-    window.isAdmin = false;
     currentUser = null;
     updateNavUI();
     showPage('auth', 'login');
   }
 });
-
-// Cek admin status lewat Firestore — email tidak hardcode di frontend
-async function checkAdminStatus(user) {
-  if (!user) return false;
-  try {
-    const snap = await getDoc(doc(db, "settings", "adminConfig"));
-    if (snap.exists() && snap.data().adminEmail === user.email) {
-      return true;
-    }
-    return false;
-  } catch(e) {
-    // Kalau gagal baca (bukan admin), return false
-    return false;
-  }
-}
 
 async function loadPublicData() {
   await loadProducts();
@@ -120,7 +71,6 @@ async function loadPublicData() {
   await loadStockPublic();
   renderProducts(products);
   renderTrackDropdown();
-  updateStats();
   updateBellDot();
   showBellIcon(true);
   // Show announcement popup after login
@@ -128,14 +78,6 @@ async function loadPublicData() {
   if (active.length) {
     setTimeout(() => openAnnPopup(), 600);
   }
-}
-
-async function loadAllData() {
-  await loadPublicData();
-  renderProductsAdmin();
-  renderSongsAdmin();
-  renderAnnAdmin();
-  await loadStockAdmin();
 }
 
 async function loadProducts() {
@@ -199,10 +141,6 @@ function applyStoreProfile() {
     if (placeholder) placeholder.style.display = 'none';
     if (videoEl) { videoEl.style.display = 'block'; videoEl.style.zIndex = '1'; }
   }
-  if (isAdmin) {
-    const overlay = document.getElementById('avatar-upload-overlay');
-    if (overlay) overlay.style.display = 'flex';
-  }
 }
 
 function getDefaultProducts() {
@@ -239,7 +177,6 @@ function getDefaultSongs() {
 function showPage(page, sub) {
   document.getElementById('page-home').style.display = 'none';
   document.getElementById('page-auth').style.display = 'none';
-  document.getElementById('page-admin').style.display = 'none';
 
   if (page === 'home') {
     if (!currentUser) { showPage('auth', 'login'); return; }
@@ -251,36 +188,26 @@ function showPage(page, sub) {
     if (sub) switchAuthTab(sub);
     document.getElementById('auth-back-home').style.display = currentUser ? 'block' : 'none';
   }
-  if (page === 'admin') {
-    if (!isAdmin) { showPage('home'); return; }
-    document.getElementById('page-admin').style.display = 'block';
-    renderProductsAdmin();
-    renderSongsAdmin();
-  }
   document.getElementById('user-menu').style.display = 'none';
 }
 
 function updateSettingsPanel() {
   const uname = document.getElementById('settings-username');
   const uemail = document.getElementById('settings-email');
-  const adminBtn = document.getElementById('settings-admin-btn');
   if (uname && currentUser) {
     uname.textContent = currentUser.displayName || 'Pengguna';
     uemail.textContent = currentUser.email || '';
   }
-  if (adminBtn) adminBtn.style.display = isAdmin ? 'flex' : 'none';
 }
 
 function updateNavUI() {
   const authEl = document.getElementById('nav-auth');
   const userEl = document.getElementById('nav-user');
-  const adminBtn = document.getElementById('admin-menu-btn');
   const avatarEl = document.getElementById('nav-avatar');
   if (currentUser) {
     authEl.classList.add('hidden');
     userEl.classList.remove('hidden');
     avatarEl.textContent = (currentUser.displayName || currentUser.email || 'U')[0].toUpperCase();
-    adminBtn.style.display = isAdmin ? 'flex' : 'none';
   } else {
     authEl.classList.remove('hidden');
     userEl.classList.add('hidden');
@@ -756,317 +683,6 @@ async function checkPaymentStatus(transactionId) {
   }
 }
 
-// ===== ADMIN PRODUCTS =====
-function renderProductsAdmin() {
-  const tbody = document.getElementById('products-tbody');
-  if (!products.length) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:28px;color:var(--text2);">Belum ada produk.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = products.map(p => `
-    <tr>
-      <td>
-        <div class="td-name">
-          ${p.img ? `<img src="${p.img}" class="td-thumb" alt="" onerror="this.style.display='none'">` : `<div class="td-thumb-placeholder"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>`}
-          <div>
-            <div class="td-product-name">${p.name}</div>
-            <div class="td-category">${p.category || '-'}</div>
-          </div>
-        </div>
-      </td>
-      <td style="text-transform:capitalize;">${p.category || '-'}</td>
-      <td style="color:var(--text);font-weight:600;white-space:nowrap;">Rp${Number(p.price||0).toLocaleString('id-ID')}</td>
-      <td><span class="status-active"><svg width="7" height="7" viewBox="0 0 24 24" fill="var(--success)"><circle cx="12" cy="12" r="10"/></svg>Aktif</span></td>
-      <td>
-        <div class="actions-cell">
-          <button class="btn btn-ghost btn-sm" onclick="editProduct('${p.id}')">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">Hapus</button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-  updateStats();
-}
-
-function openAddProduct() {
-  document.getElementById('modal-product-title').textContent = 'Tambah Produk';
-  document.getElementById('product-id').value = '';
-  document.getElementById('product-name').value = '';
-  document.getElementById('product-desc').value = '';
-  document.getElementById('product-price').value = '';
-  document.getElementById('product-packages').value = '';
-  document.getElementById('product-badge').value = '';
-  document.getElementById('product-link').value = '';
-  document.getElementById('product-img-file').value = '';
-  document.getElementById('product-img-url').value = '';
-  document.getElementById('product-img-preview').classList.remove('show');
-  pendingProductImgDataUrl = '';
-  openModal('modal-product');
-}
-
-function editProduct(id) {
-  const p = products.find(x => x.id === id);
-  if (!p) return;
-  document.getElementById('modal-product-title').textContent = 'Edit Produk';
-  document.getElementById('product-id').value = p.id;
-  document.getElementById('product-name').value = p.name || '';
-  document.getElementById('product-desc').value = p.desc || '';
-  document.getElementById('product-price').value = p.price || '';
-  document.getElementById('product-packages').value = (Array.isArray(p.packages) && p.packages.length > 0)
-    ? p.packages.map(pkg => `${pkg.name}:${pkg.price}`).join('\n')
-    : '';
-  document.getElementById('product-badge').value = p.badge || '';
-  document.getElementById('product-link').value = p.link || '';
-  document.getElementById('product-cat').value = p.category || 'lainnya';
-  if (p.img) {
-    const prev = document.getElementById('product-img-preview');
-    prev.src = p.img; prev.classList.add('show');
-  } else {
-    document.getElementById('product-img-preview').classList.remove('show');
-  }
-  pendingProductImgDataUrl = '';  // reset, biar upload baru bisa override
-  openModal('modal-product');
-}
-
-async function saveProduct() {
-  const id = document.getElementById('product-id').value;
-  const name = document.getElementById('product-name').value.trim();
-  const desc = document.getElementById('product-desc').value.trim();
-  const price = sanitizeAmount(document.getElementById('product-price').value);
-  const packagesRaw = document.getElementById('product-packages').value.trim();
-  const packages = packagesRaw
-    ? packagesRaw.split('\n').map(line => line.trim()).filter(Boolean).map(line => {
-        const idx = line.lastIndexOf(':');
-        if (idx === -1) return null;
-        const name = line.slice(0, idx).trim();
-        const pkgPrice = sanitizeAmount(line.slice(idx + 1).trim());
-        return name && !isNaN(pkgPrice) ? { name, price: pkgPrice } : null;
-      }).filter(Boolean)
-    : [];
-  const badge = document.getElementById('product-badge').value.trim();
-  const link = document.getElementById('product-link').value.trim();
-  const category = document.getElementById('product-cat').value;
-  const imgUrl = document.getElementById('product-img-url').value.trim();
-  if (!name) { showNotif('Nama produk wajib diisi', 'error'); return; }
-  if (!price || isNaN(price) || price <= 0) { showNotif('Harga tidak valid. Masukkan angka saja, mis. 10000.', 'error'); return; }
-  const uploadTabActive = document.getElementById('ptab-prd-upload').classList.contains('active');
-  const imgFinal = pendingProductImgDataUrl
-    ? pendingProductImgDataUrl
-    : (!uploadTabActive && imgUrl)
-      ? imgUrl
-      : (id ? (products.find(x => x.id === id)?.img || '') : '');
-  const btn = document.getElementById('btn-save-product');
-  btn.innerHTML = '<div class="spinner"></div>'; btn.disabled = true;
-  const data = { name, desc, price, badge, link, category, img: imgFinal, packages };
-  try {
-    if (id) {
-      await updateDoc(doc(db, "products", id), data);
-      const idx = products.findIndex(x => x.id === id);
-      if (idx !== -1) products[idx] = { id, ...data };
-      showNotif('Produk berhasil diperbarui', 'success');
-    } else {
-      const r = await addDoc(collection(db, "products"), data);
-      products.push({ id: r.id, ...data });
-      showNotif('Produk berhasil ditambahkan', 'success');
-    }
-  } catch(e) {
-    if (id) { const idx = products.findIndex(x => x.id === id); if (idx !== -1) products[idx] = { id, ...data }; }
-    else products.push({ id: 'local_' + Date.now(), ...data });
-    showNotif('Disimpan lokal', 'success');
-  }
-  closeModal('modal-product');
-  pendingProductImgDataUrl = '';
-  renderProducts(products);
-  renderProductsAdmin();
-  btn.innerHTML = 'Simpan Produk'; btn.disabled = false;
-}
-
-async function deleteProduct(id) {
-  if (!confirm('Hapus produk ini?')) return;
-  try { await deleteDoc(doc(db, "products", id)); } catch(e) {}
-  products = products.filter(p => p.id !== id);
-  renderProducts(products);
-  renderProductsAdmin();
-  showNotif('Produk dihapus', 'success');
-}
-
-// ===== ADMIN SONGS =====
-function renderSongsAdmin() {
-  const tbody = document.getElementById('songs-tbody');
-  const addBtn = document.getElementById('btn-add-song');
-  if (addBtn) addBtn.style.display = songs.length >= 50 ? 'none' : 'flex';
-  if (!songs.length) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:28px;color:var(--text2);">Belum ada lagu.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = songs.map((s, i) => `
-    <tr>
-      <td style="color:var(--text3);font-family:'Syne',sans-serif;font-weight:700;">${i+1}</td>
-      <td style="color:var(--text);font-weight:500;">${s.title || '-'}</td>
-      <td>${s.artist || '-'}</td>
-      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-family:monospace;color:var(--text3);">${s.url || '-'}</td>
-      <td>
-        <div class="actions-cell">
-          <button class="btn btn-ghost btn-sm" onclick="editSong('${s.id}')">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteSong('${s.id}')">Hapus</button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-  updateStats();
-}
-
-function openAddSong() {
-  if (songs.length >= 50) { showNotif('Maksimal 50 lagu', 'error'); return; }
-  document.getElementById('modal-song-title').textContent = 'Tambah Lagu';
-  document.getElementById('song-id').value = '';
-  document.getElementById('song-title').value = '';
-  document.getElementById('song-artist').value = '';
-  document.getElementById('song-url').value = '';
-  openModal('modal-song');
-}
-
-function editSong(id) {
-  const s = songs.find(x => x.id === id);
-  if (!s) return;
-  document.getElementById('modal-song-title').textContent = 'Edit Lagu';
-  document.getElementById('song-id').value = s.id;
-  document.getElementById('song-title').value = s.title || '';
-  document.getElementById('song-artist').value = s.artist || '';
-  document.getElementById('song-url').value = s.url || '';
-  openModal('modal-song');
-}
-
-async function saveSong() {
-  const id = document.getElementById('song-id').value;
-  const title = document.getElementById('song-title').value.trim();
-  const artist = document.getElementById('song-artist').value.trim();
-  const url = document.getElementById('song-url').value.trim();
-  if (!title || !url) { showNotif('Judul dan URL wajib diisi', 'error'); return; }
-  const data = { title, artist, url };
-  try {
-    if (id) {
-      await updateDoc(doc(db, "songs", id), data);
-      const idx = songs.findIndex(x => x.id === id);
-      if (idx !== -1) songs[idx] = { id, ...data };
-      showNotif('Lagu diperbarui', 'success');
-    } else {
-      const r = await addDoc(collection(db, "songs"), data);
-      songs.push({ id: r.id, ...data });
-      showNotif('Lagu ditambahkan', 'success');
-    }
-  } catch(e) {
-    if (id) { const idx = songs.findIndex(x => x.id === id); if (idx !== -1) songs[idx] = { id, ...data }; }
-    else songs.push({ id: 'local_' + Date.now(), ...data });
-    showNotif('Disimpan lokal', 'success');
-  }
-  closeModal('modal-song');
-  renderSongsAdmin();
-  renderTrackDropdown();
-}
-
-async function deleteSong(id) {
-  if (!confirm('Hapus lagu ini?')) return;
-  try { await deleteDoc(doc(db, "songs", id)); } catch(e) {}
-  songs = songs.filter(s => s.id !== id);
-  renderSongsAdmin();
-  renderTrackDropdown();
-  showNotif('Lagu dihapus', 'success');
-}
-
-// ===== STORE PROFILE =====
-async function saveStoreProfile() {
-  const urlInput = document.getElementById('admin-avatar-url').value.trim();
-  let imgUrl = '';
-  if (pendingImgDataUrl) imgUrl = pendingImgDataUrl;
-  else if (urlInput) imgUrl = urlInput;
-  else imgUrl = storeProfile.avatarUrl || '';
-  if (!imgUrl) { showNotif('Masukkan URL atau upload gambar dulu', 'error'); return; }
-  storeProfile.avatarUrl = imgUrl;
-  try {
-    await setDoc(doc(db, "settings", "store"), storeProfile);
-    showNotif('Profil toko disimpan!', 'success');
-  } catch(e) {
-    showNotif('Gagal simpan: ' + (e.message||e), 'error');
-  }
-  pendingImgDataUrl = '';
-  applyStoreProfile();
-}
-
-function previewAdminAvatar(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    pendingImgDataUrl = e.target.result;
-    const prev = document.getElementById('admin-avatar-preview');
-    prev.src = e.target.result; prev.classList.add('show');
-  };
-  reader.readAsDataURL(file);
-}
-
-function previewAdminAvatarUrl(url) {
-  if (!url) return;
-  const prev = document.getElementById('admin-avatar-preview');
-  prev.src = url; prev.classList.add('show');
-}
-
-function switchProfileImgTab(tab) {
-  document.getElementById('pimg-upload-wrap').style.display = tab === 'upload' ? 'block' : 'none';
-  document.getElementById('pimg-url-wrap').style.display = tab === 'url' ? 'block' : 'none';
-  document.getElementById('ptab-upload').classList.toggle('active', tab === 'upload');
-  document.getElementById('ptab-url').classList.toggle('active', tab === 'url');
-}
-
-function previewProductImg(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    pendingProductImgDataUrl = e.target.result;
-    const prev = document.getElementById('product-img-preview');
-    prev.src = e.target.result; prev.classList.add('show');
-  };
-  reader.readAsDataURL(file);
-}
-
-function previewProductImgUrl(url) {
-  if (!url) return;
-  const prev = document.getElementById('product-img-preview');
-  prev.src = url; prev.classList.add('show');
-  pendingProductImgDataUrl = '';
-}
-
-function switchProductImgTab(tab) {
-  document.getElementById('prd-upload-wrap').style.display = tab === 'upload' ? 'block' : 'none';
-  document.getElementById('prd-url-wrap').style.display = tab === 'url' ? 'block' : 'none';
-  document.getElementById('ptab-prd-upload').classList.toggle('active', tab === 'upload');
-  document.getElementById('ptab-prd-url').classList.toggle('active', tab === 'url');
-}
-
-// ===== ADMIN PANEL SWITCH =====
-function showAdminPanel(panel, btn) {
-  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
-  // sync bottom nav
-  ['dashboard','products','music','profile','announcements','stock'].forEach(k => {
-    const btn = document.getElementById('bnav-' + k);
-    if (btn) btn.classList.remove('active');
-  });
-  const bnavBtn = document.getElementById('bnav-' + panel);
-  if (bnavBtn) bnavBtn.classList.add('active');
-  document.getElementById('panel-' + panel).classList.add('active');
-  if (btn) btn.classList.add('active');
-  if (panel === 'stock') renderStockAdmin();
-}
-
-function updateStats() {
-  const ps = document.getElementById('stat-products');
-  const ss = document.getElementById('stat-songs');
-  if (ps) ps.textContent = products.length;
-  if (ss) ss.textContent = songs.length;
-}
-
 // ===== MUSIC PLAYER — EQUALIZER FIXED =====
 function renderTrackDropdown() {
   const dd = document.getElementById('track-dropdown');
@@ -1185,8 +801,8 @@ document.addEventListener('click', e => {
 });
 
 // ===== MODAL =====
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-window.openModal = openModal; // bug lama: belum di-export ke window, tombol avatar admin gak jalan tanpa ini
+function openModal(id) { const el = document.getElementById(id); if (el) el.classList.add('open'); }
+window.openModal = openModal;
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
   if (id === 'modal-order') resetOrderModalState();
@@ -1289,7 +905,6 @@ window.showNotif = showNotif;
 
 // ===== ANNOUNCEMENTS SYSTEM =====
 let announcements = [];
-let annActiveToggle = true;
 
 async function loadAnnouncements() {
   try {
@@ -1399,122 +1014,8 @@ function showBellIcon(show) {
   if (bell) bell.classList.toggle('hidden', !show);
 }
 
-// ===== ADMIN ANN CRUD =====
-function renderAnnAdmin() {
-  const list = document.getElementById('ann-admin-list');
-  if (!list) return;
-  if (!announcements.length) {
-    list.innerHTML = `<div class="ann-empty">
-      <div class="ann-empty-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      </div>
-      Belum ada notifikasi. Klik Tambah untuk membuat notifikasi baru.
-    </div>`;
-    return;
-  }
-  list.innerHTML = announcements.map(a => `
-    <div class="ann-admin-item">
-      <div class="ann-admin-dot ann-admin-dot-${a.type||'info'}"></div>
-      <div class="ann-admin-body">
-        <div class="ann-admin-title">${escHtml(a.title||'')}</div>
-        <div class="ann-admin-msg">${escHtml((a.msg||'').substring(0,120))}${(a.msg||'').length > 120 ? '…' : ''}</div>
-        <div class="ann-admin-meta">
-          <span class="ann-type-chip ann-type-${a.type||'info'}">${getAnnLabel(a.type||'info')}</span>
-          ${a.active === false ? '<span style="color:var(--text3);">· Nonaktif</span>' : '<span style="color:var(--success);">· Aktif</span>'}
-          ${a.createdAt ? `<span>· ${formatAnnDate(a.createdAt)}</span>` : ''}
-        </div>
-      </div>
-      <div class="ann-admin-actions">
-        <button class="btn btn-ghost btn-sm" onclick="editAnn('${a.id}')">Edit</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteAnn('${a.id}')">Hapus</button>
-      </div>
-    </div>
-  `).join('');
-  updateBellDot();
-}
-
-function openAddAnn() {
-  document.getElementById('modal-ann-title').textContent = 'Tambah Notifikasi';
-  document.getElementById('ann-id').value = '';
-  document.getElementById('ann-type').value = 'info';
-  document.getElementById('ann-title-input').value = '';
-  document.getElementById('ann-msg-input').value = '';
-  annActiveToggle = true;
-  const tog = document.getElementById('ann-active-toggle');
-  tog.classList.add('on');
-  openModal('modal-ann');
-}
-
-function editAnn(id) {
-  const a = announcements.find(x => x.id === id);
-  if (!a) return;
-  document.getElementById('modal-ann-title').textContent = 'Edit Notifikasi';
-  document.getElementById('ann-id').value = a.id;
-  document.getElementById('ann-type').value = a.type || 'info';
-  document.getElementById('ann-title-input').value = a.title || '';
-  document.getElementById('ann-msg-input').value = a.msg || '';
-  annActiveToggle = a.active !== false;
-  const tog = document.getElementById('ann-active-toggle');
-  tog.classList.toggle('on', annActiveToggle);
-  openModal('modal-ann');
-}
-
-function toggleAnnActive() {
-  annActiveToggle = !annActiveToggle;
-  const tog = document.getElementById('ann-active-toggle');
-  tog.classList.toggle('on', annActiveToggle);
-}
-
-async function saveAnn() {
-  const id = document.getElementById('ann-id').value;
-  const data = {
-    type: document.getElementById('ann-type').value,
-    title: document.getElementById('ann-title-input').value.trim(),
-    msg: document.getElementById('ann-msg-input').value.trim(),
-    active: annActiveToggle,
-    createdAt: id ? (announcements.find(x=>x.id===id)?.createdAt || Date.now()) : Date.now(),
-  };
-  if (!data.title) { showNotif('Judul wajib diisi', 'error'); return; }
-  if (!data.msg)   { showNotif('Pesan wajib diisi', 'error'); return; }
-  try {
-    if (id) {
-      await updateDoc(doc(db, "announcements", id), data);
-      const idx = announcements.findIndex(x => x.id === id);
-      if (idx !== -1) announcements[idx] = { id, ...data };
-    } else {
-      const r = await addDoc(collection(db, "announcements"), data);
-      announcements.unshift({ id: r.id, ...data });
-    }
-    showNotif('Notifikasi disimpan', 'success');
-  } catch(e) {
-    if (id) {
-      const idx = announcements.findIndex(x => x.id === id);
-      if (idx !== -1) announcements[idx] = { id, ...data };
-    } else {
-      announcements.unshift({ id: 'local_' + Date.now(), ...data });
-    }
-    showNotif('Disimpan lokal', 'success');
-  }
-  closeModal('modal-ann');
-  renderAnnAdmin();
-}
-
-async function deleteAnn(id) {
-  if (!confirm('Hapus notifikasi ini?')) return;
-  try { await deleteDoc(doc(db, "announcements", id)); } catch(e) {}
-  announcements = announcements.filter(a => a.id !== id);
-  renderAnnAdmin();
-  updateBellDot();
-  showNotif('Notifikasi dihapus', 'success');
-}
-
 window.openAnnPopup = openAnnPopup;
 window.closeAnnPopup = closeAnnPopup;
-window.openAddAnn = openAddAnn;
-window.editAnn = editAnn;
-window.deleteAnn = deleteAnn;
-window.saveAnn = saveAnn;
-window.toggleAnnActive = toggleAnnActive;
 
 // ===== HOME DASHBOARD TABS (SWIPE) =====
 function switchHomeTab(idx) {
@@ -1615,214 +1116,4 @@ async function loadStockPublic() {
     stockItems = [];
   }
 }
-
-// Load stock untuk admin (semua data)
-async function loadStockAdmin() {
-  try {
-    const snap = await getDocs(collection(db, "stock"));
-    stockItems = [];
-    snap.forEach(d => stockItems.push({ id: d.id, ...d.data() }));
-    renderStockAdmin();
-    updateStockStats();
-  } catch(e) {
-    stockItems = [];
-  }
-}
-
-function updateStockStats() {
-  const total = stockItems.length;
-  const avail = stockItems.filter(s => !s.sold).length;
-  const sold = stockItems.filter(s => s.sold).length;
-  const ts = document.getElementById('stat-stock-total');
-  const as = document.getElementById('stat-stock-available');
-  const ss = document.getElementById('stat-stock-sold');
-  if (ts) ts.textContent = total;
-  if (as) as.textContent = avail;
-  if (ss) ss.textContent = sold;
-}
-
-function renderStockAdmin() {
-  const list = document.getElementById('stock-admin-list');
-  if (!list) return;
-  let filtered = stockItems;
-  if (stockFilter === 'available') filtered = stockItems.filter(s => !s.sold);
-  if (stockFilter === 'sold') filtered = stockItems.filter(s => s.sold);
-  if (!filtered.length) {
-    list.innerHTML = `<div class="stock-empty">
-      <div class="stock-empty-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-      </div>
-      ${stockFilter === 'all' ? 'Belum ada stock.' : 'Tidak ada stock dengan filter ini.'}
-    </div>`;
-    return;
-  }
-  list.innerHTML = filtered.map(s => `
-    <div class="stock-item">
-      <div class="stock-item-dot ${s.sold ? 'stock-dot-sold' : 'stock-dot-available'}"></div>
-      <div class="stock-item-body">
-        <div class="stock-item-product">${escHtml(s.productName || '-')}</div>
-        <div class="stock-item-email">${escHtml(s.email || '-')}</div>
-        <div class="stock-item-meta">
-          <span class="stock-sold-chip ${s.sold ? 'stock-chip-sold' : 'stock-chip-available'}">${s.sold ? 'Terjual' : 'Tersedia'}</span>
-          ${s.note ? `<span>· ${escHtml(s.note.substring(0,40))}${s.note.length > 40 ? '…' : ''}</span>` : ''}
-          ${s.soldAt ? `<span>· Terjual: ${formatAnnDate(s.soldAt)}</span>` : ''}
-        </div>
-      </div>
-      <div class="stock-item-actions">
-        <button class="btn btn-ghost btn-sm" onclick="viewStockDetail('${s.id}')">Detail</button>
-        <button class="btn btn-ghost btn-sm" onclick="editStock('${s.id}')">Edit</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteStock('${s.id}')">Hapus</button>
-      </div>
-    </div>
-  `).join('');
-  updateStockStats();
-}
-
-function filterStock(f, btn) {
-  stockFilter = f;
-  document.querySelectorAll('.stock-filter-tab').forEach(t => t.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  renderStockAdmin();
-}
-
-function onStockProductChange(select) {
-  const pid = select.value;
-  const p = products.find(x => x.id === pid);
-  if (p) document.getElementById('stock-product-name').value = p.name;
-}
-
-function openAddStock() {
-  document.getElementById('modal-stock-title').textContent = 'Tambah Stock';
-  document.getElementById('stock-id').value = '';
-  document.getElementById('stock-email').value = '';
-  document.getElementById('stock-password').value = '';
-  document.getElementById('stock-login-url').value = '';
-  document.getElementById('stock-password-url').value = '';
-  document.getElementById('stock-note').value = '';
-  document.getElementById('stock-product-name').value = '';
-  // Populate product select
-  const sel = document.getElementById('stock-product-id');
-  sel.innerHTML = '<option value="">Pilih Produk</option>' +
-    products.map(p => `<option value="${p.id}">${escHtml(p.name)}</option>`).join('');
-  openModal('modal-stock');
-}
-
-function editStock(id) {
-  const s = stockItems.find(x => x.id === id);
-  if (!s) return;
-  document.getElementById('modal-stock-title').textContent = 'Edit Stock';
-  document.getElementById('stock-id').value = s.id;
-  document.getElementById('stock-email').value = s.email || '';
-  document.getElementById('stock-password').value = s.password || '';
-  document.getElementById('stock-login-url').value = s.loginUrl || '';
-  document.getElementById('stock-password-url').value = s.passwordUrl || '';
-  document.getElementById('stock-note').value = s.note || '';
-  document.getElementById('stock-product-name').value = s.productName || '';
-  const sel = document.getElementById('stock-product-id');
-  sel.innerHTML = '<option value="">Pilih Produk</option>' +
-    products.map(p => `<option value="${p.id}" ${p.id === s.productId ? 'selected' : ''}>${escHtml(p.name)}</option>`).join('');
-  openModal('modal-stock');
-}
-
-async function saveStock() {
-  const id = document.getElementById('stock-id').value;
-  const productId = document.getElementById('stock-product-id').value;
-  const productName = document.getElementById('stock-product-name').value.trim();
-  const email = document.getElementById('stock-email').value.trim();
-  const password = document.getElementById('stock-password').value.trim();
-  const loginUrl = document.getElementById('stock-login-url').value.trim();
-  const passwordUrl = document.getElementById('stock-password-url').value.trim();
-  const note = document.getElementById('stock-note').value.trim();
-  if (!productId) { showNotif('Pilih produk terlebih dahulu', 'error'); return; }
-  if (!email) { showNotif('Email akun wajib diisi', 'error'); return; }
-  if (!password) { showNotif('Password wajib diisi', 'error'); return; }
-  const data = {
-    productId, productName, email, password,
-    loginUrl, passwordUrl, note,
-    sold: id ? (stockItems.find(x => x.id === id)?.sold || false) : false,
-    createdAt: id ? (stockItems.find(x => x.id === id)?.createdAt || Date.now()) : Date.now(),
-    soldAt: id ? (stockItems.find(x => x.id === id)?.soldAt || null) : null,
-  };
-  const btn = document.getElementById('btn-save-stock');
-  btn.innerHTML = '<div class="spinner"></div>'; btn.disabled = true;
-  try {
-    if (id) {
-      await updateDoc(doc(db, "stock", id), data);
-      const idx = stockItems.findIndex(x => x.id === id);
-      if (idx !== -1) stockItems[idx] = { id, ...data };
-      showNotif('Stock diperbarui', 'success');
-    } else {
-      const r = await addDoc(collection(db, "stock"), data);
-      stockItems.push({ id: r.id, ...data });
-      showNotif('Stock ditambahkan', 'success');
-    }
-  } catch(e) {
-    if (id) { const idx = stockItems.findIndex(x => x.id === id); if (idx !== -1) stockItems[idx] = { id, ...data }; }
-    else stockItems.push({ id: 'local_' + Date.now(), ...data });
-    showNotif('Disimpan lokal', 'success');
-  }
-  closeModal('modal-stock');
-  btn.innerHTML = 'Simpan Stock'; btn.disabled = false;
-  renderStockAdmin();
-  renderProducts(products); // update badge on product cards
-}
-
-async function deleteStock(id) {
-  if (!confirm('Hapus stock ini?')) return;
-  try { await deleteDoc(doc(db, "stock", id)); } catch(e) {}
-  stockItems = stockItems.filter(s => s.id !== id);
-  renderStockAdmin();
-  renderProducts(products);
-  showNotif('Stock dihapus', 'success');
-}
-
-function viewStockDetail(id) {
-  const s = stockItems.find(x => x.id === id);
-  if (!s) return;
-  document.getElementById('modal-stock-detail-body').innerHTML = `
-    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
-      <div class="order-delivered-row"><span class="order-delivered-label">Produk</span><span class="order-delivered-val">${escHtml(s.productName||'-')}</span></div>
-      <div class="order-delivered-row"><span class="order-delivered-label">Email</span><span class="order-delivered-val">${escHtml(s.email||'-')}</span></div>
-      <div class="order-delivered-row"><span class="order-delivered-label">Password</span><span class="order-delivered-val">${escHtml(s.password||'-')}</span></div>
-      <div class="order-delivered-row"><span class="order-delivered-label">Login URL</span><span class="order-delivered-val">${s.loginUrl ? `<a href="${escHtml(s.loginUrl)}" target="_blank" style="color:var(--accent);">${escHtml(s.loginUrl)}</a>` : '-'}</span></div>
-      <div class="order-delivered-row"><span class="order-delivered-label">Pw URL</span><span class="order-delivered-val">${s.passwordUrl||'-'}</span></div>
-      <div class="order-delivered-row"><span class="order-delivered-label">Catatan</span><span class="order-delivered-val">${escHtml(s.note||'-')}</span></div>
-      <div class="order-delivered-row"><span class="order-delivered-label">Status</span><span class="order-delivered-val" style="color:${s.sold?'var(--danger)':'var(--success)'};">${s.sold ? 'Terjual' : 'Tersedia'}</span></div>
-      ${s.soldAt ? `<div class="order-delivered-row"><span class="order-delivered-label">Terjual</span><span class="order-delivered-val">${formatAnnDate(s.soldAt)}</span></div>` : ''}
-    </div>
-  `;
-  openModal('modal-stock-detail');
-}
-
-// ===== STOCK DELIVERY HELPER (dipakai saat order sukses) =====
-// Exported ke window untuk dipakai di payment flow nanti
-async function deliverStock(productId, orderId) {
-  // Cari 1 stock tersedia untuk produk ini
-  const avail = stockItems.find(s => s.productId === productId && !s.sold);
-  if (!avail) return null;
-  const now = Date.now();
-  const update = { sold: true, soldAt: now };
-  try {
-    await updateDoc(doc(db, "stock", avail.id), update);
-    const idx = stockItems.findIndex(x => x.id === avail.id);
-    if (idx !== -1) stockItems[idx] = { ...stockItems[idx], ...update };
-    // Jika ada orderId, update dokumen order dengan data akun
-    if (orderId) {
-      await updateDoc(doc(db, "orders", orderId), {
-        deliveredEmail: avail.email,
-        deliveredPassword: avail.password,
-        deliveredLoginUrl: avail.loginUrl || '',
-        deliveredNote: avail.note || '',
-        deliveredAt: now,
-      });
-    }
-    renderStockAdmin();
-    renderProducts(products);
-    return avail;
-  } catch(e) {
-    return null;
-  }
-}
-window.deliverStock = deliverStock;
-
 
