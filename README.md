@@ -1,10 +1,10 @@
 # 🛍️ Aliftzy Store
 
-Website Store resmi **Aliftzy Store** yang dibuat menggunakan HTML, CSS, JavaScript (ES Modules), Firebase Authentication, Cloud Firestore, dan backend pembayaran terpisah.
+Website Store resmi **Aliftzy Store** yang dikembangkan menggunakan **HTML5, CSS3, JavaScript (ES Modules), Firebase Authentication, Cloud Firestore**, serta backend pembayaran terpisah.
 
-Repository ini berisi **website yang digunakan oleh pelanggan (User)** untuk melakukan login, melihat produk, melakukan pembelian, serta melihat status pesanan secara realtime.
+Repository ini berisi **website yang digunakan oleh pelanggan (User)** untuk melakukan login, melihat produk, melakukan pembelian, dan melihat status pesanan secara realtime.
 
-> Dashboard Admin berada pada repository terpisah agar keamanan, struktur proyek, dan proses maintenance menjadi lebih baik.
+> Dashboard Admin dikembangkan pada repository terpisah agar keamanan, struktur proyek, dan proses maintenance menjadi lebih baik.
 
 ---
 
@@ -27,14 +27,14 @@ Repository ini berisi **website yang digunakan oleh pelanggan (User)** untuk mel
 - Kategori produk
 - Harga produk
 - Badge stok
-- Responsive layout
+- Responsive Layout
 
 ---
 
 ## 💳 Checkout
 
 - Membuat pesanan
-- Integrasi backend pembayaran
+- Integrasi Backend Payment
 - Status pembayaran realtime
 - Riwayat pesanan
 
@@ -49,10 +49,10 @@ Repository ini berisi **website yang digunakan oleh pelanggan (User)** untuk mel
 
 ---
 
-## 📢 Announcement
+## 📢 Announcements
 
-- Menampilkan pengumuman dari Admin
-- Update otomatis melalui Firestore
+- Menampilkan pengumuman
+- Sinkronisasi realtime dari Firestore
 
 ---
 
@@ -60,13 +60,15 @@ Repository ini berisi **website yang digunakan oleh pelanggan (User)** untuk mel
 
 - Playlist lagu
 - Pemutar musik
-- Pengaturan musik dari Firestore
+- Pengaturan lagu dari Firestore
 
 ---
 
 ## ⚙️ Settings
 
-Mengambil konfigurasi Store secara realtime dari Firestore seperti:
+Mengambil konfigurasi Store secara realtime melalui Firestore.
+
+Contohnya:
 
 - Nama toko
 - Informasi toko
@@ -81,14 +83,17 @@ Mengambil konfigurasi Store secara realtime dari Firestore seperti:
 - JavaScript (ES Modules)
 - Firebase Authentication
 - Cloud Firestore
-- Firebase Hosting / Netlify
-- Backend Payment API
+- Firebase SDK
+- Railway
+- SiTransfer
+- Netlify
+- GitHub
 
 ---
 
 # 📁 Struktur Project
 
-```
+```text
 Aliftzy-Store/
 │
 ├── api/
@@ -113,11 +118,11 @@ Aliftzy-Store/
 
 # 🔥 Database
 
-Website ini menggunakan satu Firebase Project yang sama dengan Dashboard Admin.
+Website ini menggunakan satu **Firebase Project** yang sama dengan Dashboard Admin.
 
 Collection yang digunakan:
 
-```
+```text
 products
 songs
 settings
@@ -126,13 +131,13 @@ stock
 orders
 ```
 
-Semua perubahan yang dilakukan melalui Dashboard Admin akan langsung tersinkronisasi ke Website Store melalui Cloud Firestore.
+Semua perubahan yang dilakukan melalui Dashboard Admin akan langsung tersinkronisasi ke Website Store menggunakan Cloud Firestore secara realtime.
 
 ---
 
 # 🔒 Keamanan
 
-Repository ini hanya berisi Website Store.
+Repository ini hanya berisi **Website Store**.
 
 Hak akses seluruh data dikendalikan menggunakan **Firestore Security Rules**.
 
@@ -142,8 +147,8 @@ Proteksi dilakukan melalui:
 
 - Firebase Authentication
 - Firestore Security Rules
-- Validasi data
-- Ownership validation pada Order
+- Validasi Data
+- Ownership Validation pada Order
 
 ---
 
@@ -152,30 +157,145 @@ Proteksi dilakukan melalui:
 Repository ini dapat di-deploy menggunakan:
 
 - Netlify
+- Vercel
 - Firebase Hosting
-- Vercel (Frontend)
 
 Pastikan menggunakan konfigurasi Firebase Project yang sama dengan Dashboard Admin agar data tetap tersinkronisasi.
 
 ---
 
+# 👨‍💻 Developer
+
+Website **Aliftzy Store** dirancang dan dikembangkan oleh:
+
+## Muhammad Alifudin
+
+**Mahasiswa SMK Industri Kreatif Kota Bekasi**
+
+🌐 **Official Developer Website**  
+**https://privatealif.netlify.app**
+
+Project ini dikembangkan dengan tujuan membangun sebuah website digital store modern yang aman, responsif, cepat, dan mudah dikelola.
+
+Arsitektur project menggunakan konsep **pemisahan Website Store dan Dashboard Admin**, sehingga keamanan, performa, dan proses maintenance menjadi jauh lebih baik.
+
+Seluruh autentikasi, penyimpanan data, dan sinkronisasi informasi dilakukan menggunakan **Firebase Authentication** dan **Cloud Firestore** secara realtime.
+
+---
+
+# 📅 Timeline Project
+
+| Tahap | Tanggal |
+|-------|----------|
+| 🚀 Project Dimulai | **12 Juni 2026** |
+| 🎉 Project Selesai | **4 Juli 2026** |
+
+Durasi pengembangan sekitar **22 hari**, meliputi:
+
+- Perancangan UI / UX
+- Pengembangan Frontend
+- Integrasi Firebase
+- Sistem Authentication
+- Sistem Checkout
+- Realtime Database
+- Refactor Kode
+- Peningkatan Keamanan
+- Pemisahan Website Store & Dashboard Admin
+- Debugging
+- Optimasi Performa
+- Final Testing
+- Deployment
+
+---
+
+# 🙏 Special Thanks
+
+Terima kasih kepada seluruh layanan, platform, teknologi, dokumentasi resmi, dan komunitas open-source yang telah membantu proses pengembangan **Aliftzy Store** hingga selesai.
+
+## 🤖 Artificial Intelligence
+
+- **ChatGPT (OpenAI)** — Membantu brainstorming, debugging, audit keamanan, dokumentasi, refactor kode, serta memberikan berbagai solusi selama proses pengembangan.
+- **Claude AI (Anthropic)** — Membantu proses refactor repository, pengembangan Dashboard Admin, audit kode, optimasi struktur project, dan debugging.
+
+---
+
+## ☁️ Backend & Database
+
+- Firebase Authentication
+- Cloud Firestore
+- Firebase Console
+- Firebase SDK
+
+---
+
+## 🚀 Deployment & Hosting
+
+- GitHub
+- Netlify
+- Railway
+- Vercel
+
+---
+
+## 💳 Payment Services
+
+- SiTransfer
+- QRIS
+
+---
+
+## 💻 Development Tools
+
+- Visual Studio Code
+- Git
+- GitHub Desktop
+- Node.js
+- npm
+
+---
+
+## 🌐 Web Technologies
+
+- HTML5
+- CSS3
+- JavaScript (ES Modules)
+
+---
+
+## ❤️ Appreciation
+
+Terima kasih kepada seluruh dokumentasi resmi, komunitas developer, layanan cloud, platform deployment, serta teknologi modern yang telah membantu proses pengembangan **Aliftzy Store** hingga selesai.
+
+Project ini juga menjadi bagian dari proses pembelajaran dan pengembangan kemampuan dalam bidang **Web Development**, **UI/UX**, **Firebase**, serta **Frontend Engineering**.
+
+---
+
 # 📌 Catatan
 
-Repository ini merupakan **Frontend Store**.
+Repository ini merupakan **Frontend Website Store**.
 
-Dashboard Admin berada pada repository terpisah agar:
+Dashboard Admin dikembangkan pada repository terpisah agar:
 
-- Struktur proyek lebih rapi
+- Struktur project lebih rapi
 - Maintenance lebih mudah
 - Keamanan lebih baik
-- Tidak ada kode Admin yang terkirim ke browser pengguna
+- Kode Admin tidak pernah dikirim ke browser pengguna
+- Pengembangan Store dan Admin dapat dilakukan secara independen
 
-Kedua repository tetap saling terhubung melalui Firebase Authentication dan Cloud Firestore yang sama.
+Meskipun dipisahkan menjadi dua repository, keduanya tetap terhubung menggunakan **Firebase Authentication** dan **Cloud Firestore** yang sama sehingga seluruh perubahan dari Dashboard Admin akan langsung tersinkronisasi ke Website Store secara realtime.
 
 ---
 
 # 📄 License
 
-Project ini dibuat untuk kebutuhan **Aliftzy Store**.
+**© 2026 Muhammad Alifudin**
 
-Unauthorized redistribution or commercial reuse without permission is not permitted.
+Seluruh source code dan desain pada repository ini dibuat untuk kebutuhan **Aliftzy Store**.
+
+Dilarang memperbanyak, memodifikasi, mendistribusikan, atau menggunakan sebagian maupun seluruh isi project ini untuk kepentingan komersial tanpa izin dari pemilik project.
+
+---
+
+> **Aliftzy Store v1.0**  
+> Developed with ❤️ by **Muhammad Alifudin**  
+> Official Developer Website: **https://privatealif.netlify.app**
