@@ -1,181 +1,168 @@
-```{=html}
 <p align="center">
-```
-`<img src="https://raw.githubusercontent.com/Alifkece/media/main/uploads/1783125315449_file_00000000f2087209a7976135db13f666.png" width="100%">`{=html}
-```{=html}
+  <img src="assets/banner.png" width="100%">
 </p>
-```
-```{=html}
-<h1 align="center">
-```
-🛍️ Aliftzy Store
-```{=html}
-</h1>
-```
-```{=html}
+
+<h1 align="center">🛍️ Aliftzy Store</h1>
+
 <p align="center">
-```
-`<b>`{=html}Modern Digital Store • Safe & Trusted`</b>`{=html}
-```{=html}
+<b>Modern Digital Store • Safe & Trusted</b>
 </p>
-```
-```{=html}
+
 <p align="center">
-```
-`<img src="https://img.shields.io/badge/Version-v1.0-gold?style=for-the-badge">`{=html}
-`<img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white">`{=html}
-`<img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white">`{=html}
-`<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">`{=html}
-`<img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black">`{=html}
-`<img src="https://img.shields.io/badge/Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white">`{=html}
-`<img src="https://img.shields.io/badge/Netlify-00C7B7?style=for-the-badge&logo=netlify&logoColor=white">`{=html}
-```{=html}
+<img src="https://img.shields.io/badge/Version-v1.0-gold?style=for-the-badge">
+<img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white">
+<img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white">
+<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">
+<img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black">
+<img src="https://img.shields.io/badge/Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white">
+<img src="https://img.shields.io/badge/Netlify-00C7B7?style=for-the-badge&logo=netlify&logoColor=white">
+<img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white">
 </p>
-```
+
+---
+
 # 📸 Website Preview
 
 ## 🏠 Home
 
-```{=html}
 <p align="center">
-```
-`<img src="https://raw.githubusercontent.com/Alifkece/media/main/uploads/1783125163408_IMG-20260704-WA0000.jpg" width="90%">`{=html}
-```{=html}
+<img src="assets/home.jpg" width="90%">
 </p>
-```
+
+---
+
 ## 🛒 Products
 
-```{=html}
 <p align="center">
-```
-`<img src="https://raw.githubusercontent.com/Alifkece/media/main/uploads/1783125190189_IMG-20260704-WA0001.jpg" width="90%">`{=html}
-```{=html}
+<img src="assets/products.jpg" width="90%">
 </p>
-```
+
+---
+
 ## 💰 Product Detail
 
-```{=html}
 <p align="center">
-```
-`<img src="https://raw.githubusercontent.com/Alifkece/media/main/uploads/1783125203044_IMG-20260704-WA0002.jpg" width="90%">`{=html}
-```{=html}
+<img src="assets/product-detail.jpg" width="90%">
 </p>
-```
+
+---
+
 ## 💳 QRIS Payment
 
-```{=html}
 <p align="center">
-```
-`<img src="https://raw.githubusercontent.com/Alifkece/media/main/uploads/1783125217683_IMG-20260704-WA0004.jpg" width="90%">`{=html}
-```{=html}
+<img src="assets/qris.jpg" width="90%">
 </p>
-```
+
+---
+
 ## 📦 My Orders
 
-```{=html}
 <p align="center">
-```
-`<img src="https://raw.githubusercontent.com/Alifkece/media/main/uploads/1783125228627_IMG-20260704-WA0004.jpg" width="90%">`{=html}
-```{=html}
+<img src="assets/orders.jpg" width="90%">
 </p>
-```
+
+---
+
 ## 🤝 Reseller
 
-```{=html}
 <p align="center">
-```
-`<img src="https://raw.githubusercontent.com/Alifkece/media/main/uploads/1783125241808_IMG-20260704-WA0003.jpg" width="90%">`{=html}
-```{=html}
+<img src="assets/reseller.jpg" width="90%">
 </p>
-```
+
+---
+
 ## ⚙️ Settings
 
-```{=html}
 <p align="center">
-```
-`<img src="https://raw.githubusercontent.com/Alifkece/media/main/uploads/1783125252117_IMG-20260704-WA0005.jpg" width="90%">`{=html}
-```{=html}
+<img src="assets/settings.jpg" width="90%">
 </p>
-```
-# 🛍️ Aliftzy Store
 
-Website Store resmi **Aliftzy Store** yang dikembangkan menggunakan
-**HTML5, CSS3, JavaScript (ES Modules), Firebase Authentication, Cloud
-Firestore**, serta backend pembayaran terpisah.
+---
 
-Repository ini berisi **website yang digunakan oleh pelanggan (User)**
-untuk melakukan login, melihat produk, melakukan pembelian, dan melihat
-status pesanan secara realtime.
+# 🛍️ About
 
-> Dashboard Admin dikembangkan pada repository terpisah agar keamanan,
-> struktur proyek, dan proses maintenance menjadi lebih baik.
+**Aliftzy Store** merupakan website digital store modern yang dikembangkan menggunakan **HTML5, CSS3, JavaScript (ES Modules), Firebase Authentication, Cloud Firestore**, serta backend pembayaran terpisah.
 
-------------------------------------------------------------------------
+Repository ini berisi **Website Store (Frontend User)** yang digunakan pelanggan untuk melakukan login, melihat produk, melakukan pembelian, dan memantau status pesanan secara realtime.
 
-# ✨ Fitur
+Dashboard Admin dikembangkan pada repository terpisah agar keamanan, struktur proyek, dan proses maintenance menjadi lebih baik.
+
+---
+
+# ✨ Features
 
 ## 👤 Authentication
 
--   Login
--   Register
--   Logout
--   Session Login
--   Firebase Authentication
+- Login
+- Register
+- Logout
+- Session Login
+- Firebase Authentication
 
 ## 🛒 Store
 
--   Menampilkan daftar produk
--   Detail produk
--   Kategori produk
--   Harga produk
--   Badge stok
--   Responsive Layout
+- Product Catalog
+- Product Detail
+- Categories
+- Dynamic Pricing
+- Stock Badge
+- Responsive Layout
 
 ## 💳 Checkout
 
--   Membuat pesanan
--   Integrasi Backend Payment
--   Status pembayaran realtime
--   Riwayat pesanan
+- Create Order
+- Backend Payment Integration
+- QRIS Payment
+- Realtime Payment Status
+- Order History
 
 ## 📦 Orders
 
--   Melihat seluruh pesanan milik pengguna
--   Status pesanan
--   Detail pesanan
--   Informasi akun setelah diproses Admin
+- My Orders
+- Order Detail
+- Order Status
+- Account Delivery After Admin Process
 
-## 📢 Announcements
+## 📢 Announcement
 
--   Sinkronisasi realtime Firestore
+- Realtime Announcement
+- Firestore Sync
 
 ## 🎵 Music
 
--   Playlist lagu
--   Music Player
+- Playlist
+- Music Player
 
 ## ⚙️ Settings
 
--   Konfigurasi Store realtime
+- Store Configuration
+- Dynamic Information
 
-# 🛠️ Teknologi
+---
 
--   HTML5
--   CSS3
--   JavaScript (ES Modules)
--   Firebase Authentication
--   Cloud Firestore
--   Firebase SDK
--   Railway
--   SiTransfer
--   Netlify
--   GitHub
+# 🛠️ Technologies
 
-# 📁 Struktur Project
+- HTML5
+- CSS3
+- JavaScript (ES Modules)
+- Firebase Authentication
+- Cloud Firestore
+- Firebase SDK
+- Railway
+- SiTransfer
+- GitHub
+- Netlify
+- Vercel
 
-``` text
+---
+
+# 📁 Project Structure
+
+```text
 Aliftzy-Store/
+│
 ├── api/
+├── assets/
 ├── css/
 ├── js/
 ├── lib/
@@ -183,23 +170,48 @@ Aliftzy-Store/
 └── package.json
 ```
 
+---
+
 # 🔥 Database
 
-Collection: - products - songs - settings - announcements - stock -
+Menggunakan satu Firebase Project yang sama dengan Dashboard Admin.
+
+Collection yang digunakan:
+
+```text
+products
+songs
+settings
+announcements
+stock
 orders
+```
 
-# 🔒 Keamanan
+Seluruh perubahan yang dilakukan Dashboard Admin akan langsung tersinkronisasi secara realtime ke Website Store melalui Cloud Firestore.
 
--   Firebase Authentication
--   Firestore Security Rules
--   Ownership Validation
--   Store dipisahkan dari Dashboard Admin
+---
+
+# 🔒 Security
+
+- Firebase Authentication
+- Firestore Security Rules
+- Ownership Validation
+- Store & Admin Repository Separation
+- Realtime Firestore Synchronization
+
+---
 
 # 🚀 Deployment
 
--   Netlify
--   Vercel
--   Firebase Hosting
+Website dapat di-deploy menggunakan:
+
+- Netlify
+- Vercel
+- Firebase Hosting
+
+Pastikan menggunakan Firebase Project yang sama dengan Dashboard Admin.
+
+---
 
 # 👨‍💻 Developer
 
@@ -207,33 +219,64 @@ orders
 
 **Mahasiswa SMK Industri Kreatif Kota Bekasi**
 
-🌐 **Official Developer Website**\
-**https://privatealif.netlify.app**
+🌐 **Official Developer Website**  
+https://privatealif.netlify.app
 
-Project dimulai **12 Juni 2026** dan selesai **4 Juli 2026**.
+---
+
+# 📅 Timeline
+
+| Tahap | Tanggal |
+|-------|----------|
+| 🚀 Project Dimulai | **12 Juni 2026** |
+| 🎉 Project Selesai | **4 Juli 2026** |
+
+Durasi pengembangan sekitar **22 hari**.
+
+---
 
 # 🙏 Special Thanks
 
--   ChatGPT (OpenAI)
--   Claude AI (Anthropic)
--   Firebase
--   Cloud Firestore
--   Firebase Authentication
--   Railway
--   Netlify
--   Vercel
--   GitHub
--   SiTransfer
--   QRIS
--   Visual Studio Code
--   Node.js
--   npm
+### 🤖 Artificial Intelligence
+- ChatGPT (OpenAI)
+- Claude AI (Anthropic)
 
-# 📌 Catatan
+### ☁️ Backend
+- Firebase Authentication
+- Cloud Firestore
+- Firebase SDK
 
-Repository ini merupakan Frontend Website Store. Dashboard Admin berada
-pada repository terpisah namun tetap menggunakan Firebase Project yang
-sama sehingga perubahan Admin langsung tersinkronisasi ke Store.
+### 🚀 Hosting & Deployment
+- GitHub
+- Netlify
+- Railway
+- Vercel
+
+### 💳 Payment
+- SiTransfer
+- QRIS
+
+### 💻 Development
+- Visual Studio Code
+- Git
+- GitHub Desktop
+- Node.js
+- npm
+
+### 🌐 Web Technologies
+- HTML5
+- CSS3
+- JavaScript (ES Modules)
+
+---
+
+# 📌 Notes
+
+Repository ini hanya berisi **Website Store**.
+
+Dashboard Admin dikembangkan pada repository terpisah namun tetap menggunakan Firebase Authentication dan Cloud Firestore yang sama sehingga seluruh perubahan dari Admin akan langsung muncul di Website Store secara realtime.
+
+---
 
 # 📄 License
 
@@ -241,8 +284,12 @@ sama sehingga perubahan Admin langsung tersinkronisasi ke Store.
 
 Seluruh source code dan desain dibuat untuk kebutuhan **Aliftzy Store**.
 
-------------------------------------------------------------------------
+Dilarang memperbanyak, memodifikasi, mendistribusikan, atau menggunakan sebagian maupun seluruh isi project ini tanpa izin dari pemilik.
 
-> **Aliftzy Store v1.0**\
-> Developed with ❤️ by **Muhammad Alifudin**\
-> Official Developer Website: **https://privatealif.netlify.app**
+---
+
+<p align="center">
+<b>🛍️ Aliftzy Store v1.0</b><br>
+Developed with ❤️ by <b>Muhammad Alifudin</b><br>
+🌐 https://privatealif.netlify.app
+</p>
