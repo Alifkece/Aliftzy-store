@@ -247,8 +247,8 @@ Seluruh sistem dirancang menggunakan arsitektur terpisah antara **Website Store*
 | ⏱️ Durasi Pengembangan | **22 Hari** |
 | 💻 Developer | **Muhammad Alifudin** |
 | 🏫 Institusi | **SMK Industri Kreatif Kota Bekasi** |
-| 🌐 Website | **https://privatealif.netlify.app** |
-
+| 🌐 Website Portofolio | **https://privatealif.netlify.app** |
+| 🌐 Website Store | **https://aliftzy-store.vercel.app** |
 ---
 
 ### 🎯 Project Goals
