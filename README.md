@@ -215,81 +215,75 @@ Pastikan menggunakan Firebase Project yang sama dengan Dashboard Admin.
 
 # 👨‍💻 Developer
 
-## Muhammad Alifudin
+<p align="center">
+  <img src="assets/developer.jpg" width="220">
+</p>
 
-**Mahasiswa SMK Industri Kreatif Kota Bekasi**
+<h2 align="center">Muhammad Alifudin</h2>
 
-🌐 **Official Developer Website**  
-https://privatealif.netlify.app
-
----
-
-# 📅 Timeline
-
-| Tahap | Tanggal |
-|-------|----------|
-| 🚀 Project Dimulai | **12 Juni 2026** |
-| 🎉 Project Selesai | **4 Juli 2026** |
-
-Durasi pengembangan sekitar **22 hari**.
+<p align="center">
+<b>Frontend Web Developer • Firebase Enthusiast • UI/UX Designer</b>
+</p>
 
 ---
 
-# 🙏 Special Thanks
+### 👋 About Me
 
-### 🤖 Artificial Intelligence
-- ChatGPT (OpenAI)
-- Claude AI (Anthropic)
+Halo! Saya **Muhammad Alifudin**, mahasiswa **SMK Industri Kreatif Kota Bekasi** yang memiliki minat besar di bidang **Web Development**, **Frontend Engineering**, **UI/UX Design**, dan **Cloud Computing**.
 
-### ☁️ Backend
-- Firebase Authentication
-- Cloud Firestore
-- Firebase SDK
+Saya mengembangkan **Aliftzy Store** sebagai proyek pembelajaran sekaligus implementasi nyata dalam membangun platform digital store modern yang mengutamakan keamanan, performa, dan pengalaman pengguna.
 
-### 🚀 Hosting & Deployment
-- GitHub
-- Netlify
-- Railway
-- Vercel
+Seluruh sistem dirancang menggunakan arsitektur terpisah antara **Website Store** dan **Dashboard Admin**, dengan sinkronisasi realtime menggunakan **Firebase Authentication** dan **Cloud Firestore**.
 
-### 💳 Payment
-- SiTransfer
-- QRIS
+---
 
-### 💻 Development
-- Visual Studio Code
-- Git
-- GitHub Desktop
-- Node.js
-- npm
+### 📅 Project Information
 
-### 🌐 Web Technologies
+| Keterangan | Detail |
+|------------|--------|
+| 🚀 Project | **Aliftzy Store** |
+| 📅 Dimulai | **12 Juni 2026** |
+| 🎉 Selesai | **4 Juli 2026** |
+| ⏱️ Durasi Pengembangan | **22 Hari** |
+| 💻 Developer | **Muhammad Alifudin** |
+| 🏫 Institusi | **SMK Industri Kreatif Kota Bekasi** |
+| 🌐 Website | **https://privatealif.netlify.app** |
+
+---
+
+### 🎯 Project Goals
+
+- Membangun digital store yang modern dan responsif.
+- Mempermudah proses penjualan akun digital.
+- Menggunakan sistem realtime berbasis Firebase.
+- Mengimplementasikan keamanan menggunakan Firestore Security Rules.
+- Mengembangkan arsitektur Store & Admin yang terpisah agar lebih aman dan mudah dikelola.
+
+---
+
+### 🛠️ Skills
+
 - HTML5
 - CSS3
 - JavaScript (ES Modules)
+- Firebase Authentication
+- Cloud Firestore
+- Git & GitHub
+- Netlify
+- Railway
+- Responsive Web Design
+- UI / UX Design
 
 ---
 
-# 📌 Notes
+### 🌐 Portfolio
 
-Repository ini hanya berisi **Website Store**.
+**Website:**  
+https://privatealif.netlify.app
 
-Dashboard Admin dikembangkan pada repository terpisah namun tetap menggunakan Firebase Authentication dan Cloud Firestore yang sama sehingga seluruh perubahan dari Admin akan langsung muncul di Website Store secara realtime.
-
----
-
-# 📄 License
-
-**© 2026 Muhammad Alifudin**
-
-Seluruh source code dan desain dibuat untuk kebutuhan **Aliftzy Store**.
-
-Dilarang memperbanyak, memodifikasi, mendistribusikan, atau menggunakan sebagian maupun seluruh isi project ini tanpa izin dari pemilik.
+**GitHub:**  
+https://github.com/Alifkece
 
 ---
 
-<p align="center">
-<b>🛍️ Aliftzy Store v1.0</b><br>
-Developed with ❤️ by <b>Muhammad Alifudin</b><br>
-🌐 https://privatealif.netlify.app
-</p>
+> **"Every project is an opportunity to learn, improve, and build something better than before."** 🚀
