@@ -1,85 +1,147 @@
-<p align="center">
-  <img src="assets/banner.png" width="100%">
+<div align="center">
+
+<img src="assets/banner.png" width="100%" alt="Aliftzy Store Banner" />
+
+<br />
+
+<h1>
+  <img src="https://api.iconify.design/lucide:shopping-bag.svg?color=%236366F1" width="30" align="center" />
+  &nbsp;Aliftzy Store
+</h1>
+
+<p>
+  <b>Modern Digital Store&nbsp;•&nbsp;Safe &amp; Trusted</b>
 </p>
 
-<h1 align="center">🛍️ Aliftzy Store</h1>
-
-<p align="center">
-<b>Modern Digital Store • Safe & Trusted</b>
+<p>
+  <img src="https://img.shields.io/badge/Version-v1.0-gold?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" />
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" />
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
+  <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" />
+  <img src="https://img.shields.io/badge/Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white" />
+  <img src="https://img.shields.io/badge/SiTransfer-0099FF?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" />
 </p>
 
-<p align="center">
-<img src="https://img.shields.io/badge/Version-v1.0-gold?style=for-the-badge">
-<img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white">
-<img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white">
-<img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black">
-<img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black">
-<img src="https://img.shields.io/badge/Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white">
-<img src="https://img.shields.io/badge/SiTransfer-0099FF?style=for-the-badge">
-<img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white">
+<p>
+  <img src="https://img.shields.io/badge/License-Proprietary-red?style=for-the-badge" />
+  <img src="https://img.shields.io/github/last-commit/Alifkece/Aliftzy-Store?style=for-the-badge&color=6366F1&label=Last%20Commit" />
+  <img src="https://img.shields.io/github/repo-size/Alifkece/Aliftzy-Store?style=for-the-badge&color=6366F1&label=Repo%20Size" />
+  <img src="https://img.shields.io/github/stars/Alifkece/Aliftzy-Store?style=for-the-badge&color=6366F1&label=Stars" />
+  <img src="https://img.shields.io/github/forks/Alifkece/Aliftzy-Store?style=for-the-badge&color=6366F1&label=Forks" />
+  <img src="https://img.shields.io/github/issues/Alifkece/Aliftzy-Store?style=for-the-badge&color=6366F1&label=Issues" />
+  <img src="https://img.shields.io/badge/Maintained-yes-brightgreen?style=for-the-badge" />
 </p>
+
+<p>
+  <a href="#preview"><b>Preview</b></a> &nbsp;•&nbsp;
+  <a href="#about"><b>About</b></a> &nbsp;•&nbsp;
+  <a href="#features"><b>Features</b></a> &nbsp;•&nbsp;
+  <a href="#technologies"><b>Tech Stack</b></a> &nbsp;•&nbsp;
+  <a href="#structure"><b>Structure</b></a> &nbsp;•&nbsp;
+  <a href="#database"><b>Database</b></a> &nbsp;•&nbsp;
+  <a href="#security"><b>Security</b></a> &nbsp;•&nbsp;
+  <a href="#deployment"><b>Deployment</b></a> &nbsp;•&nbsp;
+  <a href="#developer"><b>Developer</b></a>
+</p>
+
+</div>
+
+<br />
+
+<a id="preview"></a>
+<h2>
+  <img src="https://api.iconify.design/lucide:image.svg?color=%236366F1" width="22" align="center" />
+  &nbsp;Website Preview
+</h2>
+
+<br />
+
+<h3>
+  <img src="https://api.iconify.design/lucide:home.svg?color=%236366F1" width="18" align="center" />
+  &nbsp;Home
+</h3>
+
+<p align="center">
+  <img src="assets/home.jpg" width="90%" />
+</p>
+
+<br />
+
+<h3>
+  <img src="https://api.iconify.design/lucide:shopping-bag.svg?color=%236366F1" width="18" align="center" />
+  &nbsp;Products
+</h3>
+
+<p align="center">
+  <img src="assets/products.jpg" width="90%" />
+</p>
+
+<br />
+
+<h3>
+  <img src="https://api.iconify.design/lucide:tag.svg?color=%236366F1" width="18" align="center" />
+  &nbsp;Product Detail
+</h3>
+
+<p align="center">
+  <img src="assets/product-detail.jpg" width="90%" />
+</p>
+
+<br />
+
+<h3>
+  <img src="https://api.iconify.design/lucide:qr-code.svg?color=%236366F1" width="18" align="center" />
+  &nbsp;QRIS Payment
+</h3>
+
+<p align="center">
+  <img src="assets/qris.jpg" width="90%" />
+</p>
+
+<br />
+
+<h3>
+  <img src="https://api.iconify.design/lucide:package.svg?color=%236366F1" width="18" align="center" />
+  &nbsp;My Orders
+</h3>
+
+<p align="center">
+  <img src="assets/orders.jpg" width="90%" />
+</p>
+
+<br />
+
+<h3>
+  <img src="https://api.iconify.design/lucide:users.svg?color=%236366F1" width="18" align="center" />
+  &nbsp;Reseller
+</h3>
+
+<p align="center">
+  <img src="assets/reseller.jpg" width="90%" />
+</p>
+
+<br />
+
+<h3>
+  <img src="https://api.iconify.design/lucide:settings.svg?color=%236366F1" width="18" align="center" />
+  &nbsp;Settings
+</h3>
+
+<p align="center">
+  <img src="assets/settings.jpg" width="90%" />
+</p>
+
+<br />
 
 ---
 
-# 📸 Website Preview
-
-## 🏠 Home
-
-<p align="center">
-<img src="assets/home.jpg" width="90%">
-</p>
-
----
-
-## 🛒 Products
-
-<p align="center">
-<img src="assets/products.jpg" width="90%">
-</p>
-
----
-
-## 💰 Product Detail
-
-<p align="center">
-<img src="assets/product-detail.jpg" width="90%">
-</p>
-
----
-
-## 💳 QRIS Payment
-
-<p align="center">
-<img src="assets/qris.jpg" width="90%">
-</p>
-
----
-
-## 📦 My Orders
-
-<p align="center">
-<img src="assets/orders.jpg" width="90%">
-</p>
-
----
-
-## 🤝 Reseller
-
-<p align="center">
-<img src="assets/reseller.jpg" width="90%">
-</p>
-
----
-
-## ⚙️ Settings
-
-<p align="center">
-<img src="assets/settings.jpg" width="90%">
-</p>
-
----
-
-# 🛍️ About
+<a id="about"></a>
+<h2>
+  <img src="https://api.iconify.design/lucide:info.svg?color=%236366F1" width="22" align="center" />
+  &nbsp;About
+</h2>
 
 **Aliftzy Store** merupakan website digital store modern yang dikembangkan menggunakan **HTML5, CSS3, JavaScript (ES Modules), Firebase Authentication, Cloud Firestore**, serta backend pembayaran terpisah.
 
@@ -89,9 +151,21 @@ Dashboard Admin dikembangkan pada repository terpisah agar keamanan, struktur pr
 
 ---
 
-# ✨ Features
+<a id="features"></a>
+<h2>
+  <img src="https://api.iconify.design/lucide:sparkles.svg?color=%236366F1" width="22" align="center" />
+  &nbsp;Features
+</h2>
 
-## 👤 Authentication
+<table>
+<tr>
+<td width="40%" valign="top">
+  <h3>
+    <img src="https://api.iconify.design/lucide:user.svg?color=%236366F1" width="18" align="center" />
+    &nbsp;Authentication
+  </h3>
+</td>
+<td valign="top">
 
 - Login
 - Register
@@ -99,7 +173,16 @@ Dashboard Admin dikembangkan pada repository terpisah agar keamanan, struktur pr
 - Session Login
 - Firebase Authentication
 
-## 🛒 Store
+</td>
+</tr>
+<tr>
+<td valign="top">
+  <h3>
+    <img src="https://api.iconify.design/lucide:shopping-cart.svg?color=%236366F1" width="18" align="center" />
+    &nbsp;Store
+  </h3>
+</td>
+<td valign="top">
 
 - Product Catalog
 - Product Detail
@@ -108,7 +191,16 @@ Dashboard Admin dikembangkan pada repository terpisah agar keamanan, struktur pr
 - Stock Badge
 - Responsive Layout
 
-## 💳 Checkout
+</td>
+</tr>
+<tr>
+<td valign="top">
+  <h3>
+    <img src="https://api.iconify.design/lucide:credit-card.svg?color=%236366F1" width="18" align="center" />
+    &nbsp;Checkout
+  </h3>
+</td>
+<td valign="top">
 
 - Create Order
 - Backend Payment Integration
@@ -116,47 +208,130 @@ Dashboard Admin dikembangkan pada repository terpisah agar keamanan, struktur pr
 - Realtime Payment Status
 - Order History
 
-## 📦 Orders
+</td>
+</tr>
+<tr>
+<td valign="top">
+  <h3>
+    <img src="https://api.iconify.design/lucide:package.svg?color=%236366F1" width="18" align="center" />
+    &nbsp;Orders
+  </h3>
+</td>
+<td valign="top">
 
 - My Orders
 - Order Detail
 - Order Status
 - Account Delivery After Admin Process
 
-## 📢 Announcement
+</td>
+</tr>
+<tr>
+<td valign="top">
+  <h3>
+    <img src="https://api.iconify.design/lucide:megaphone.svg?color=%236366F1" width="18" align="center" />
+    &nbsp;Announcement
+  </h3>
+</td>
+<td valign="top">
 
 - Realtime Announcement
 - Firestore Sync
 
-## 🎵 Music
+</td>
+</tr>
+<tr>
+<td valign="top">
+  <h3>
+    <img src="https://api.iconify.design/lucide:music.svg?color=%236366F1" width="18" align="center" />
+    &nbsp;Music
+  </h3>
+</td>
+<td valign="top">
 
 - Playlist
 - Music Player
 
-## ⚙️ Settings
+</td>
+</tr>
+<tr>
+<td valign="top">
+  <h3>
+    <img src="https://api.iconify.design/lucide:settings.svg?color=%236366F1" width="18" align="center" />
+    &nbsp;Settings
+  </h3>
+</td>
+<td valign="top">
 
 - Store Configuration
 - Dynamic Information
 
----
-
-# 🛠️ Technologies
-
-- HTML5
-- CSS3
-- JavaScript (ES Modules)
-- Firebase Authentication
-- Cloud Firestore
-- Firebase SDK
-- Railway
-- SiTransfer
-- GitHub
-- Netlify
-- Vercel
+</td>
+</tr>
+</table>
 
 ---
 
-# 📁 Project Structure
+<a id="technologies"></a>
+<h2>
+  <img src="https://api.iconify.design/lucide:layers.svg?color=%236366F1" width="22" align="center" />
+  &nbsp;Technologies
+</h2>
+
+<div align="center">
+
+<table>
+<tr>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/html5/E34F26" width="40" /><br /><sub><b>HTML5</b></sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/css3/1572B6" width="40" /><br /><sub><b>CSS3</b></sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/javascript/F7DF1E" width="40" /><br /><sub><b>JavaScript (ES Modules)</b></sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/firebase/FFCA28" width="40" /><br /><sub><b>Firebase Authentication</b></sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="120">
+<img src="https://api.iconify.design/lucide:database.svg?color=%23FFA000" width="40" /><br /><sub><b>Cloud Firestore</b></sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/firebase/FFCA28" width="40" /><br /><sub><b>Firebase SDK</b></sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/railway/0B0D0E" width="40" /><br /><sub><b>Railway</b></sub>
+</td>
+<td align="center" width="120">
+<img src="https://api.iconify.design/lucide:credit-card.svg?color=%230099FF" width="40" /><br /><sub><b>SiTransfer</b></sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/github/181717" width="40" /><br /><sub><b>GitHub</b></sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/netlify/00C7B7" width="40" /><br /><sub><b>Netlify</b></sub>
+</td>
+<td align="center" width="120">
+<img src="https://cdn.simpleicons.org/vercel/000000" width="40" /><br /><sub><b>Vercel</b></sub>
+</td>
+<td></td>
+</tr>
+</table>
+
+</div>
+
+---
+
+<a id="structure"></a>
+<h2>
+  <img src="https://api.iconify.design/lucide:folder-tree.svg?color=%236366F1" width="22" align="center" />
+  &nbsp;Project Structure
+</h2>
 
 ```text
 Aliftzy-Store/
@@ -172,7 +347,11 @@ Aliftzy-Store/
 
 ---
 
-# 🔥 Database
+<a id="database"></a>
+<h2>
+  <img src="https://api.iconify.design/lucide:database.svg?color=%236366F1" width="22" align="center" />
+  &nbsp;Database
+</h2>
 
 Menggunakan satu Firebase Project yang sama dengan Dashboard Admin.
 
@@ -191,7 +370,11 @@ Seluruh perubahan yang dilakukan Dashboard Admin akan langsung tersinkronisasi s
 
 ---
 
-# 🔒 Security
+<a id="security"></a>
+<h2>
+  <img src="https://api.iconify.design/lucide:shield-check.svg?color=%236366F1" width="22" align="center" />
+  &nbsp;Security
+</h2>
 
 - Firebase Authentication
 - Firestore Security Rules
@@ -201,7 +384,11 @@ Seluruh perubahan yang dilakukan Dashboard Admin akan langsung tersinkronisasi s
 
 ---
 
-# 🚀 Deployment
+<a id="deployment"></a>
+<h2>
+  <img src="https://api.iconify.design/lucide:rocket.svg?color=%236366F1" width="22" align="center" />
+  &nbsp;Deployment
+</h2>
 
 Website dapat di-deploy menggunakan:
 
@@ -213,21 +400,37 @@ Pastikan menggunakan Firebase Project yang sama dengan Dashboard Admin.
 
 ---
 
-# 👨‍💻 Developer
+<a id="developer"></a>
+<h2>
+  <img src="https://api.iconify.design/lucide:code.svg?color=%236366F1" width="22" align="center" />
+  &nbsp;Developer
+</h2>
 
-<p align="center">
-  <img src="assets/developer.jpg" width="220">
+<div align="center">
+
+<img src="assets/developer.jpg" width="220" style="border-radius:50%;" />
+
+<h2>Muhammad Alifudin</h2>
+
+<p><b>Frontend Web Developer&nbsp;•&nbsp;Firebase Enthusiast&nbsp;•&nbsp;UI/UX Designer</b></p>
+
+<p>
+  <a href="https://privatealif.netlify.app">
+    <img src="https://img.shields.io/badge/Portfolio-6366F1?style=for-the-badge&logo=vercel&logoColor=white" />
+  </a>
+  <a href="https://github.com/Alifkece">
+    <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" />
+  </a>
 </p>
 
-<h2 align="center">Muhammad Alifudin</h2>
+</div>
 
-<p align="center">
-<b>Frontend Web Developer • Firebase Enthusiast • UI/UX Designer</b>
-</p>
+<br />
 
----
-
-### 👋 About Me
+<h3>
+  <img src="https://api.iconify.design/lucide:user-circle.svg?color=%236366F1" width="18" align="center" />
+  &nbsp;About Me
+</h3>
 
 Halo! Saya **Muhammad Alifudin**, mahasiswa **SMK Industri Kreatif Kota Bekasi** yang memiliki minat besar di bidang **Web Development**, **Frontend Engineering**, **UI/UX Design**, dan **Cloud Computing**.
 
@@ -235,23 +438,34 @@ Saya mengembangkan **Aliftzy Store** sebagai proyek pembelajaran sekaligus imple
 
 Seluruh sistem dirancang menggunakan arsitektur terpisah antara **Website Store** dan **Dashboard Admin**, dengan sinkronisasi realtime menggunakan **Firebase Authentication** dan **Cloud Firestore**.
 
----
+<br />
 
-### 📅 Project Information
+<h3>
+  <img src="https://api.iconify.design/lucide:calendar-days.svg?color=%236366F1" width="18" align="center" />
+  &nbsp;Project Information
+</h3>
+
+<div align="center">
 
 | Keterangan | Detail |
-|------------|--------|
-| 🚀 Project | **Aliftzy Store** |
-| 📅 Dimulai | **12 Juni 2026** |
-| 🎉 Selesai | **4 Juli 2026** |
-| ⏱️ Durasi Pengembangan | **22 Hari** |
-| 💻 Developer | **Muhammad Alifudin** |
-| 🏫 Institusi | **SMK Industri Kreatif Kota Bekasi** |
-| 🌐 Website Portofolio | **https://privatealif.netlify.app** |
-| 🌐 Website Store | **https://aliftzy-store.vercel.app** |
----
+|:--|:--|
+| Project | **Aliftzy Store** |
+| Dimulai | **12 Juni 2026** |
+| Selesai | **4 Juli 2026** |
+| Durasi Pengembangan | **22 Hari** |
+| Developer | **Muhammad Alifudin** |
+| Institusi | **SMK Industri Kreatif Kota Bekasi** |
+| Website Portofolio | **[privatealif.netlify.app](https://privatealif.netlify.app)** |
+| Website Store | **[aliftzy-store.vercel.app](https://aliftzy-store.vercel.app)** |
 
-### 🎯 Project Goals
+</div>
+
+<br />
+
+<h3>
+  <img src="https://api.iconify.design/lucide:target.svg?color=%236366F1" width="18" align="center" />
+  &nbsp;Project Goals
+</h3>
 
 - Membangun digital store yang modern dan responsif.
 - Mempermudah proses penjualan akun digital.
@@ -259,9 +473,12 @@ Seluruh sistem dirancang menggunakan arsitektur terpisah antara **Website Store*
 - Mengimplementasikan keamanan menggunakan Firestore Security Rules.
 - Mengembangkan arsitektur Store & Admin yang terpisah agar lebih aman dan mudah dikelola.
 
----
+<br />
 
-### 🛠️ Skills
+<h3>
+  <img src="https://api.iconify.design/lucide:wrench.svg?color=%236366F1" width="18" align="center" />
+  &nbsp;Skills
+</h3>
 
 - HTML5
 - CSS3
@@ -274,16 +491,24 @@ Seluruh sistem dirancang menggunakan arsitektur terpisah antara **Website Store*
 - Responsive Web Design
 - UI / UX Design
 
----
+<br />
 
-### 🌐 Portfolio
+<h3>
+  <img src="https://api.iconify.design/lucide:globe.svg?color=%236366F1" width="18" align="center" />
+  &nbsp;Portfolio
+</h3>
 
-**Website:**  
+**Website:**
 https://privatealif.netlify.app
 
-**GitHub:**  
+**GitHub:**
 https://github.com/Alifkece
 
 ---
 
-> **"Every project is an opportunity to learn, improve, and build something better than before."** 🚀
+<div align="center">
+
+> **"Every project is an opportunity to learn, improve, and build something better than before."**
+> <img src="https://api.iconify.design/lucide:rocket.svg?color=%236366F1" width="16" align="center" />
+
+</div>
