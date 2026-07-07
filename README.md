@@ -286,7 +286,8 @@ Dashboard Admin dikembangkan pada repository terpisah agar keamanan, struktur pr
 <img src="https://cdn.simpleicons.org/html5/E34F26" width="40" /><br /><sub><b>HTML5</b></sub>
 </td>
 <td align="center" width="120">
-<img src="https://cdn.simpleicons.org/css3/1572B6" width="40" /><br /><sub><b>CSS3</b></sub>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" width="40"><br>
+  <sub><strong>CSS3</strong></sub>
 </td>
 <td align="center" width="120">
 <img src="https://cdn.simpleicons.org/javascript/F7DF1E" width="40" /><br /><sub><b>JavaScript (ES Modules)</b></sub>
