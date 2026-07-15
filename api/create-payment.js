@@ -1,3 +1,7 @@
+import { getAvailableStockCount, createPendingOrder } from "../lib/orders.js";
+
+const SITRANSFER_GENERATE_URL = "https://rest.sitranfer.com/payment/api/generate";
+
 export default async function handler(req, res) {
 
   if (req.method !== "POST") {
@@ -23,6 +27,10 @@ export default async function handler(req, res) {
 
     const amount = body.amount;
     const username = body.username;
+    const productId = body.productId;
+    const productName = body.productName;
+    const packageName = body.packageName;
+    const userId = body.userId;
 
 
     if (!amount || !username) {
@@ -31,6 +39,40 @@ export default async function handler(req, res) {
       });
     }
 
+    // productId wajib supaya stok bisa divalidasi sebelum QRIS dibuat,
+    // sama seperti aturan di backend Railway.
+    if (!productId) {
+      return res.status(400).json({
+        error: "productId wajib diisi untuk validasi stok"
+      });
+    }
+
+    const cleanAmount = Number(amount);
+    if (!cleanAmount || isNaN(cleanAmount) || cleanAmount <= 0) {
+      return res.status(400).json({
+        error: "amount tidak valid"
+      });
+    }
+
+    // ===== CEK STOK SEBELUM GENERATE QRIS =====
+    let availableStock;
+    try {
+      availableStock = await getAvailableStockCount(productId);
+    } catch (err) {
+      return res.status(500).json({
+        error: "Gagal memeriksa stok, coba lagi"
+      });
+    }
+
+    if (availableStock <= 0) {
+      // Stok kosong: jangan generate QRIS, jangan buat order, jangan panggil
+      // payment gateway sama sekali.
+      return res.status(409).json({
+        success: false,
+        outOfStock: true,
+        error: "Stok habis"
+      });
+    }
 
     const key = process.env.SITRANSFER_KEY;
 
@@ -43,7 +85,7 @@ export default async function handler(req, res) {
 
 
     const response = await fetch(
-      "https://rest.sitranfer.com/payment/api/generate",
+      SITRANSFER_GENERATE_URL,
       {
         method: "POST",
 
@@ -53,7 +95,7 @@ export default async function handler(req, res) {
 
         body: JSON.stringify({
           channel: "QRIS",
-          amount: Number(amount),
+          amount: cleanAmount,
           player_username: username,
           key: key
         })
@@ -62,6 +104,30 @@ export default async function handler(req, res) {
 
 
     const result = await response.json();
+
+    if (!response.ok || result?.success === false || result?.error) {
+      return res.status(response.ok ? 400 : response.status).json(result);
+    }
+
+    const data = result.data || result;
+    const transactionId = data.transaction_id;
+
+    if (transactionId) {
+      try {
+        await createPendingOrder({
+          transactionId,
+          userId,
+          username,
+          productId,
+          productName,
+          price: cleanAmount,
+          packageName,
+          expiredAt: data.expired_at || null
+        });
+      } catch (err) {
+        console.error("GAGAL SIMPAN ORDER PENDING:", transactionId, err);
+      }
+    }
 
     return res.status(200).json(result);
 
