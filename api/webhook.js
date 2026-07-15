@@ -1,4 +1,4 @@
-import { db } from "../lib/firebase.js";
+import { validateStockAndDeliver, markOrderTerminalStatus } from "../lib/orders.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -12,19 +12,7 @@ export default async function handler(req, res) {
 
     console.log("WEBHOOK RECEIVED:", body);
 
-    // 🔥 VALIDASI DATA DARI SITRANSFER
-    const isSuccess =
-      body?.success === true &&
-      body?.data?.status === "success";
-
-    if (!isSuccess) {
-      return res.status(200).json({
-        message: "Not paid or invalid payload"
-      });
-    }
-
     const trx = body?.data?.transaction_id;
-    const paymentType = body?.data?.type || "unknown";
 
     if (!trx) {
       return res.status(400).json({
@@ -32,20 +20,54 @@ export default async function handler(req, res) {
       });
     }
 
-    // 🔥 UPDATE ORDER DI FIREBASE
-    await db.collection("orders")
-      .doc(trx)
-      .update({
-        status: "PAID",
-        payment: paymentType,
-        paidAt: new Date()
-      });
+    const status = String(body?.data?.status || "").toLowerCase();
 
-    console.log("ORDER UPDATED TO PAID:", trx);
+    // 🔥 VALIDASI DATA DARI SITRANSFER
+    const isSuccess = body?.success === true && status === "success";
+
+    if (!isSuccess) {
+      // Sinkronkan status order untuk status terminal lain (failed/expired)
+      // supaya order tidak stuck PENDING selamanya.
+      if (status === "failed" || status === "expired") {
+        try {
+          await markOrderTerminalStatus(trx, status.toUpperCase());
+        } catch (err) {
+          console.error("WEBHOOK: gagal update status terminal:", trx, err);
+        }
+      }
+
+      return res.status(200).json({
+        message: "Not paid or invalid payload"
+      });
+    }
+
+    const paymentType = body?.data?.type || "unknown";
+
+    // 🔥 VALIDASI ULANG STOK + AUTO DELIVERY (Firestore transaction,
+    // race-condition safe, idempotent terhadap webhook retry)
+    const result = await validateStockAndDeliver(trx, paymentType);
+
+    if (!result.ok && result.reason === "ORDER_NOT_FOUND") {
+      console.error("WEBHOOK: order tidak ditemukan untuk transaction_id", trx);
+      return res.status(200).json({
+        status: "ok",
+        message: "order not found, ignored"
+      });
+    }
+
+    if (result.reason === "OUT_OF_STOCK_ON_PAYMENT") {
+      console.error(
+        "WEBHOOK: pembayaran sukses tapi stok habis saat validasi ulang untuk",
+        trx
+      );
+    }
+
+    console.log("ORDER UPDATED:", trx, result.reason);
 
     return res.status(200).json({
       status: "ok",
-      message: "payment processed"
+      message: "payment processed",
+      detail: result.reason
     });
 
   } catch (error) {
