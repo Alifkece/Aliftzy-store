@@ -1,6 +1,6 @@
 import { auth, db } from "./firebase-config.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, doc, getDoc, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, doc, getDoc, getDocs, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let currentUser = null;
 let products = [];
@@ -58,6 +58,7 @@ onAuthStateChanged(auth, async user => {
     loadPublicData();
   } else {
     currentUser = null;
+    if (stockUnsubscribe) { stockUnsubscribe(); stockUnsubscribe = null; }
     updateNavUI();
     showPage('auth', 'login');
   }
@@ -296,6 +297,21 @@ function getAuthError(code) {
 }
 
 // ===== PRODUCTS =====
+// Dipakai bersama oleh renderProducts() (badge/tombol) dan orderProduct()
+// (guard sebelum modal checkout dibuka), supaya aturan "stok kosong" selalu
+// konsisten di manapun dicek.
+function getProductStock(productId) {
+  const pStock = stockItems.filter(s => s.productId === productId);
+  const availableCount = pStock.filter(s => !s.sold).length;
+  const totalCount = pStock.length;
+  return {
+    availableCount,
+    totalCount,
+    hasStock: availableCount > 0,
+    hasStockData: totalCount > 0
+  };
+}
+
 function renderProducts(list) {
   const grid = document.getElementById('product-grid');
   if (!list.length) {
@@ -303,12 +319,7 @@ function renderProducts(list) {
     return;
   }
   grid.innerHTML = list.map(p => {
-    // Hitung stock
-    const pStock = stockItems.filter(s => s.productId === p.id);
-    const availableCount = pStock.filter(s => !s.sold).length;
-    const totalCount = pStock.length;
-    const hasStock = availableCount > 0;
-    const hasStockData = totalCount > 0;
+    const { availableCount, totalCount, hasStock, hasStockData } = getProductStock(p.id);
 
     const stockBadgeHtml = hasStockData
       ? `<div class="stock-badge ${hasStock ? 'stock-badge-available' : 'stock-badge-empty'}">
@@ -348,6 +359,7 @@ function renderProducts(list) {
 function filterProducts(cat, btn) {
   document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
+  stockFilter = cat;
   renderProducts(cat === 'all' ? products : products.filter(p => p.category === cat));
 }
 
@@ -355,6 +367,15 @@ function orderProduct(id) {
   const p = products.find(x => x.id === id);
   if (!p) return;
   if (!currentUser) { showNotif('Silakan masuk terlebih dahulu', 'error'); showPage('auth', 'login'); return; }
+
+  // Cegah modal checkout terbuka untuk produk yang stoknya kosong, bukan
+  // cuma mengandalkan tombol "Habis" yang disabled — klik pada kartu produk
+  // sebelumnya masih bisa membuka modal walau tombolnya sudah disabled.
+  const { hasStock, hasStockData } = getProductStock(p.id);
+  if (hasStockData && !hasStock) {
+    showNotif('Stok habis', 'error');
+    return;
+  }
 
   console.log("SELECTED PRODUCT", p);
 
@@ -525,13 +546,25 @@ async function generateQrisPayment() {
     return;
   }
 
+  // Cek ulang stok di sisi client sesaat sebelum bayar (UX cepat) — otoritas
+  // sebenarnya tetap di backend, yang mengecek ulang stok sebelum generate
+  // QRIS dan sekali lagi saat webhook pembayaran sukses masuk.
+  if (currentOrderProduct) {
+    const { hasStock, hasStockData } = getProductStock(currentOrderProduct.id);
+    if (hasStockData && !hasStock) {
+      showNotif('Stok habis', 'error');
+      return;
+    }
+  }
+
   btn.disabled = true;
   btn.innerHTML = 'Memproses...';
 
   try {
     console.log("REQUEST BODY", {
       amount: cleanAmount,
-      username: cleanUsername
+      username: cleanUsername,
+      productId: currentOrderProduct ? currentOrderProduct.id : null
     });
 
     const res = await fetch('https://aliftzy-backend-production.up.railway.app/create-payment', {
@@ -539,7 +572,11 @@ async function generateQrisPayment() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         amount: cleanAmount,
-        username: cleanUsername
+        username: cleanUsername,
+        productId: currentOrderProduct ? currentOrderProduct.id : null,
+        productName: currentOrderProduct ? currentOrderProduct.name : null,
+        packageName: selectedPackage ? selectedPackage.name : null,
+        userId: currentUser ? currentUser.uid : null
       })
     });
 
@@ -547,6 +584,13 @@ async function generateQrisPayment() {
     console.log("RESPONSE create-payment", { ok: res.ok, status: res.status, result });
 
     // Backend Railway membungkus hasil SiTransfer di { success, data: { qris_image, transaction_id, amount } }
+    if (res.status === 409 || result.outOfStock) {
+      showNotif(result.error || 'Stok habis', 'error');
+      btn.disabled = false;
+      btn.innerHTML = originalBtnHtml;
+      return;
+    }
+
     if (!res.ok || result.success === false || result.error) {
       showNotif(result.error || 'Gagal membuat pembayaran QRIS', 'error');
       btn.disabled = false;
@@ -1130,14 +1174,30 @@ function renderMyOrders() {
 
 // ===== STOCK SYSTEM =====
 
-// Load stock untuk display publik (hanya jumlah tersedia)
+// Load stock untuk display publik (hanya jumlah tersedia).
+// Realtime (onSnapshot), bukan getDocs sekali-jalan — supaya badge stok dan
+// guard "stok habis" di checkout selalu sesuai data terbaru selama user
+// masih buka halaman (konsisten dengan Dashboard Admin yang sync realtime).
 async function loadStockPublic() {
-  try {
-    const snap = await getDocs(collection(db, "stock"));
-    stockItems = [];
-    snap.forEach(d => stockItems.push({ id: d.id, ...d.data() }));
-  } catch(e) {
-    stockItems = [];
-  }
+  if (stockUnsubscribe) { stockUnsubscribe(); stockUnsubscribe = null; }
+
+  return new Promise((resolve) => {
+    let resolved = false;
+    stockUnsubscribe = onSnapshot(
+      collection(db, "stock"),
+      snap => {
+        stockItems = [];
+        snap.forEach(d => stockItems.push({ id: d.id, ...d.data() }));
+        if (products.length) renderProducts(
+          stockFilter === 'all' ? products : products.filter(p => p.category === stockFilter)
+        );
+        if (!resolved) { resolved = true; resolve(); }
+      },
+      () => {
+        stockItems = [];
+        if (!resolved) { resolved = true; resolve(); }
+      }
+    );
+  });
 }
 
