@@ -460,5 +460,297 @@
   </div>
 </div>
 
+
+<!-- ===== WELCOME INTRO OVERLAY (Aliftzy Store) ===== -->
+<style>
+  #wi-overlay{
+    position:fixed; inset:0; z-index:9999;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(5,8,18,.82);
+    -webkit-backdrop-filter:blur(18px);
+    backdrop-filter:blur(18px);
+    opacity:0; transform:scale(.96);
+    transition:opacity .7s cubic-bezier(.16,.8,.24,1), transform .7s cubic-bezier(.16,.8,.24,1);
+    padding:20px; box-sizing:border-box;
+  }
+  #wi-overlay.wi-show{ opacity:1; transform:scale(1); }
+  #wi-overlay.wi-hide{ opacity:0; transform:scale(.96); pointer-events:none; }
+  #wi-overlay *{ box-sizing:border-box; }
+
+  #wi-particles{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+  .wi-particle{
+    position:absolute; bottom:-10px; border-radius:50%;
+    background:rgba(96,165,250,.55);
+    box-shadow:0 0 6px rgba(96,165,250,.6);
+    animation-name:wi-float; animation-timing-function:linear; animation-iteration-count:infinite;
+  }
+  @keyframes wi-float{
+    0%{ transform:translateY(0) translateX(0); opacity:0; }
+    10%{ opacity:.7; }
+    90%{ opacity:.5; }
+    100%{ transform:translateY(-110vh) translateX(var(--wi-drift,20px)); opacity:0; }
+  }
+
+  #wi-card{
+    position:relative;
+    width:92%; max-width:900px;
+    border-radius:24px;
+    background:rgba(15,20,35,.55);
+    border:1px solid rgba(255,255,255,.12);
+    padding:3px;
+    opacity:0; transform:scale(.92);
+    transition:opacity .6s cubic-bezier(.16,.8,.24,1), transform .6s cubic-bezier(.16,.8,.24,1);
+    box-shadow:0 0 30px rgba(59,130,246,.25), 0 0 60px rgba(59,130,246,.15);
+  }
+  #wi-overlay.wi-show #wi-card{ opacity:1; transform:scale(1); transition-delay:.15s; }
+
+  #wi-card::before{
+    content:""; position:absolute; inset:-1px; border-radius:24px; z-index:0;
+    padding:1px;
+    background:linear-gradient(45deg,#3B82F6,#60A5FA,#2563EB,#60A5FA,#3B82F6);
+    background-size:300% 300%;
+    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor;
+    mask-composite:exclude;
+    animation:wi-border-move 6s ease infinite;
+    opacity:.9;
+  }
+  @keyframes wi-border-move{
+    0%{ background-position:0% 50%; }
+    50%{ background-position:100% 50%; }
+    100%{ background-position:0% 50%; }
+  }
+
+  #wi-inner{
+    position:relative; z-index:1;
+    background:rgba(10,14,26,.55);
+    border-radius:21px;
+    padding:28px 28px 32px;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+  }
+
+  #wi-video-wrap{
+    width:100%; max-width:820px;
+    aspect-ratio:16/9;
+    border-radius:16px;
+    overflow:hidden;
+    background:#05070f;
+    position:relative;
+    opacity:0;
+    transition:opacity .6s ease;
+    margin-bottom:22px;
+  }
+  #wi-video-wrap.wi-video-show{ opacity:1; }
+  #wi-video{
+    width:100%; height:100%; object-fit:cover; display:block;
+    transform:scale(1);
+    transition:transform 6s ease-out;
+  }
+  #wi-video.wi-zoom{ transform:scale(1.03); }
+
+  #wi-heading{
+    font-family:'Syne', sans-serif;
+    font-weight:700;
+    font-size:clamp(24px,4vw,36px);
+    color:#e8eaf0;
+    line-height:1.25;
+    opacity:0; transform:translateY(18px);
+    transition:opacity .5s ease, transform .5s ease;
+    margin:0 0 10px;
+  }
+  #wi-overlay.wi-show #wi-heading{ opacity:1; transform:translateY(0); transition-delay:.9s; }
+  #wi-heading .wi-grad{
+    background:linear-gradient(135deg,#3B82F6,#60A5FA,#2563EB);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    display:block;
+  }
+
+  #wi-subtitle{
+    font-family:'DM Sans', sans-serif;
+    font-size:14.5px;
+    color:#8892a4;
+    max-width:520px;
+    line-height:1.7;
+    opacity:0;
+    transition:opacity .6s ease;
+    margin:0 0 26px;
+  }
+  #wi-overlay.wi-show #wi-subtitle{ opacity:1; transition-delay:1.15s; }
+
+  #wi-btn{
+    height:52px; padding:0 34px; border-radius:14px; border:none; cursor:pointer;
+    font-family:'DM Sans', sans-serif; font-weight:500; font-size:14.5px; color:#fff;
+    background:linear-gradient(135deg,#2563EB,#3B82F6);
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    position:relative; overflow:hidden;
+    opacity:0; transform:translateY(10px) scale(1);
+    transition:opacity .5s ease, transform .18s ease, box-shadow .25s ease;
+    box-shadow:0 0 0 rgba(59,130,246,0);
+  }
+  #wi-overlay.wi-show #wi-btn{ opacity:1; transform:translateY(0) scale(1); transition-delay:1.4s, 0s, 0s; }
+  #wi-btn:hover{ box-shadow:0 0 24px rgba(59,130,246,.55); }
+  #wi-btn:active{ transform:scale(.96); }
+  .wi-ripple{
+    position:absolute; border-radius:50%; background:rgba(255,255,255,.45);
+    transform:scale(0); animation:wi-ripple-anim .6s ease-out forwards;
+    pointer-events:none;
+  }
+  @keyframes wi-ripple-anim{ to{ transform:scale(2.6); opacity:0; } }
+
+  #wi-footer{
+    font-family:'DM Sans', sans-serif;
+    font-size:11px; color:#4a5568; margin-top:18px;
+    opacity:0; transition:opacity .6s ease;
+  }
+  #wi-overlay.wi-show #wi-footer{ opacity:1; transition-delay:1.5s; }
+
+  @media (max-width:640px){
+    #wi-inner{ padding:20px 16px 24px; }
+    #wi-btn{ width:100%; }
+  }
+</style>
+
+<div id="wi-overlay">
+  <div id="wi-particles"></div>
+  <div id="wi-card">
+    <div id="wi-inner">
+      <div id="wi-video-wrap">
+        <video id="wi-video" src="https://c.termai.cc/v199/znm9m.mp4" playsinline preload="auto" controlsList="nodownload noremoteplayback" disablepictureinpicture></video>
+      </div>
+      <h1 id="wi-heading">Welcome to<span class="wi-grad">Aliftzy Store</span></h1>
+      <p id="wi-subtitle">Experience premium digital products with fast delivery, secure payment, and trusted service.</p>
+      <button id="wi-btn" type="button">Enter Store</button>
+      <div id="wi-footer">Powered by Aliftzy Store &copy; 2026</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var STORAGE_KEY = 'aliftzy_welcome_shown';
+  if (sessionStorage.getItem(STORAGE_KEY)) return;
+
+  var overlay = document.getElementById('wi-overlay');
+  var card = document.getElementById('wi-card');
+  var video = document.getElementById('wi-video');
+  var videoWrap = document.getElementById('wi-video-wrap');
+  var btn = document.getElementById('wi-btn');
+  var particlesWrap = document.getElementById('wi-particles');
+  var prevOverflow = '';
+  var closed = false;
+
+  // Build floating particles
+  var count = 20 + Math.floor(Math.random() * 21); // 20-40
+  for (var i = 0; i < count; i++) {
+    var p = document.createElement('div');
+    p.className = 'wi-particle';
+    var size = 2 + Math.random() * 4;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.left = (Math.random() * 100) + '%';
+    p.style.setProperty('--wi-drift', (Math.random() * 60 - 30) + 'px');
+    var dur = 8 + Math.random() * 10;
+    p.style.animationDuration = dur + 's';
+    p.style.animationDelay = (Math.random() * dur) + 's';
+    particlesWrap.appendChild(p);
+  }
+
+  function lockBody(){
+    prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+  }
+  function unlockBody(){
+    document.body.style.overflow = prevOverflow;
+  }
+
+  function fadeAudio(from, to, duration, done){
+    var startTime = null;
+    function step(ts){
+      if (startTime === null) startTime = ts;
+      var t = Math.min(1, (ts - startTime) / duration);
+      video.volume = from + (to - from) * t;
+      if (t < 1) {
+        requestAnimationFrame(step);
+      } else if (done) {
+        done();
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  function startVideo(){
+    video.volume = 0;
+    videoWrap.classList.add('wi-video-show');
+    var playPromise = video.play();
+    if (playPromise && playPromise.catch) {
+      playPromise.then(function(){
+        video.classList.add('wi-zoom');
+        fadeAudio(0, 1, 1000);
+      }).catch(function(){
+        // Autoplay with sound may be blocked; try muted fallback once, unmuting on first interaction
+        video.muted = true;
+        video.play().then(function(){
+          video.classList.add('wi-zoom');
+          function unmuteOnce(){
+            video.muted = false;
+            video.volume = 0;
+            fadeAudio(0, 1, 1000);
+            document.removeEventListener('click', unmuteOnce);
+            document.removeEventListener('touchstart', unmuteOnce);
+          }
+          document.addEventListener('click', unmuteOnce, { once:true });
+          document.addEventListener('touchstart', unmuteOnce, { once:true });
+        });
+      });
+    } else {
+      video.classList.add('wi-zoom');
+      fadeAudio(0, 1, 1000);
+    }
+  }
+
+  function closeOverlay(){
+    if (closed) return;
+    closed = true;
+    fadeAudio(video.volume, 0, 500, function(){
+      video.pause();
+      video.currentTime = 0;
+    });
+    card.style.transform = 'scale(.96)';
+    overlay.classList.remove('wi-show');
+    overlay.classList.add('wi-hide');
+    setTimeout(function(){
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      unlockBody();
+    }, 550);
+  }
+
+  btn.addEventListener('click', function(e){
+    var rect = btn.getBoundingClientRect();
+    var ripple = document.createElement('span');
+    var d = Math.max(rect.width, rect.height);
+    ripple.className = 'wi-ripple';
+    ripple.style.width = ripple.style.height = d + 'px';
+    ripple.style.left = (e.clientX - rect.left - d/2) + 'px';
+    ripple.style.top = (e.clientY - rect.top - d/2) + 'px';
+    btn.appendChild(ripple);
+    setTimeout(function(){ ripple.remove(); }, 650);
+    video.pause();
+    video.currentTime = 0;
+    closeOverlay();
+  });
+
+  video.addEventListener('ended', function(){
+    closeOverlay();
+  });
+
+  sessionStorage.setItem(STORAGE_KEY, '1');
+  lockBody();
+  requestAnimationFrame(function(){
+    overlay.classList.add('wi-show');
+  });
+  setTimeout(startVideo, 350);
+})();
+</script>
+
 </body>
 </html>
