@@ -615,7 +615,7 @@
   <div id="wi-card">
     <div id="wi-inner">
       <div id="wi-video-wrap">
-        <video id="wi-video" src="https://raw.githubusercontent.com/Alifkece/media/main/uploads/1784259852099_New Project 166 [EDC6548].mp4" playsinline preload="auto" controlsList="nodownload noremoteplayback" disablepictureinpicture></video>
+        <video id="wi-video" src="https://raw.githubusercontent.com/Alifkece/media/main/uploads/1784259852099_New Project 166 [EDC6548].mp4" playsinline muted preload="auto" controlsList="nodownload noremoteplayback" disablepictureinpicture></video>
       </div>
       <h1 id="wi-heading">Welcome to<span class="wi-grad">Aliftzy Store</span></h1>
       <p id="wi-subtitle">Experience premium digital products with fast delivery, secure payment, and trusted service.</p>
@@ -679,32 +679,49 @@
   }
 
   function startVideo(){
+    // Mulai selalu muted dulu supaya autoplay dijamin lolos di semua browser
+    // (termasuk in-app browser yang strict), lalu unmute otomatis begitu
+    // pemutaran berhasil / saat user berinteraksi pertama kali.
+    video.muted = true;
     video.volume = 0;
     videoWrap.classList.add('wi-video-show');
+
+    function armUnmute(){
+      video.classList.add('wi-zoom');
+      function unmuteOnce(){
+        video.muted = false;
+        video.volume = 0;
+        fadeAudio(0, 1, 1000);
+        document.removeEventListener('click', unmuteOnce);
+        document.removeEventListener('touchstart', unmuteOnce);
+      }
+      document.addEventListener('click', unmuteOnce, { once:true });
+      document.addEventListener('touchstart', unmuteOnce, { once:true });
+    }
+
     var playPromise = video.play();
     if (playPromise && playPromise.catch) {
-      playPromise.then(function(){
-        video.classList.add('wi-zoom');
-        fadeAudio(0, 1, 1000);
-      }).catch(function(){
-        // Autoplay with sound may be blocked; try muted fallback once, unmuting on first interaction
+      playPromise.then(armUnmute).catch(function(){
+        // Fallback aman jika attempt pertama gagal: pastikan tetap muted lalu coba lagi
         video.muted = true;
-        video.play().then(function(){
-          video.classList.add('wi-zoom');
-          function unmuteOnce(){
-            video.muted = false;
-            video.volume = 0;
-            fadeAudio(0, 1, 1000);
-            document.removeEventListener('click', unmuteOnce);
-            document.removeEventListener('touchstart', unmuteOnce);
-          }
-          document.addEventListener('click', unmuteOnce, { once:true });
-          document.addEventListener('touchstart', unmuteOnce, { once:true });
-        });
+        var retryPromise = video.play();
+        if (retryPromise && retryPromise.catch) {
+          retryPromise.then(armUnmute).catch(function(){
+            // Autoplay benar-benar diblokir; video akan mulai berjalan
+            // begitu user menyentuh/klik halaman (fallback terakhir).
+            function playOnInteraction(){
+              video.muted = true;
+              video.play().then(armUnmute).catch(function(){});
+              document.removeEventListener('click', playOnInteraction);
+              document.removeEventListener('touchstart', playOnInteraction);
+            }
+            document.addEventListener('click', playOnInteraction, { once:true });
+            document.addEventListener('touchstart', playOnInteraction, { once:true });
+          });
+        }
       });
     } else {
-      video.classList.add('wi-zoom');
-      fadeAudio(0, 1, 1000);
+      armUnmute();
     }
   }
 
