@@ -1355,3 +1355,44 @@
   .social-btn-ig { background:rgba(225,48,108,.1); border-color:rgba(225,48,108,.3); color:#e1306c; }
   .social-btn-ig:hover { background:rgba(225,48,108,.2); border-color:rgba(225,48,108,.5); transform:translateY(-1px); box-shadow:0 4px 14px rgba(225,48,108,.2); }
 
+
+/* ===== DESKTOP TIDY-UP (>=1024px) ===== */
+/* Hanya merapikan spacing/proporsi di layar besar. Layout mobile/tablet tidak diubah. */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1180px;
+    padding: 0 32px;
+  }
+
+  .navbar {
+    padding: 0 32px;
+  }
+
+  .section {
+    padding: 56px 0;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+  }
+
+  .auth-card {
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  #page-auth {
+    padding: 80px 32px 40px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .container {
+    max-width: 1320px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  }
+}
