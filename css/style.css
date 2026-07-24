@@ -1356,43 +1356,141 @@
   .social-btn-ig:hover { background:rgba(225,48,108,.2); border-color:rgba(225,48,108,.5); transform:translateY(-1px); box-shadow:0 4px 14px rgba(225,48,108,.2); }
 
 
-/* ===== DESKTOP TIDY-UP (>=1024px) ===== */
-/* Hanya merapikan spacing/proporsi di layar besar. Layout mobile/tablet tidak diubah. */
-@media (min-width: 1024px) {
-  .container {
-    max-width: 1180px;
-    padding: 0 32px;
-  }
+/* =====================================================================
+   PLATFORM EXPERIENCE (Choose Your Experience)
+   Primary switch is the body class applied from the platform picker
+   (body.platform-mobile / body.platform-ios / body.platform-desktop),
+   NOT the viewport width. Media queries below are only used for fine
+   adjustments within an already-selected experience.
+   ===================================================================== */
 
-  .navbar {
-    padding: 0 32px;
-  }
+/* ---- Android / Mobile experience -----------------------------------
+   Intentionally left as-is: this is the site's current/default layout,
+   so no overrides are needed here. */
 
-  .section {
-    padding: 56px 0;
-  }
+/* ---- Apple iOS experience -------------------------------------------
+   Same layout as mobile, with softer/rounder, more "iOS" polish. */
+body.platform-ios {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
 
-  .product-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
-  }
+body.platform-ios .navbar {
+  -webkit-backdrop-filter: blur(26px);
+  backdrop-filter: blur(26px);
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+}
 
-  .auth-card {
-    max-width: 420px;
-    margin: 0 auto;
-  }
+body.platform-ios .product-card,
+body.platform-ios .auth-card,
+body.platform-ios .banner-ratio,
+body.platform-ios .btn,
+body.platform-ios .product-thumb {
+  border-radius: 20px;
+}
 
-  #page-auth {
-    padding: 80px 32px 40px;
+body.platform-ios .cat-tab {
+  border-radius: 100px;
+}
+
+body.platform-ios #page-auth {
+  padding-top: max(80px, calc(env(safe-area-inset-top) + 60px));
+  padding-bottom: max(40px, calc(env(safe-area-inset-bottom) + 20px));
+}
+
+body.platform-ios .section {
+  padding: 44px 0;
+}
+
+body.platform-ios .section-header {
+  gap: 20px;
+}
+
+/* ---- Desktop experience ----------------------------------------------
+   Triggered purely by body.platform-desktop so it stays active even if
+   the window is resized narrower, and stays OFF for platform-mobile /
+   platform-ios even on a wide laptop screen. */
+body.platform-desktop .container {
+  max-width: 1180px;
+  padding: 0 32px;
+}
+
+body.platform-desktop .navbar {
+  padding: 0 32px;
+}
+
+body.platform-desktop .nav-links {
+  display: flex;
+}
+
+body.platform-desktop .section {
+  padding: 56px 0;
+}
+
+body.platform-desktop .section-header {
+  align-items: center;
+}
+
+body.platform-desktop .hero-banner .banner-ratio::after {
+  padding-top: calc(4 / 19 * 100%);
+}
+
+body.platform-desktop .banner-ratio {
+  min-height: 260px;
+}
+
+body.platform-desktop .banner-content {
+  padding: 32px 6%;
+}
+
+body.platform-desktop .banner-inner {
+  max-width: 1080px;
+  gap: 32px;
+}
+
+body.platform-desktop .product-grid {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+body.platform-desktop .product-card:hover {
+  transform: translateY(-5px);
+}
+
+body.platform-desktop .auth-card {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 36px 32px;
+}
+
+body.platform-desktop #page-auth {
+  padding: 80px 32px 40px;
+}
+
+/* Fine adjustments for common desktop resolutions — the class above is
+   still the primary trigger; these only refine spacing further. */
+@media (min-width: 1366px) {
+  body.platform-desktop .container {
+    max-width: 1240px;
   }
 }
 
-@media (min-width: 1440px) {
-  .container {
+@media (min-width: 1600px) {
+  body.platform-desktop .container {
     max-width: 1320px;
   }
-
-  .product-grid {
+  body.platform-desktop .product-grid {
     grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   }
 }
+
+@media (min-width: 1920px) {
+  body.platform-desktop .container {
+    max-width: 1440px;
+  }
+  body.platform-desktop .banner-inner {
+    max-width: 1200px;
+  }
+}
+
