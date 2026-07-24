@@ -21,7 +21,14 @@
     if (cls) document.body.classList.add(cls);
   };
 
-  var saved = localStorage.getItem('selectedPlatform');
+  // BUGFIX: guarded against storage exceptions (private mode, sandboxed
+  // preview frames, etc). This runs first, before any other script on
+  // the page - if it threw unguarded, nothing else below it in this
+  // block would run (harmless here since it's the last line), but more
+  // importantly it established the unguarded-localStorage pattern that
+  // was copied into the Choose Your Experience script further down.
+  var saved = null;
+  try { saved = localStorage.getItem('selectedPlatform'); } catch(e) {}
   if (saved) window.applyAliftzyPlatformClass(saved);
 })();
 </script>
@@ -475,8 +482,6 @@
     </div>
   </div>
 </div>
-
-
 <!-- ===== CHOOSE YOUR EXPERIENCE OVERLAY (Aliftzy Store) ===== -->
 <style>
   #cxp-overlay{
@@ -697,6 +702,23 @@
   var prevOverflow = '';
   var settled = false;
 
+  // BUGFIX: localStorage can throw (private/incognito mode, sandboxed
+  // preview iframes, storage disabled by policy, quota errors, etc).
+  // Previously every localStorage.getItem/setItem call below was
+  // unguarded, so a single thrown SecurityError aborted this entire
+  // IIFE immediately -> the overlay never got its "cxp-show" class,
+  // the click listeners at the bottom of this script never got bound,
+  // and the whole Choose Your Experience / Loading stage silently
+  // "disappeared" while the page underneath (already showing
+  // Login/Store) became visible through it. These helpers make storage
+  // failures non-fatal so the visual flow always runs.
+  function safeGet(key){
+    try { return localStorage.getItem(key); } catch(e) { return null; }
+  }
+  function safeSet(key, val){
+    try { localStorage.setItem(key, val); return true; } catch(e) { return false; }
+  }
+
   function removeOverlayInstant(){
     if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
   }
@@ -714,7 +736,7 @@
   }
 
   // If a platform was already chosen previously, skip this screen entirely.
-  if (localStorage.getItem(LS_KEY)) {
+  if (safeGet(LS_KEY)) {
     removeOverlayInstant();
     runWelcome();
     return;
@@ -783,9 +805,15 @@
     cards.forEach(function(c){ c.disabled = true; });
     card.classList.add('cxp-selected');
 
-    localStorage.setItem(LS_KEY, platform);
+    // BUGFIX: this used to be a raw localStorage.setItem() call. If it
+    // threw (see safeGet/safeSet note above), execution stopped right
+    // here and the setTimeout(startLoadingStage, ...) below never ran
+    // -> "Loading Experience never appears" even when the card click
+    // itself worked fine. safeSet() never throws, so the flow always
+    // continues to the loading stage regardless of storage support.
+    safeSet(LS_KEY, platform);
     if (typeof window.applyAliftzyPlatformClass === 'function') {
-      window.applyAliftzyPlatformClass(platform);
+      try { window.applyAliftzyPlatformClass(platform); } catch(e) {}
     }
 
     // Card Scale + Glow (CSS) -> lalu Fade Out ke Loading Experience
@@ -809,8 +837,6 @@
   });
 })();
 </script>
-
-
 <!-- ===== WELCOME INTRO OVERLAY (Aliftzy Store) ===== -->
 <style>
   #wi-overlay{
@@ -972,7 +998,13 @@
 function initAliftzyWelcome(){
   var STORAGE_KEY = 'aliftzy_welcome_shown';
   var overlay = document.getElementById('wi-overlay');
-  if (sessionStorage.getItem(STORAGE_KEY)) {
+  // BUGFIX: same class of bug as the Choose Your Experience overlay -
+  // an unguarded sessionStorage.getItem() throwing here used to abort
+  // initAliftzyWelcome() before the video/overlay was ever shown,
+  // which looked like "startup skips straight to Login".
+  var alreadyShown = false;
+  try { alreadyShown = !!sessionStorage.getItem(STORAGE_KEY); } catch(e) {}
+  if (alreadyShown) {
     if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
     return;
   }
@@ -1099,7 +1131,10 @@ function initAliftzyWelcome(){
     closeOverlay();
   });
 
-  sessionStorage.setItem(STORAGE_KEY, '1');
+  // BUGFIX: this write used to be unguarded too - if it threw, the
+  // fade-in below (lockBody / requestAnimationFrame / startVideo) never
+  // ran, so the welcome video overlay stayed invisible.
+  try { sessionStorage.setItem(STORAGE_KEY, '1'); } catch(e) {}
   lockBody();
   requestAnimationFrame(function(){
     overlay.classList.add('wi-show');
