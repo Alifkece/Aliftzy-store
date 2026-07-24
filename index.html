@@ -10,6 +10,22 @@
 </head>
 <body>
 
+<script>
+(function(){
+  var PLATFORM_CLASS_MAP = { android: 'platform-mobile', ios: 'platform-ios', desktop: 'platform-desktop' };
+  var ALL_PLATFORM_CLASSES = ['platform-mobile', 'platform-ios', 'platform-desktop'];
+
+  window.applyAliftzyPlatformClass = function(platformKey){
+    ALL_PLATFORM_CLASSES.forEach(function(c){ document.body.classList.remove(c); });
+    var cls = PLATFORM_CLASS_MAP[platformKey];
+    if (cls) document.body.classList.add(cls);
+  };
+
+  var saved = localStorage.getItem('selectedPlatform');
+  if (saved) window.applyAliftzyPlatformClass(saved);
+})();
+</script>
+
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 <div class="bg-particles" id="bg-particles"></div>
@@ -579,22 +595,50 @@
   }
   @keyframes cxp-ripple-anim{ to{ transform:scale(3); opacity:0; } }
 
-  #cxp-loading{
-    position:absolute; inset:0; z-index:2;
-    display:flex; align-items:center; justify-content:center;
-    opacity:0; pointer-events:none;
-    transition:opacity .4s ease;
-    background:rgba(3,4,8,.6);
-    -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  @keyframes cxp-glow-pulse{
+    0%{ box-shadow:0 0 0 1px rgba(96,165,250,.3), 0 0 22px rgba(59,130,246,.28); }
+    50%{ box-shadow:0 0 0 1px rgba(96,165,250,.55), 0 0 58px rgba(59,130,246,.55); }
+    100%{ box-shadow:0 0 0 1px rgba(96,165,250,.3), 0 0 22px rgba(59,130,246,.28); }
   }
-  #cxp-loading.cxp-loading-show{ opacity:1; }
-  .cxp-spinner{
+  .cxp-card.cxp-selected{ animation:cxp-glow-pulse 1.1s ease-in-out infinite; }
+
+  #cxp-loading-stage{
+    position:absolute; inset:0; z-index:2;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px;
+    opacity:0; pointer-events:none;
+    transition:opacity .5s ease;
+  }
+  #cxp-overlay.cxp-loading-active #cxp-content{ opacity:0; pointer-events:none; }
+  #cxp-overlay.cxp-loading-active #cxp-loading-stage{ opacity:1; pointer-events:auto; }
+
+  #cxp-loading-logo{
+    font-family:'Syne', sans-serif; font-weight:800; font-size:19px;
+    letter-spacing:.16em; color:#eef0f6;
+  }
+  #cxp-loading-logo span{ color:#60A5FA; }
+
+  .cxp-loading-spinner{
     width:38px; height:38px; border-radius:50%;
     border:2.5px solid rgba(255,255,255,.14);
     border-top-color:#60A5FA;
     animation:cxp-spin .8s linear infinite;
   }
   @keyframes cxp-spin{ to{ transform:rotate(360deg); } }
+
+  #cxp-loading-bar-track{
+    width:220px; height:3px; border-radius:100px;
+    background:rgba(255,255,255,.1); overflow:hidden;
+  }
+  #cxp-loading-bar-fill{
+    height:100%; width:0%; border-radius:100px;
+    background:linear-gradient(90deg,#3B82F6,#60A5FA);
+    transition:width linear;
+  }
+
+  #cxp-loading-text{
+    font-family:'DM Sans', sans-serif; font-size:13px; color:#8892a4;
+    transition:opacity .25s ease;
+  }
 
   @media (min-width:1024px){
     #cxp-content{ max-width:900px; }
@@ -634,14 +678,20 @@
       </button>
     </div>
   </div>
-  <div id="cxp-loading"><div class="cxp-spinner"></div></div>
+  <div id="cxp-loading-stage">
+    <div id="cxp-loading-logo">ALIFTZY <span>STORE</span></div>
+    <div class="cxp-loading-spinner"></div>
+    <div id="cxp-loading-bar-track"><div id="cxp-loading-bar-fill"></div></div>
+    <div id="cxp-loading-text">Loading Experience...</div>
+  </div>
 </div>
 
 <script>
 (function(){
   var LS_KEY = 'selectedPlatform';
   var overlay = document.getElementById('cxp-overlay');
-  var loading = document.getElementById('cxp-loading');
+  var loadingText = document.getElementById('cxp-loading-text');
+  var loadingBarFill = document.getElementById('cxp-loading-bar-fill');
   var particlesWrap = document.getElementById('cxp-particles');
   var cards = overlay.querySelectorAll('.cxp-card');
   var prevOverflow = '';
@@ -690,18 +740,30 @@
 
   requestAnimationFrame(function(){ overlay.classList.add('cxp-show'); });
 
-  function selectPlatform(card){
-    if (settled) return;
-    settled = true;
+  function startLoadingStage(){
+    var duration = 800 + Math.random() * 400; // 800-1200ms premium loading duration
 
-    cards.forEach(function(c){ c.disabled = true; });
-    card.classList.add('cxp-selected');
+    overlay.classList.add('cxp-loading-active');
+    loadingText.style.opacity = '1';
+    loadingText.textContent = 'Loading Experience...';
+    loadingBarFill.style.transitionDuration = '0ms';
+    loadingBarFill.style.width = '0%';
 
-    localStorage.setItem(LS_KEY, card.getAttribute('data-platform'));
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        loadingBarFill.style.transitionDuration = duration + 'ms';
+        loadingBarFill.style.width = '100%';
+      });
+    });
 
-    setTimeout(function(){ loading.classList.add('cxp-loading-show'); }, 180);
+    setTimeout(function(){
+      loadingText.style.opacity = '0';
+      setTimeout(function(){
+        loadingText.textContent = 'Preparing your experience...';
+        loadingText.style.opacity = '1';
+      }, 220);
+    }, duration * 0.45);
 
-    var delay = 800 + Math.random() * 400; // 800-1200ms total transition
     setTimeout(function(){
       overlay.classList.remove('cxp-show');
       overlay.classList.add('cxp-hide');
@@ -710,7 +772,24 @@
         document.body.style.overflow = prevOverflow;
         runWelcome();
       }, 550);
-    }, delay);
+    }, duration);
+  }
+
+  function selectPlatform(card){
+    if (settled) return;
+    settled = true;
+
+    var platform = card.getAttribute('data-platform');
+    cards.forEach(function(c){ c.disabled = true; });
+    card.classList.add('cxp-selected');
+
+    localStorage.setItem(LS_KEY, platform);
+    if (typeof window.applyAliftzyPlatformClass === 'function') {
+      window.applyAliftzyPlatformClass(platform);
+    }
+
+    // Card Scale + Glow (CSS) -> lalu Fade Out ke Loading Experience
+    setTimeout(startLoadingStage, 320);
   }
 
   cards.forEach(function(card){
@@ -867,19 +946,6 @@
   #wi-close:hover{ background:rgba(59,130,246,.25); color:#fff; }
   #wi-close:active{ transform:scale(.92); }
 
-  #global-change-platform-btn{
-    position:fixed; right:16px; bottom:16px; z-index:10000;
-    display:none; align-items:center; gap:6px;
-    height:34px; padding:0 14px; border-radius:100px;
-    border:1px solid rgba(255,255,255,.14);
-    background:rgba(15,20,35,.55);
-    -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
-    color:#aab2c5; font-family:'DM Sans', sans-serif; font-size:12px; font-weight:500;
-    cursor:pointer; transition:all .2s ease;
-  }
-  #global-change-platform-btn:hover{ color:#fff; border-color:rgba(96,165,250,.4); box-shadow:0 0 18px rgba(59,130,246,.3); }
-  #global-change-platform-btn svg{ width:13px; height:13px; }
-
   @media (max-width:640px){
     #wi-inner{ padding:20px 16px 24px; }
   }
@@ -901,11 +967,6 @@
     </div>
   </div>
 </div>
-
-<button id="global-change-platform-btn" type="button">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 4v5h-5"/></svg>
-  Change Platform
-</button>
 
 <script>
 function initAliftzyWelcome(){
@@ -1045,43 +1106,6 @@ function initAliftzyWelcome(){
   });
   setTimeout(startVideo, 350);
 }
-
-document.addEventListener('DOMContentLoaded', function(){
-  var changeBtn = document.getElementById('global-change-platform-btn');
-  if (!changeBtn) return;
-
-  changeBtn.addEventListener('click', function(){
-    localStorage.removeItem('selectedPlatform');
-    sessionStorage.removeItem('aliftzy_welcome_shown');
-    location.reload();
-  });
-
-  function toggleChangePlatformBtn(page){
-    changeBtn.style.display = (page === 'home') ? 'none' : 'flex';
-  }
-
-  // Hook non-invasif ke showPage yang sudah ada di js/app.js (tanpa mengubah logicnya)
-  var attempts = 0;
-  var waitForShowPage = setInterval(function(){
-    attempts++;
-    if (typeof window.showPage === 'function' && !window.showPage.__cxpWrapped) {
-      var originalShowPage = window.showPage;
-      window.showPage = function(page, sub){
-        originalShowPage(page, sub);
-        toggleChangePlatformBtn(page);
-      };
-      window.showPage.__cxpWrapped = true;
-      clearInterval(waitForShowPage);
-    } else if (attempts > 100) {
-      clearInterval(waitForShowPage);
-    }
-  }, 50);
-
-  // Tampilkan tombol saat halaman login aktif sebelum showPage sempat di-hook
-  if (document.getElementById('page-auth') && document.getElementById('page-auth').style.display !== 'none') {
-    toggleChangePlatformBtn('auth');
-  }
-});
 </script>
 
 </body>
