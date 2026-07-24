@@ -461,6 +461,277 @@
 </div>
 
 
+<!-- ===== CHOOSE YOUR EXPERIENCE OVERLAY (Aliftzy Store) ===== -->
+<style>
+  #cxp-overlay{
+    position:fixed; inset:0; z-index:10050;
+    display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(120% 120% at 50% 0%, #0d1428 0%, #05070f 55%, #030408 100%);
+    opacity:0; transform:scale(1.02);
+    transition:opacity .6s cubic-bezier(.16,.8,.24,1), transform .6s cubic-bezier(.16,.8,.24,1);
+    padding:24px; box-sizing:border-box; overflow:hidden;
+  }
+  #cxp-overlay.cxp-show{ opacity:1; transform:scale(1); }
+  #cxp-overlay.cxp-hide{ opacity:0; transform:scale(.98); pointer-events:none; }
+  #cxp-overlay *{ box-sizing:border-box; }
+
+  #cxp-aurora{ position:absolute; inset:-20%; pointer-events:none; z-index:0; filter:blur(10px); }
+  #cxp-aurora::before, #cxp-aurora::after{
+    content:""; position:absolute; border-radius:50%; filter:blur(90px); opacity:.35;
+    animation:cxp-drift 16s ease-in-out infinite alternate;
+  }
+  #cxp-aurora::before{
+    width:520px; height:520px; top:-120px; left:-100px;
+    background:radial-gradient(circle,#3B82F6,transparent 70%);
+  }
+  #cxp-aurora::after{
+    width:480px; height:480px; bottom:-140px; right:-100px;
+    background:radial-gradient(circle,#a78bfa,transparent 70%);
+    animation-delay:-8s;
+  }
+  @keyframes cxp-drift{
+    0%{ transform:translate(0,0) scale(1); }
+    100%{ transform:translate(40px,30px) scale(1.08); }
+  }
+
+  #cxp-particles{ position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+  .cxp-particle{
+    position:absolute; bottom:-10px; border-radius:50%;
+    background:rgba(148,178,255,.5);
+    box-shadow:0 0 6px rgba(148,178,255,.55);
+    animation-name:cxp-float; animation-timing-function:linear; animation-iteration-count:infinite;
+  }
+  @keyframes cxp-float{
+    0%{ transform:translateY(0) translateX(0); opacity:0; }
+    10%{ opacity:.65; }
+    90%{ opacity:.45; }
+    100%{ transform:translateY(-110vh) translateX(var(--cxp-drift,20px)); opacity:0; }
+  }
+
+  #cxp-content{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; text-align:center; width:100%; max-width:980px; }
+
+  #cxp-title{
+    font-family:'Syne', sans-serif; font-weight:700;
+    font-size:clamp(26px,4.4vw,40px); color:#eef0f6;
+    opacity:0; transform:translateY(16px);
+    transition:opacity .6s ease, transform .6s ease; transition-delay:.15s;
+    margin:0 0 10px;
+  }
+  #cxp-overlay.cxp-show #cxp-title{ opacity:1; transform:translateY(0); }
+
+  #cxp-subtitle{
+    font-family:'DM Sans', sans-serif; font-size:14.5px; color:#8892a4;
+    opacity:0; transition:opacity .6s ease; transition-delay:.3s;
+    margin:0 0 40px;
+  }
+  #cxp-overlay.cxp-show #cxp-subtitle{ opacity:1; }
+
+  #cxp-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:18px;
+    width:100%;
+  }
+  @media (max-width:760px){
+    #cxp-grid{ grid-template-columns:1fr; max-width:360px; }
+  }
+
+  .cxp-card{
+    position:relative; overflow:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:16px; padding:36px 20px;
+    border-radius:22px;
+    background:rgba(18,22,38,.5);
+    border:1px solid rgba(255,255,255,.1);
+    -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px);
+    box-shadow:0 8px 30px rgba(0,0,0,.35);
+    cursor:pointer; color:inherit; font-family:inherit;
+    opacity:0; transform:translateY(22px) scale(.96);
+    transition:opacity .55s ease, transform .45s cubic-bezier(.16,.8,.24,1), border-color .3s ease, box-shadow .3s ease;
+  }
+  #cxp-overlay.cxp-show .cxp-card{ opacity:1; transform:translateY(0) scale(1); }
+  #cxp-overlay.cxp-show .cxp-card:nth-child(1){ transition-delay:.45s; }
+  #cxp-overlay.cxp-show .cxp-card:nth-child(2){ transition-delay:.58s; }
+  #cxp-overlay.cxp-show .cxp-card:nth-child(3){ transition-delay:.71s; }
+
+  .cxp-card:hover{
+    border-color:rgba(96,165,250,.45);
+    box-shadow:0 0 0 1px rgba(96,165,250,.2), 0 0 40px rgba(59,130,246,.28), 0 16px 40px rgba(0,0,0,.4);
+    transform:translateY(-4px) scale(1.01);
+  }
+  .cxp-card:active{ transform:scale(.97); }
+  .cxp-card.cxp-selected{
+    border-color:rgba(96,165,250,.6);
+    box-shadow:0 0 0 1px rgba(96,165,250,.3), 0 0 50px rgba(59,130,246,.4);
+    transform:scale(1.02);
+  }
+  .cxp-card[disabled]{ cursor:default; }
+  .cxp-card:not(.cxp-selected)[disabled]{ opacity:.35; transform:scale(.97); }
+
+  .cxp-icon{ width:44px; height:44px; color:#cdd6ff; transition:color .3s ease, transform .3s ease; }
+  .cxp-card:hover .cxp-icon{ color:#8fb4ff; transform:scale(1.06); }
+
+  .cxp-name{ font-family:'Syne', sans-serif; font-weight:700; font-size:17px; color:#eef0f6; }
+  .cxp-desc{ font-family:'DM Sans', sans-serif; font-size:12.5px; color:#8892a4; }
+
+  .cxp-ripple{
+    position:absolute; border-radius:50%; background:rgba(255,255,255,.35);
+    transform:scale(0); animation:cxp-ripple-anim .65s ease-out forwards;
+    pointer-events:none;
+  }
+  @keyframes cxp-ripple-anim{ to{ transform:scale(3); opacity:0; } }
+
+  #cxp-loading{
+    position:absolute; inset:0; z-index:2;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+    transition:opacity .4s ease;
+    background:rgba(3,4,8,.6);
+    -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  }
+  #cxp-loading.cxp-loading-show{ opacity:1; }
+  .cxp-spinner{
+    width:38px; height:38px; border-radius:50%;
+    border:2.5px solid rgba(255,255,255,.14);
+    border-top-color:#60A5FA;
+    animation:cxp-spin .8s linear infinite;
+  }
+  @keyframes cxp-spin{ to{ transform:rotate(360deg); } }
+
+  @media (min-width:1024px){
+    #cxp-content{ max-width:900px; }
+    .cxp-card{ padding:42px 22px; }
+  }
+</style>
+
+<div id="cxp-overlay">
+  <div id="cxp-aurora"></div>
+  <div id="cxp-particles"></div>
+  <div id="cxp-content">
+    <h1 id="cxp-title">Choose Your Experience</h1>
+    <p id="cxp-subtitle">Select the platform you want to preview.</p>
+    <div id="cxp-grid">
+      <button class="cxp-card" type="button" data-platform="android">
+        <svg class="cxp-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.6 9.48l1.84-3.18a.4.4 0 10-.7-.4l-1.86 3.23a10.6 10.6 0 00-8.76 0L6.26 5.9a.4.4 0 10-.7.4L7.4 9.48A9.4 9.4 0 002.5 17h19a9.4 9.4 0 00-3.9-7.52zM7.5 14.25a1.13 1.13 0 110-2.25 1.13 1.13 0 010 2.25zm9 0a1.13 1.13 0 110-2.25 1.13 1.13 0 010 2.25z" fill="currentColor"/>
+          <path d="M3 18v3.5A1.5 1.5 0 004.5 23h.25v-5H3zm16.25 0v5h.25a1.5 1.5 0 001.5-1.5V18h-1.75zM5.75 18v5.5a1.25 1.25 0 002.5 0V18h-2.5zm10 0v5.5a1.25 1.25 0 002.5 0V18h-2.5z" fill="currentColor"/>
+        </svg>
+        <div class="cxp-name">Android</div>
+        <div class="cxp-desc">Optimized for Android Phones</div>
+      </button>
+      <button class="cxp-card" type="button" data-platform="ios">
+        <svg class="cxp-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16.365 1.43c0 1.14-.462 2.15-1.212 2.87-.822.78-2.14 1.38-3.24 1.29-.14-1.1.42-2.24 1.17-2.94.83-.78 2.26-1.36 3.28-1.22zM20.5 17.02c-.55 1.27-.82 1.84-1.53 2.96-1 1.56-2.4 3.5-4.15 3.52-1.55.02-1.95-1.01-4.05-1-2.1.01-2.54 1.02-4.09 1-1.75-.02-3.07-1.78-4.07-3.34-2.8-4.3-3.09-9.35-1.37-12.04 1.22-1.9 3.15-3.02 4.96-3.02 1.84 0 3 1.02 4.53 1.02 1.48 0 2.38-1.02 4.52-1.02 1.6 0 3.3.87 4.5 2.38-3.96 2.17-3.32 7.83.75 9.54z" fill="currentColor"/>
+        </svg>
+        <div class="cxp-name">Apple iOS</div>
+        <div class="cxp-desc">Optimized for iPhone &amp; iPad</div>
+      </button>
+      <button class="cxp-card" type="button" data-platform="desktop">
+        <svg class="cxp-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2.5" y="4" width="19" height="12.5" rx="1.6" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M8.5 20.5h7M12 16.5v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <div class="cxp-name">Desktop</div>
+        <div class="cxp-desc">Optimized for Laptop &amp; PC</div>
+      </button>
+    </div>
+  </div>
+  <div id="cxp-loading"><div class="cxp-spinner"></div></div>
+</div>
+
+<script>
+(function(){
+  var LS_KEY = 'selectedPlatform';
+  var overlay = document.getElementById('cxp-overlay');
+  var loading = document.getElementById('cxp-loading');
+  var particlesWrap = document.getElementById('cxp-particles');
+  var cards = overlay.querySelectorAll('.cxp-card');
+  var prevOverflow = '';
+  var settled = false;
+
+  function removeOverlayInstant(){
+    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+  }
+
+  function runWelcome(){
+    if (typeof window.initAliftzyWelcome === 'function') {
+      window.initAliftzyWelcome();
+      return;
+    }
+    // Skrip #wi-overlay ada lebih bawah di dokumen dan belum tentu sudah
+    // dieksekusi; tunggu sampai fungsinya tersedia lalu jalankan.
+    document.addEventListener('DOMContentLoaded', function(){
+      if (typeof window.initAliftzyWelcome === 'function') window.initAliftzyWelcome();
+    });
+  }
+
+  // If a platform was already chosen previously, skip this screen entirely.
+  if (localStorage.getItem(LS_KEY)) {
+    removeOverlayInstant();
+    runWelcome();
+    return;
+  }
+
+  prevOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+
+  var count = 18 + Math.floor(Math.random() * 18); // 18-35
+  for (var i = 0; i < count; i++) {
+    var p = document.createElement('div');
+    p.className = 'cxp-particle';
+    var size = 2 + Math.random() * 4;
+    p.style.width = size + 'px';
+    p.style.height = size + 'px';
+    p.style.left = (Math.random() * 100) + '%';
+    p.style.setProperty('--cxp-drift', (Math.random() * 60 - 30) + 'px');
+    var dur = 9 + Math.random() * 11;
+    p.style.animationDuration = dur + 's';
+    p.style.animationDelay = (Math.random() * dur) + 's';
+    particlesWrap.appendChild(p);
+  }
+
+  requestAnimationFrame(function(){ overlay.classList.add('cxp-show'); });
+
+  function selectPlatform(card){
+    if (settled) return;
+    settled = true;
+
+    cards.forEach(function(c){ c.disabled = true; });
+    card.classList.add('cxp-selected');
+
+    localStorage.setItem(LS_KEY, card.getAttribute('data-platform'));
+
+    setTimeout(function(){ loading.classList.add('cxp-loading-show'); }, 180);
+
+    var delay = 800 + Math.random() * 400; // 800-1200ms total transition
+    setTimeout(function(){
+      overlay.classList.remove('cxp-show');
+      overlay.classList.add('cxp-hide');
+      setTimeout(function(){
+        removeOverlayInstant();
+        document.body.style.overflow = prevOverflow;
+        runWelcome();
+      }, 550);
+    }, delay);
+  }
+
+  cards.forEach(function(card){
+    card.addEventListener('click', function(e){
+      if (settled) return;
+      var rect = card.getBoundingClientRect();
+      var ripple = document.createElement('span');
+      var d = Math.max(rect.width, rect.height) * 1.4;
+      ripple.className = 'cxp-ripple';
+      ripple.style.width = ripple.style.height = d + 'px';
+      ripple.style.left = (e.clientX - rect.left - d / 2) + 'px';
+      ripple.style.top = (e.clientY - rect.top - d / 2) + 'px';
+      card.appendChild(ripple);
+      setTimeout(function(){ ripple.remove(); }, 700);
+      selectPlatform(card);
+    });
+  });
+})();
+</script>
+
+
 <!-- ===== WELCOME INTRO OVERLAY (Aliftzy Store) ===== -->
 <style>
   #wi-overlay{
@@ -577,26 +848,6 @@
   }
   #wi-overlay.wi-show #wi-subtitle{ opacity:1; transition-delay:1.15s; }
 
-  #wi-btn{
-    height:52px; padding:0 34px; border-radius:14px; border:none; cursor:pointer;
-    font-family:'DM Sans', sans-serif; font-weight:500; font-size:14.5px; color:#fff;
-    background:linear-gradient(135deg,#2563EB,#3B82F6);
-    display:inline-flex; align-items:center; justify-content:center; gap:8px;
-    position:relative; overflow:hidden;
-    opacity:0; transform:translateY(10px) scale(1);
-    transition:opacity .5s ease, transform .18s ease, box-shadow .25s ease;
-    box-shadow:0 0 0 rgba(59,130,246,0);
-  }
-  #wi-overlay.wi-show #wi-btn{ opacity:1; transform:translateY(0) scale(1); transition-delay:1.4s, 0s, 0s; }
-  #wi-btn:hover{ box-shadow:0 0 24px rgba(59,130,246,.55); }
-  #wi-btn:active{ transform:scale(.96); }
-  .wi-ripple{
-    position:absolute; border-radius:50%; background:rgba(255,255,255,.45);
-    transform:scale(0); animation:wi-ripple-anim .6s ease-out forwards;
-    pointer-events:none;
-  }
-  @keyframes wi-ripple-anim{ to{ transform:scale(2.6); opacity:0; } }
-
   #wi-footer{
     font-family:'DM Sans', sans-serif;
     font-size:11px; color:#4a5568; margin-top:18px;
@@ -604,37 +855,71 @@
   }
   #wi-overlay.wi-show #wi-footer{ opacity:1; transition-delay:1.5s; }
 
+  #wi-close{
+    position:absolute; top:14px; right:14px; z-index:2;
+    width:34px; height:34px; border-radius:50%; border:1px solid rgba(255,255,255,.14);
+    background:rgba(10,14,26,.5); color:#aab2c5; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+    opacity:0; transition:opacity .5s ease, background .2s ease, color .2s ease, transform .18s ease;
+  }
+  #wi-overlay.wi-show #wi-close{ opacity:1; transition-delay:1.4s; }
+  #wi-close:hover{ background:rgba(59,130,246,.25); color:#fff; }
+  #wi-close:active{ transform:scale(.92); }
+
+  #global-change-platform-btn{
+    position:fixed; right:16px; bottom:16px; z-index:10000;
+    display:none; align-items:center; gap:6px;
+    height:34px; padding:0 14px; border-radius:100px;
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(15,20,35,.55);
+    -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
+    color:#aab2c5; font-family:'DM Sans', sans-serif; font-size:12px; font-weight:500;
+    cursor:pointer; transition:all .2s ease;
+  }
+  #global-change-platform-btn:hover{ color:#fff; border-color:rgba(96,165,250,.4); box-shadow:0 0 18px rgba(59,130,246,.3); }
+  #global-change-platform-btn svg{ width:13px; height:13px; }
+
   @media (max-width:640px){
     #wi-inner{ padding:20px 16px 24px; }
-    #wi-btn{ width:100%; }
   }
 </style>
 
 <div id="wi-overlay">
   <div id="wi-particles"></div>
   <div id="wi-card">
+    <button id="wi-close" type="button" aria-label="Skip intro">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
     <div id="wi-inner">
       <div id="wi-video-wrap">
         <video id="wi-video" src="https://raw.githubusercontent.com/Alifkece/media/main/uploads/1784259852099_New Project 166 [EDC6548].mp4" playsinline muted preload="auto" controlsList="nodownload noremoteplayback" disablepictureinpicture></video>
       </div>
       <h1 id="wi-heading">Welcome to<span class="wi-grad">Aliftzy Store</span></h1>
       <p id="wi-subtitle">Experience premium digital products with fast delivery, secure payment, and trusted service.</p>
-      <button id="wi-btn" type="button">Enter Store</button>
       <div id="wi-footer">Powered by Aliftzy Store &copy; 2026</div>
     </div>
   </div>
 </div>
 
-<script>
-(function(){
-  var STORAGE_KEY = 'aliftzy_welcome_shown';
-  if (sessionStorage.getItem(STORAGE_KEY)) return;
+<button id="global-change-platform-btn" type="button">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 4v5h-5"/></svg>
+  Change Platform
+</button>
 
+<script>
+function initAliftzyWelcome(){
+  var STORAGE_KEY = 'aliftzy_welcome_shown';
   var overlay = document.getElementById('wi-overlay');
+  if (sessionStorage.getItem(STORAGE_KEY)) {
+    if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    return;
+  }
+
   var card = document.getElementById('wi-card');
   var video = document.getElementById('wi-video');
   var videoWrap = document.getElementById('wi-video-wrap');
-  var btn = document.getElementById('wi-btn');
+  var closeBtn = document.getElementById('wi-close');
   var particlesWrap = document.getElementById('wi-particles');
   var prevOverflow = '';
   var closed = false;
@@ -741,21 +1026,14 @@
     }, 550);
   }
 
-  btn.addEventListener('click', function(e){
-    var rect = btn.getBoundingClientRect();
-    var ripple = document.createElement('span');
-    var d = Math.max(rect.width, rect.height);
-    ripple.className = 'wi-ripple';
-    ripple.style.width = ripple.style.height = d + 'px';
-    ripple.style.left = (e.clientX - rect.left - d/2) + 'px';
-    ripple.style.top = (e.clientY - rect.top - d/2) + 'px';
-    btn.appendChild(ripple);
-    setTimeout(function(){ ripple.remove(); }, 650);
+  // Menutup popup lebih awal (skip) tetap otomatis lanjut ke Login
+  closeBtn.addEventListener('click', function(){
     video.pause();
     video.currentTime = 0;
     closeOverlay();
   });
 
+  // Video selesai diputar -> otomatis lanjut ke Login (fade halus dari closeOverlay)
   video.addEventListener('ended', function(){
     closeOverlay();
   });
@@ -766,7 +1044,44 @@
     overlay.classList.add('wi-show');
   });
   setTimeout(startVideo, 350);
-})();
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  var changeBtn = document.getElementById('global-change-platform-btn');
+  if (!changeBtn) return;
+
+  changeBtn.addEventListener('click', function(){
+    localStorage.removeItem('selectedPlatform');
+    sessionStorage.removeItem('aliftzy_welcome_shown');
+    location.reload();
+  });
+
+  function toggleChangePlatformBtn(page){
+    changeBtn.style.display = (page === 'home') ? 'none' : 'flex';
+  }
+
+  // Hook non-invasif ke showPage yang sudah ada di js/app.js (tanpa mengubah logicnya)
+  var attempts = 0;
+  var waitForShowPage = setInterval(function(){
+    attempts++;
+    if (typeof window.showPage === 'function' && !window.showPage.__cxpWrapped) {
+      var originalShowPage = window.showPage;
+      window.showPage = function(page, sub){
+        originalShowPage(page, sub);
+        toggleChangePlatformBtn(page);
+      };
+      window.showPage.__cxpWrapped = true;
+      clearInterval(waitForShowPage);
+    } else if (attempts > 100) {
+      clearInterval(waitForShowPage);
+    }
+  }, 50);
+
+  // Tampilkan tombol saat halaman login aktif sebelum showPage sempat di-hook
+  if (document.getElementById('page-auth') && document.getElementById('page-auth').style.display !== 'none') {
+    toggleChangePlatformBtn('auth');
+  }
+});
 </script>
 
 </body>
