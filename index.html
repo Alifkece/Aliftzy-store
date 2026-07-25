@@ -3,6 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<script>
+  // Chrome Android's "Desktop site" toggle ignores width=device-width and
+  // forces a ~980px virtual viewport, then zooms the whole page out to fit
+  // the phone screen — breaking every media query on the page. Re-writing
+  // the viewport with the device's real screen width neutralizes that,
+  // regardless of which UA/desktop-mode the browser reports.
+  (function(){
+    var vp = document.querySelector('meta[name="viewport"]');
+    if (!vp || !window.screen || !screen.width) return;
+    vp.setAttribute('content', 'width=' + screen.width + ', initial-scale=1.0, maximum-scale=1.0');
+  })();
+</script>
 <title>ALIFTZY STORE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
