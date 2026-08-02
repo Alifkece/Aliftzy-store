@@ -748,7 +748,7 @@ async function generateQrisPayment() {
       productId: currentOrderProduct ? currentOrderProduct.id : null
     });
 
-    const res = await fetch('https://aliftzy-backend-production.up.railway.app/create-payment', {
+    const res = await fetch('https://aliftzy-backend.vercel.app/create-payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -888,7 +888,7 @@ function startStatusPolling(transactionId) {
 
 async function checkPaymentStatus(transactionId) {
   try {
-    const res = await fetch('https://aliftzy-backend-production.up.railway.app/status', {
+    const res = await fetch('https://aliftzy-backend.vercel.app/status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ transaction_id: transactionId })
@@ -1392,4 +1392,3 @@ async function loadStockPublic() {
     );
   });
 }
-
