@@ -78,6 +78,30 @@
     document.querySelectorAll('.btn, .cat-tab, .music-btn, .home-nav-tab, .track-select-btn').forEach(bindRipple);
   }
 
+  /* ---- 2b. Magnetic hover pull for primary buttons (desktop only) ---- */
+  function attachMagnetic(el) {
+    if (!el || el.__magneticBound) return;
+    el.__magneticBound = true;
+    var raf;
+    el.addEventListener('pointermove', function (e) {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(function () {
+        var rect = el.getBoundingClientRect();
+        var mx = (e.clientX - rect.left - rect.width / 2) * 0.22;
+        var my = (e.clientY - rect.top - rect.height / 2) * 0.28;
+        el.style.transform = 'translate(' + mx.toFixed(1) + 'px,' + my.toFixed(1) + 'px)';
+      });
+    });
+    el.addEventListener('pointerleave', function () {
+      if (raf) cancelAnimationFrame(raf);
+      el.style.transform = '';
+    });
+  }
+  function bindMagneticTargets() {
+    if (!supportsHover) return;
+    document.querySelectorAll('.btn-primary, .btn-gold, .music-btn-play').forEach(attachMagnetic);
+  }
+
   /* ---- 3. Subtle parallax on hero orbs following pointer (desktop only) ---- */
   function bindHeroParallax() {
     if (!supportsHover) return;
@@ -118,6 +142,7 @@
   function rebindDynamic() {
     bindTiltTargets();
     bindRippleTargets();
+    bindMagneticTargets();
   }
 
   document.addEventListener('DOMContentLoaded', function () {
