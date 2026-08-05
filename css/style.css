@@ -116,7 +116,9 @@
     z-index: 0;
   }
 
-  /* Aurora wash — a slow-drifting conic gradient behind everything */
+  /* Aurora wash — a very slow, quiet gradient behind everything. Kept subtle
+     on purpose: it should read as "premium dark surface", not as a moving
+     background effect competing with content. */
   body::after {
     content: '';
     position: fixed;
@@ -124,42 +126,32 @@
     z-index: 0;
     pointer-events: none;
     background:
-      radial-gradient(38% 30% at 18% 8%, rgba(109,92,255,0.16), transparent 60%),
-      radial-gradient(30% 26% at 86% 14%, rgba(78,197,255,0.13), transparent 60%),
-      radial-gradient(34% 30% at 60% 92%, rgba(183,140,255,0.10), transparent 65%);
+      radial-gradient(38% 30% at 18% 8%, rgba(109,92,255,0.09), transparent 60%),
+      radial-gradient(30% 26% at 86% 14%, rgba(78,197,255,0.07), transparent 60%),
+      radial-gradient(34% 30% at 60% 92%, rgba(183,140,255,0.06), transparent 65%);
     filter: blur(10px);
-    animation: auroraDrift 26s ease-in-out infinite alternate;
-    opacity: 0.9;
+    animation: auroraDrift 40s ease-in-out infinite alternate;
+    opacity: 0.7;
   }
 
   @keyframes auroraDrift {
     0%   { transform: translate3d(0,0,0) scale(1); }
-    50%  { transform: translate3d(-2%, 1.5%, 0) scale(1.04); }
-    100% { transform: translate3d(2%, -1%, 0) scale(1.02); }
+    100% { transform: translate3d(1%, -0.6%, 0) scale(1.02); }
   }
 
-  #fx-particle-canvas {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0.85;
+  /* Ambient particle canvas + JS-generated floating dots are disabled —
+     they read as "experimental" rather than premium. The elements stay in
+     the DOM (JS still owns them) so nothing else has to change; they are
+     simply not rendered. */
+  #fx-particle-canvas,
+  .bg-particles {
+    display: none;
   }
 
-  .orb { position: fixed; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 0; }
-  .orb-1 { width: 620px; height: 620px; background: rgba(109,92,255,0.12); top: -240px; left: -240px; animation: orbFloat1 18s ease-in-out infinite; }
-  .orb-2 { width: 520px; height: 520px; background: rgba(78,197,255,0.10); bottom: -200px; right: -140px; animation: orbFloat2 22s ease-in-out infinite; }
-
-  @keyframes orbFloat1 {
-    0%,100% { transform: translate(0,0) scale(1); }
-    50%     { transform: translate(30px,40px) scale(1.08); }
-  }
-  @keyframes orbFloat2 {
-    0%,100% { transform: translate(0,0) scale(1); }
-    50%     { transform: translate(-24px,-30px) scale(1.06); }
-  }
+  /* One or two very quiet glow orbs — barely-there ambience, not a light show. */
+  .orb { position: fixed; border-radius: 50%; filter: blur(110px); pointer-events: none; z-index: 0; }
+  .orb-1 { width: 560px; height: 560px; background: rgba(109,92,255,0.07); top: -240px; left: -240px; }
+  .orb-2 { width: 480px; height: 480px; background: rgba(78,197,255,0.06); bottom: -200px; right: -140px; }
 
   /* ===== NAVBAR — floating glass capsule ===== */
   .navbar {
@@ -330,8 +322,8 @@
     width: 100%;
     position: relative;
     background:
-      radial-gradient(120% 140% at 8% -10%, rgba(109,92,255,0.20), transparent 55%),
-      radial-gradient(90% 120% at 100% 0%, rgba(78,197,255,0.16), transparent 55%),
+      radial-gradient(120% 140% at 8% -10%, rgba(109,92,255,0.13), transparent 55%),
+      radial-gradient(90% 120% at 100% 0%, rgba(78,197,255,0.10), transparent 55%),
       linear-gradient(150deg, #121420 0%, #0d0e15 45%, #171126 100%);
     overflow: hidden;
     min-height: 160px;
@@ -385,17 +377,14 @@
   .banner-glow-left {
     position: absolute; left: -100px; top: 50%; transform: translateY(-50%);
     width: 420px; height: 420px;
-    background: radial-gradient(circle, rgba(109,92,255,0.20) 0%, transparent 70%);
-    animation: glowPulse 7s ease-in-out infinite;
+    background: radial-gradient(circle, rgba(109,92,255,0.13) 0%, transparent 70%);
   }
 
   .banner-glow-right {
     position: absolute; right: -100px; top: 50%; transform: translateY(-50%);
     width: 370px; height: 370px;
-    background: radial-gradient(circle, rgba(78,197,255,0.17) 0%, transparent 70%);
-    animation: glowPulse 8s ease-in-out infinite 1.2s;
+    background: radial-gradient(circle, rgba(78,197,255,0.11) 0%, transparent 70%);
   }
-  @keyframes glowPulse { 0%,100% { opacity: 0.75; transform: translateY(-50%) scale(1); } 50% { opacity: 1; transform: translateY(-50%) scale(1.08); } }
 
   .banner-inner {
     position: relative; z-index: 2;
@@ -487,16 +476,15 @@
       0 6px 16px rgba(0,0,0,0.4);
     overflow: hidden;
     cursor: pointer;
-    transition: transform 0.3s var(--ease-spring), box-shadow 0.3s ease;
-    transform-style: preserve-3d;
+    transition: transform 0.25s var(--ease), box-shadow 0.25s ease;
   }
   .store-avatar:hover {
-    transform: scale(1.05) translateY(-4px) rotateX(4deg) rotateY(-4deg);
+    transform: translateY(-3px);
     box-shadow:
       0 0 0 1px rgba(255,255,255,0.2) inset,
-      0 0 0 4px rgba(109,92,255,0.2),
-      0 26px 56px rgba(109,92,255,0.4),
-      0 8px 20px rgba(0,0,0,0.45);
+      0 0 0 4px rgba(109,92,255,0.18),
+      0 20px 44px rgba(109,92,255,0.34),
+      0 8px 20px rgba(0,0,0,0.4);
   }
 
   .store-info { flex: 1; min-width: 0; }
@@ -506,22 +494,11 @@
     font-weight: 700;
     font-size: clamp(22px, 4.6vw, 50px);
     letter-spacing: 0.03em;
-    background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.82) 55%, var(--accent2) 120%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #f2f5ff;
     line-height: 1.08;
     white-space: nowrap;
     position: relative;
-    filter: drop-shadow(0 0 18px rgba(78,197,255,0.45)) drop-shadow(0 0 42px rgba(109,92,255,0.28));
-    animation: neonBreathe 4.5s ease-in-out infinite;
-  }
-  @keyframes neonBreathe {
-    0%, 100% { filter: drop-shadow(0 0 14px rgba(78,197,255,0.38)) drop-shadow(0 0 34px rgba(109,92,255,0.22)); }
-    50%      { filter: drop-shadow(0 0 24px rgba(78,197,255,0.58)) drop-shadow(0 0 54px rgba(109,92,255,0.36)); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .store-name { animation: none; }
+    text-shadow: 0 0 16px rgba(78,197,255,0.4), 0 0 34px rgba(109,92,255,0.22);
   }
 
   .store-tagline {
@@ -1032,17 +1009,15 @@
   .membership-glow-reseller {
     position: absolute; top: -80px; right: -80px;
     width: 220px; height: 220px;
-    background: radial-gradient(circle, rgba(109,92,255,0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(109,92,255,0.13) 0%, transparent 70%);
     pointer-events: none;
-    animation: glowPulse 6s ease-in-out infinite;
   }
 
   .membership-glow-owner {
     position: absolute; top: -80px; right: -80px;
     width: 220px; height: 220px;
-    background: radial-gradient(circle, rgba(240,196,109,0.17) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(240,196,109,0.11) 0%, transparent 70%);
     pointer-events: none;
-    animation: glowPulse 6.5s ease-in-out infinite .8s;
   }
 
   .membership-icon {
