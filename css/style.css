@@ -998,6 +998,309 @@ body::before {
 .membership-benefits { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
 .membership-benefits li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--text2); }
 
+/* Ikon centang benefit — sebelumnya tidak punya ukuran sama sekali
+   sehingga SVG dirender di ukuran default browser (raksasa) dan merusak
+   alignment daftar benefit di kartu Reseller/Owner. */
+.benefit-check { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; }
+
+.membership-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.membership-icon-reseller { background: rgba(0, 240, 255, 0.12); border: 1px solid rgba(0, 240, 255, 0.35); }
+.membership-icon-owner { background: rgba(254, 231, 92, 0.12); border: 1px solid rgba(254, 231, 92, 0.35); }
+
+.membership-glow-reseller,
+.membership-glow-owner {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.membership-glow-reseller { background: radial-gradient(circle, rgba(0, 240, 255, 0.18) 0%, transparent 70%); }
+.membership-glow-owner { background: radial-gradient(circle, rgba(254, 231, 92, 0.18) 0%, transparent 70%); }
+
+.membership-card > * { position: relative; z-index: 1; }
+
+/* =====================================================================
+   SIDEBAR / SETTINGS LIST ITEM (dipakai di Settings & dropdown user navbar)
+   Sebelumnya tidak punya CSS sama sekali -> tampil sebagai tombol default
+   browser, tidak mengikuti tema situs.
+   ===================================================================== */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-item:hover { background: var(--surface2); color: #fff; }
+.sidebar-item svg { flex-shrink: 0; }
+
+/* =====================================================================
+   MUSIC PLAYER — bagian yang sebelumnya tidak memiliki CSS sama sekali
+   (progress bar, volume, tombol pilih lagu), sehingga tampil sebagai
+   elemen native browser tanpa styling dan berantakan di layar sempit.
+   ===================================================================== */
+.music-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1 1 90px;
+  min-width: 60px;
+}
+
+.progress-bar-wrap {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--surface2);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--neon-cyan), var(--accent));
+}
+
+.progress-times {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9.5px;
+  color: var(--text3);
+  font-family: 'Orbitron', sans-serif;
+}
+
+.volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 1;
+  width: 70px;
+  min-width: 46px;
+}
+
+.volume-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--surface2);
+  cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--neon-cyan);
+  box-shadow: var(--glow-cyan);
+  cursor: pointer;
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 50%;
+  background: var(--neon-cyan);
+  box-shadow: var(--glow-cyan);
+  cursor: pointer;
+}
+
+.music-track-select { position: relative; flex-shrink: 0; }
+
+.track-num {
+  width: 18px;
+  flex-shrink: 0;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  color: var(--text3);
+}
+
+.track-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.section-divider { height: 1px; background: var(--border); width: 100%; }
+
+/* =====================================================================
+   PESANAN SAYA — seluruh komponen ini sebelumnya tidak memiliki CSS
+   sama sekali (order-card, status chip, kotak akun terkirim, empty state).
+   ===================================================================== */
+.orders-empty {
+  text-align: center;
+  padding: 48px 16px;
+  color: var(--text2);
+  font-size: 13px;
+}
+
+.orders-empty-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.order-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.order-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.order-card-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.4;
+}
+
+.order-card-date { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+.order-status-chip {
+  flex-shrink: 0;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 4px 9px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.order-status-delivered { background: rgba(87, 242, 135, 0.15); border: 1px solid var(--success); color: var(--success); }
+.order-status-pending { background: rgba(254, 231, 92, 0.12); border: 1px solid var(--gold); color: var(--gold); }
+
+.order-delivered-box {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+}
+
+.order-delivered-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  font-size: 12px;
+  padding: 4px 0;
+}
+
+.order-delivered-label { color: var(--text3); min-width: 70px; flex-shrink: 0; }
+.order-delivered-val { color: var(--text); word-break: break-all; }
+
+/* Spinner loading generik (tombol order, refresh pesanan, dll) */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: currentColor;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Tombol aksi di dalam modal order — dirapikan agar tidak menumpuk acak
+   di layar sempit. */
+.modal-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+
+/* =====================================================================
+   PARTIKEL LATAR BELAKANG — sebelumnya container & elemen partikel tidak
+   punya posisi/animasi sama sekali, sehingga 18 div kecil ikut mengambil
+   ruang di alur dokumen dan mendorong konten (celah aneh di atas halaman,
+   terutama terlihat di mobile). Dibuat fixed + absolute seperti orb.
+   ===================================================================== */
+.bg-particles {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.particle {
+  position: absolute;
+  bottom: -10px;
+  border-radius: 50%;
+  animation-name: particleFloat;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes particleFloat {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: .6; }
+  100% { transform: translateY(-100vh); opacity: 0; }
+}
+
+/* =====================================================================
+   FOOTER — sebelumnya tidak punya CSS sama sekali (tanpa padding/rata
+   tengah), tampil mepet dan tidak konsisten di semua ukuran layar.
+   ===================================================================== */
+.footer {
+  text-align: center;
+  padding: 28px 16px max(28px, env(safe-area-inset-bottom));
+  font-size: 11.5px;
+  color: var(--text3);
+  border-top: 1px solid var(--border);
+}
+
 /* =====================================================================
    AUTH CARD & MODALS
    ===================================================================== */
@@ -1099,6 +1402,27 @@ body::before {
 
 .hidden { display: none !important; }
 .full-btn { width: 100%; justify-content: center; }
+
+/* =====================================================================
+   REFINEMENT LAYAR SANGAT KECIL (≤480px)
+   Hanya menyesuaikan ukuran & spacing, desain/warna/komponen tetap sama.
+   ===================================================================== */
+@media (max-width: 480px) {
+  .banner-content { padding: 22px 14px; }
+  .banner-inner { gap: 12px; }
+  .store-avatar { width: clamp(64px, 20vw, 82px); height: clamp(64px, 20vw, 82px); }
+  .store-name { font-size: clamp(17px, 5.2vw, 22px); }
+
+  .music-section { flex-wrap: wrap; row-gap: 8px; padding: 10px 12px; }
+  .music-progress-wrap { order: 5; flex-basis: 100%; }
+  .volume-wrap { width: 56px; }
+
+  .section { padding: 24px 0; }
+  .membership-grid { gap: 14px; }
+  .membership-card { padding: 18px; }
+
+  .home-nav-tab { padding: 12px 13px; font-size: 11px; }
+}
 
 /* =====================================================================
    MEDIA QUERIES (TABLET & DESKTOP)
