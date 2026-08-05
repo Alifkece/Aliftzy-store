@@ -444,10 +444,8 @@
 <script type="module" src="js/app.js"></script>
 <!-- Bootstrap JS bundle (grid/utility support only — no components rely on it yet) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
-<!-- Purely visual micro-interactions (tilt, ripple, parallax) — no app/business logic -->
+<!-- Purely visual micro-interactions (ripple, play-ring sync) — no app/business logic -->
 <script src="js/ui-effects.js" defer></script>
-<!-- Ambient canvas particle system (icon-morphing) — purely decorative -->
-<script src="js/particles-canvas.js" defer></script>
 
 
 <!-- ===== ANNOUNCEMENT POPUP ===== -->
@@ -488,8 +486,8 @@
     position:fixed; inset:0; z-index:9999;
     display:flex; align-items:center; justify-content:center;
     background:radial-gradient(120% 120% at 50% 0%, rgba(17,19,24,.94) 0%, rgba(9,9,11,.95) 55%, rgba(5,5,7,.97) 100%);
-    -webkit-backdrop-filter:blur(20px);
-    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(12px);
+    backdrop-filter:blur(12px);
     opacity:0; transform:scale(.97);
     transition:opacity .5s cubic-bezier(.16,.8,.24,1), transform .5s cubic-bezier(.16,.8,.24,1);
     padding:20px; box-sizing:border-box;
@@ -497,20 +495,6 @@
   #wi-overlay.wi-show{ opacity:1; transform:scale(1); }
   #wi-overlay.wi-hide{ opacity:0; transform:scale(.96); pointer-events:none; }
   #wi-overlay *{ box-sizing:border-box; }
-
-  #wi-particles{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
-  .wi-particle{
-    position:absolute; bottom:-10px; border-radius:50%;
-    background:rgba(109,92,255,.5);
-    box-shadow:0 0 6px rgba(109,92,255,.55);
-    animation-name:wi-float; animation-timing-function:linear; animation-iteration-count:infinite;
-  }
-  @keyframes wi-float{
-    0%{ transform:translateY(0) translateX(0); opacity:0; }
-    10%{ opacity:.7; }
-    90%{ opacity:.5; }
-    100%{ transform:translateY(-110vh) translateX(var(--wi-drift,20px)); opacity:0; }
-  }
 
   #wi-card{
     position:relative;
@@ -521,25 +505,18 @@
     padding:3px;
     opacity:0; transform:scale(.95);
     transition:opacity .45s cubic-bezier(.16,.8,.24,1), transform .45s cubic-bezier(.16,.8,.24,1);
-    box-shadow:0 0 40px rgba(109,92,255,.22), 0 0 80px rgba(78,197,255,.12), 0 30px 80px rgba(0,0,0,.5);
+    box-shadow:0 0 30px rgba(109,92,255,.16), 0 30px 80px rgba(0,0,0,.5);
   }
   #wi-overlay.wi-show #wi-card{ opacity:1; transform:scale(1); transition-delay:.1s; }
 
   #wi-card::before{
     content:""; position:absolute; inset:-1px; border-radius:30px; z-index:0;
     padding:1px;
-    background:linear-gradient(45deg,#6D5CFF,#4EC5FF,#6D5CFF,#4EC5FF);
-    background-size:300% 300%;
+    background:linear-gradient(135deg,#6D5CFF,#4EC5FF);
     -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite:xor;
     mask-composite:exclude;
-    animation:wi-border-move 6s ease infinite;
-    opacity:.85;
-  }
-  @keyframes wi-border-move{
-    0%{ background-position:0% 50%; }
-    50%{ background-position:100% 50%; }
-    100%{ background-position:0% 50%; }
+    opacity:.7;
   }
 
   #wi-inner{
@@ -583,14 +560,9 @@
     font-size:12px; font-weight:500; letter-spacing:.02em;
     color:#f2f3f7; white-space:nowrap;
     opacity:1; transition:opacity .3s ease, transform .3s ease;
-    animation:wi-hint-breathe 2.4s ease-in-out infinite;
     pointer-events:none;
   }
   #wi-hint.wi-hint-hide{ opacity:0; transform:translateX(-50%) translateY(8px); }
-  @keyframes wi-hint-breathe{
-    0%,100%{ box-shadow:0 8px 24px rgba(0,0,0,.35), 0 0 0 1px rgba(109,92,255,.12); }
-    50%{ box-shadow:0 8px 24px rgba(0,0,0,.35), 0 0 0 1px rgba(109,92,255,.3); }
-  }
 
   #wi-heading{
     font-family:var(--font-display, var(--font-main, sans-serif));
@@ -607,14 +579,8 @@
     background:linear-gradient(135deg,#6D5CFF,#4EC5FF);
     -webkit-background-clip:text; background-clip:text; color:transparent;
     display:block;
-    filter:drop-shadow(0 0 14px rgba(78,197,255,.4)) drop-shadow(0 0 32px rgba(109,92,255,.24));
-    animation:wi-neon-breathe 4.5s ease-in-out infinite;
+    filter:drop-shadow(0 0 12px rgba(78,197,255,.32)) drop-shadow(0 0 26px rgba(109,92,255,.18));
   }
-  @keyframes wi-neon-breathe{
-    0%,100%{ filter:drop-shadow(0 0 12px rgba(78,197,255,.34)) drop-shadow(0 0 26px rgba(109,92,255,.18)); }
-    50%{ filter:drop-shadow(0 0 20px rgba(78,197,255,.52)) drop-shadow(0 0 44px rgba(109,92,255,.3)); }
-  }
-  @media (prefers-reduced-motion: reduce){ #wi-heading .wi-grad{ animation:none; } }
 
   #wi-subtitle{
     font-family:var(--font-main, sans-serif);
@@ -654,7 +620,6 @@
 </style>
 
 <div id="wi-overlay">
-  <div id="wi-particles"></div>
   <div id="wi-card">
     <button id="wi-close" type="button" aria-label="Skip intro">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -685,25 +650,8 @@ function initAliftzyWelcome(){
   var videoWrap = document.getElementById('wi-video-wrap');
   var hint = document.getElementById('wi-hint');
   var closeBtn = document.getElementById('wi-close');
-  var particlesWrap = document.getElementById('wi-particles');
   var prevOverflow = '';
   var closed = false;
-
-  // Floating particles (premium ambience)
-  var count = 20 + Math.floor(Math.random() * 21); // 20-40
-  for (var i = 0; i < count; i++) {
-    var p = document.createElement('div');
-    p.className = 'wi-particle';
-    var size = 2 + Math.random() * 4;
-    p.style.width = size + 'px';
-    p.style.height = size + 'px';
-    p.style.left = (Math.random() * 100) + '%';
-    p.style.setProperty('--wi-drift', (Math.random() * 60 - 30) + 'px');
-    var dur = 8 + Math.random() * 10;
-    p.style.animationDuration = dur + 's';
-    p.style.animationDelay = (Math.random() * dur) + 's';
-    particlesWrap.appendChild(p);
-  }
 
   function lockBody(){
     prevOverflow = document.body.style.overflow;
