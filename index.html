@@ -18,6 +18,16 @@
 <title>ALIFTZY STORE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Bootstrap 5 — utilities-only build on purpose (no Reboot, no Components,
+     no .container/.row/.col grid). This project already defines its own
+     .container and .btn/.btn-primary/.btn-danger/.btn-sm classes; the full
+     Bootstrap bundle defines those exact same class names, and would
+     silently override this site's colors/spacing since the browser can't
+     tell the two apart. The utilities-only build ships d-flex / flex-* /
+     justify-content-* / align-items-* / order-* / text-* etc. — real
+     Bootstrap layout tools with zero risk of clobbering the existing
+     design. See the changelog at the end of this response for details. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap-utilities.min.css">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -29,7 +39,7 @@
 <div class="notif" id="notif"><span id="notif-text"></span></div>
 
 <!-- NAVBAR -->
-<nav class="navbar">
+<nav class="navbar d-flex align-items-center">
   <a class="nav-logo" href="#" onclick="showPage('home')">ALIFTZY STORE</a>
   <ul class="nav-links">
     <li><a href="#products">Produk</a></li>
@@ -116,7 +126,7 @@
           <div class="store-info reveal-left">
             <div class="store-name">WELCOME MY STORE</div>
             <div class="store-tagline">Premium App Subscription — Terpercaya dan Bergaransi</div>
-            <div class="store-badges">
+            <div class="store-badges d-flex flex-wrap">
               <span class="badge badge-blue">
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 Bergaransi
@@ -130,7 +140,7 @@
                 Open Reseller
               </span>
             </div>
-            <div class="social-btns">
+            <div class="social-btns d-flex flex-wrap">
               <!-- GANTI LINK WA DAN IG DI SINI -->
               <a class="social-btn social-btn-wa" href="https://whatsapp.com/channel/0029VbAbqrkBvvseV1Cpk73p" target="_blank" rel="noopener">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.555 4.122 1.524 5.855L0 24l6.335-1.508A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.891 0-3.659-.498-5.191-1.371l-.372-.22-3.861.919.976-3.768-.242-.388A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
