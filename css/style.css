@@ -1017,22 +1017,22 @@ body::before {
 .membership-icon-reseller { background: rgba(0, 240, 255, 0.12); border: 1px solid rgba(0, 240, 255, 0.35); }
 .membership-icon-owner { background: rgba(254, 231, 92, 0.12); border: 1px solid rgba(254, 231, 92, 0.35); }
 
+.membership-card > * { position: relative; z-index: 1; }
+
 .membership-glow-reseller,
 .membership-glow-owner {
-  position: absolute;
+  position: absolute !important;
   top: -60px;
   right: -60px;
   width: 160px;
   height: 160px;
   border-radius: 50%;
   pointer-events: none;
-  z-index: 0;
+  z-index: 0 !important;
 }
 
 .membership-glow-reseller { background: radial-gradient(circle, rgba(0, 240, 255, 0.18) 0%, transparent 70%); }
 .membership-glow-owner { background: radial-gradient(circle, rgba(254, 231, 92, 0.18) 0%, transparent 70%); }
-
-.membership-card > * { position: relative; z-index: 1; }
 
 /* =====================================================================
    SIDEBAR / SETTINGS LIST ITEM (dipakai di Settings & dropdown user navbar)
@@ -1375,8 +1375,124 @@ body::before {
 }
 
 .modal-title, .ann-popup-title { font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 800; color: #fff; }
-.modal-close, .ann-close-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); }
+.modal-close, .ann-close-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); flex-shrink: 0; }
 .modal-close:hover, .ann-close-btn:hover { background: var(--danger); color: #fff; }
+
+/* =====================================================================
+   POPUP PENGUMUMAN (ANNOUNCEMENT) — sebelumnya seluruh isi popup ini
+   (header, icon, badge, list item, divider, footer) tidak punya CSS
+   sama sekali sehingga tampil sebagai teks & ikon mentah menumpuk acak.
+   ===================================================================== */
+.ann-popup-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 2px;
+}
+
+.ann-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ann-icon-info { background: rgba(122, 176, 255, 0.12); border: 1px solid rgba(122, 176, 255, 0.35); }
+.ann-icon-success { background: rgba(87, 242, 135, 0.12); border: 1px solid var(--success); }
+.ann-icon-warning { background: rgba(254, 231, 92, 0.12); border: 1px solid var(--gold); }
+.ann-icon-danger { background: rgba(237, 66, 69, 0.12); border: 1px solid var(--danger); }
+
+.ann-header-text { flex: 1; min-width: 0; padding-top: 1px; }
+
+.ann-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+
+.ann-badge-info { background: rgba(122, 176, 255, 0.12); border: 1px solid rgba(122, 176, 255, 0.4); color: #7ab0ff; }
+.ann-badge-success { background: rgba(87, 242, 135, 0.15); border: 1px solid var(--success); color: var(--success); }
+.ann-badge-warning { background: rgba(254, 231, 92, 0.15); border: 1px solid var(--gold); color: var(--gold); }
+.ann-badge-danger { background: rgba(237, 66, 69, 0.15); border: 1px solid var(--danger); color: var(--danger); }
+
+.ann-popup-title { font-size: 16px; line-height: 1.3; }
+.ann-popup-meta { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+.ann-divider { height: 1px; background: var(--border); margin: 16px 0 14px; }
+
+.ann-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 260px;
+  overflow-y: auto;
+  margin-bottom: 18px;
+}
+
+.ann-item {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+}
+
+.ann-item-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ann-item-icon-info { background: rgba(122, 176, 255, 0.12); }
+.ann-item-icon-success { background: rgba(87, 242, 135, 0.12); }
+.ann-item-icon-warning { background: rgba(254, 231, 92, 0.12); }
+.ann-item-icon-danger { background: rgba(237, 66, 69, 0.12); }
+
+.ann-item-body { min-width: 0; flex: 1; }
+.ann-item-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: #fff; }
+.ann-item-msg { font-size: 12px; color: var(--text2); line-height: 1.5; margin-top: 3px; }
+.ann-item-time { font-size: 10.5px; color: var(--text3); margin-top: 7px; }
+
+.ann-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: 26px 10px;
+  color: var(--text2);
+  font-size: 12.5px;
+}
+
+.ann-empty-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ann-popup-footer { display: flex; flex-direction: column; gap: 10px; }
+.ann-footer-note { text-align: center; font-size: 11px; color: var(--text3); }
 
 /* NOTIFICATION TOAST */
 .notif {
