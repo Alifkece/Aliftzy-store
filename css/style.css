@@ -1531,6 +1531,7 @@ body::before {
 
   .music-section { flex-wrap: wrap; row-gap: 8px; padding: 10px 12px; }
   .music-progress-wrap { order: 5; flex-basis: 100%; }
+  .music-track-select { order: 4; flex-basis: 100%; }
   .volume-wrap { width: 56px; }
 
   .section { padding: 24px 0; }
@@ -1538,6 +1539,16 @@ body::before {
   .membership-card { padding: 18px; }
 
   .home-nav-tab { padding: 12px 13px; font-size: 11px; }
+
+  /* Tombol "Lagu" pindah ke kiri saat mobile (lihat .music-section di atas),
+     jadi dropdown-nya juga harus dibuka ke kanan (bukan ke kiri seperti versi
+     desktop) supaya tidak meluber keluar layar. */
+  .track-dropdown {
+    left: 0;
+    right: auto;
+    min-width: 200px;
+    max-width: min(260px, calc(100vw - 56px));
+  }
 }
 
 /* =====================================================================
