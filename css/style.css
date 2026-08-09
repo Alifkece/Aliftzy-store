@@ -180,6 +180,70 @@ body::before {
 
 .nav-auth { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
 
+/* =====================================================================
+   NAVBAR HAMBURGER (MOBILE/TABLET < 1024px)
+   Sebelumnya .nav-links (Produk/Reseller) cuma disembunyikan di bawah
+   1024px TANPA ada gantinya sama sekali — link itu jadi tidak bisa
+   diakses di mobile/tablet. Ini tombol + dropdown penggantinya.
+   ===================================================================== */
+.nav-hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: var(--neon-cyan);
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 4px 0 0 #05080e;
+  transition: all 0.2s ease;
+}
+.nav-hamburger:hover { background: var(--neon-cyan); color: #000; transform: translateY(-2px); box-shadow: 0 6px 0 0 #05080e, var(--glow-cyan); }
+.nav-hamburger:active { transform: translateY(2px); box-shadow: 0 1px 0 0 #05080e; }
+
+.nav-mobile-menu {
+  position: fixed;
+  top: 62px;
+  left: 0;
+  right: 0;
+  z-index: 9998;
+  background: rgba(6, 9, 17, 0.97);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  padding: 10px max(16px, env(safe-area-inset-left)) 14px;
+  gap: 4px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.28s ease, opacity 0.2s ease;
+}
+.nav-mobile-menu.show { max-height: 220px; opacity: 1; }
+.nav-mobile-menu a {
+  color: var(--text2);
+  text-decoration: none;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 12px 10px;
+  border-radius: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.nav-mobile-menu a:last-child { border-bottom: none; }
+.nav-mobile-menu a:hover, .nav-mobile-menu a:active { color: var(--neon-cyan); background: rgba(0, 240, 255, 0.08); }
+
+@media (min-width: 1024px) {
+  .nav-hamburger { display: none; }
+  .nav-mobile-menu { display: none !important; }
+}
+
 .nav-bell {
   position: relative;
   width: 38px;
