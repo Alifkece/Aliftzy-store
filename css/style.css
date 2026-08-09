@@ -1567,3 +1567,67 @@ body::before {
   .container { max-width: 1180px; }
   .product-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 20px; }
 }
+
+/* =====================================================================
+   GOOGLE LOGIN & OTP VERIFICATION (2-step login)
+   Ditambahkan di akhir file, TIDAK mengubah rule existing manapun.
+   Memakai token warna/variabel yang sama dengan .auth-card/.field agar
+   menyatu dengan desain login yang sudah ada, dan mengikuti breakpoint
+   responsive existing (tidak menambah breakpoint baru).
+   ===================================================================== */
+.btn-google-auth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-google-auth:hover { border-color: var(--neon-cyan); box-shadow: var(--glow-cyan); }
+.btn-google-auth:disabled { opacity: 0.7; cursor: default; }
+
+.otp-desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text2);
+  margin: 0 0 20px;
+}
+.otp-desc strong { color: #fff; }
+
+#otp-code.otp-code-input {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  color: #fff;
+  font-family: 'Courier New', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 10px;
+  text-align: center;
+  outline: none;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+#otp-code.otp-code-input:focus { border-color: var(--neon-cyan); box-shadow: var(--glow-cyan); }
+
+.otp-resend {
+  margin-top: 16px;
+  text-align: center;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12.5px;
+  color: var(--text2);
+}
+.otp-resend a { color: var(--neon-cyan); text-decoration: none; font-weight: 600; cursor: pointer; }
+.otp-resend a:hover { text-decoration: underline; }
