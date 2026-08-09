@@ -42,6 +42,13 @@ let otpGateUid = null;
 let otpCooldownInterval = null;
 let otpNextResendAt = 0;
 let otpBusy = false;
+// Ditandai true tepat SEBELUM createUserWithEmailAndPassword dipanggil di
+// handleRegister(), lalu dikonsumsi (dan direset) sekali oleh runOtpGate()
+// saat onAuthStateChanged berikutnya menyala. Tujuannya: user yang BARU
+// SAJA mendaftar langsung masuk toko tanpa OTP (sesuai permintaan pemilik
+// toko), TAPI login-login berikutnya (setelah logout) tetap wajib OTP —
+// lihat penjelasan keamanan di lib/otp.js grantFirstSessionIfNew().
+let pendingRegistrationGrant = false;
 
 // Expose globals — HANYA fungsi untuk Store/User. Tidak ada satupun
 // fungsi/CRUD Admin yang di-expose ke window pada repository ini.
@@ -107,6 +114,37 @@ onAuthStateChanged(auth, async user => {
 async function runOtpGate(user) {
   try {
     const idToken = await user.getIdToken();
+
+    // Kalau ini adalah sesi hasil BARU SAJA daftar (bukan login), coba
+    // langsung "grant" tanpa OTP. Kalau backend menolak (mis. race
+    // condition, atau uid ini ternyata sudah pernah punya sesi OTP
+    // sebelumnya), jatuh balik ke alur check-session normal di bawah —
+    // jadi tetap aman, tidak pernah diam-diam membuka akses.
+    if (pendingRegistrationGrant) {
+      pendingRegistrationGrant = false;
+      try {
+        const grantRes = await fetch('/api/auth/register-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + idToken },
+        });
+        const grantData = await grantRes.json().catch(() => ({}));
+        if (grantRes.ok && grantData.granted === true) {
+          otpVerified = true;
+          otpGateUid = null;
+          stopOtpCountdown();
+          sessionStorage.removeItem('otpRequested_' + user.uid);
+          sessionStorage.removeItem('otpNextResendAt_' + user.uid);
+          updateNavUI();
+          showPage('home');
+          loadPublicData();
+          return;
+        }
+      } catch (e) {
+        console.error('register-session error:', e);
+        // lanjut ke check-session normal di bawah
+      }
+    }
+
     const res = await fetch('/api/auth/check-session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + idToken },
@@ -367,12 +405,19 @@ async function handleRegister() {
   btn.innerHTML = '<div class="spinner"></div>';
   btn.disabled = true;
   try {
+    // Tandai dulu SEBELUM Firebase auth berubah, supaya onAuthStateChanged
+    // yang akan menyala sesaat lagi tahu ini hasil DAFTAR (bukan login) —
+    // lihat runOtpGate(). Kalau registrasi gagal, flag ini di-reset lagi
+    // di blok catch supaya tidak "nyangkut" ke percobaan berikutnya.
+    pendingRegistrationGrant = true;
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await updateProfile(cred.user, { displayName: name });
-    succEl.textContent = 'Akun berhasil dibuat. Silakan masuk.';
+    succEl.textContent = 'Akun berhasil dibuat! Mengarahkan ke toko...';
     succEl.style.display = 'block';
-    setTimeout(() => switchAuthTab('login'), 1500);
+    // Tidak lagi diarahkan ke tab "Masuk" — onAuthStateChanged akan otomatis
+    // membuka halaman utama lewat runOtpGate() begitu akun ini ter-grant.
   } catch(e) {
+    pendingRegistrationGrant = false;
     errEl.textContent = getAuthError(e.code);
     errEl.style.display = 'block';
   }
