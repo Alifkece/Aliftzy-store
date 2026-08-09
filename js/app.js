@@ -1,5 +1,5 @@
 import { auth, db } from "./firebase-config.js";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { collection, doc, getDoc, getDocs, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let currentUser = null;
@@ -29,6 +29,20 @@ let myOrders = [];
 let stockUnsubscribe = null;
 let currentHomeTab = 0;
 
+// ===== 2-STEP LOGIN (Email OTP) STATE =====
+// Google login TIDAK langsung membuka website — lihat onAuthStateChanged +
+// runOtpGate() di bawah. currentUser hanya dianggap "benar-benar login"
+// setelah backend (/api/auth/check-session) menyatakan sesi login ini
+// verified. TIDAK memakai Firebase custom claim (sengaja dihapus — lihat
+// catatan di runOtpGate) supaya status verifikasi tidak pernah "menempel"
+// permanen ke akun dan terbawa ke sesi login berikutnya.
+const googleProvider = new GoogleAuthProvider();
+let otpVerified = false;
+let otpGateUid = null;
+let otpCooldownInterval = null;
+let otpNextResendAt = 0;
+let otpBusy = false;
+
 // Expose globals — HANYA fungsi untuk Store/User. Tidak ada satupun
 // fungsi/CRUD Admin yang di-expose ke window pada repository ini.
 window.showPage = showPage;
@@ -36,6 +50,9 @@ window.switchAuthTab = switchAuthTab;
 window.handleLogin = handleLogin;
 window.handleRegister = handleRegister;
 window.handleLogout = handleLogout;
+window.handleGoogleLogin = handleGoogleLogin;
+window.handleVerifyOtp = handleVerifyOtp;
+window.handleResendOtp = handleResendOtp;
 window.toggleUserMenu = toggleUserMenu;
 window.filterProducts = filterProducts;
 window.closeModal = closeModal;
@@ -56,16 +73,92 @@ window.downloadPaymentCard = downloadPaymentCard;
 onAuthStateChanged(auth, async user => {
   currentUser = user;
   if (user) {
-    updateNavUI();
-    showPage('home');
-    loadPublicData();
+    // Firebase auth berhasil BUKAN berarti login selesai — tanya ke backend
+    // dulu apakah SESI LOGIN INI sudah lolos OTP. Kalau belum, jangan buka
+    // halaman utama sama sekali.
+    await runOtpGate(user);
   } else {
     currentUser = null;
+    otpVerified = false;
+    otpGateUid = null;
+    stopOtpCountdown();
     if (stockUnsubscribe) { stockUnsubscribe(); stockUnsubscribe = null; }
     updateNavUI();
     showPage('auth', 'login');
   }
 });
+
+// Memutuskan apakah user yang baru saja lolos Firebase Authentication
+// sudah boleh masuk ke website, atau harus menyelesaikan OTP dulu.
+//
+// REVISI PENTING (audit round 2): versi sebelumnya membaca custom claim
+// `otpVerified` dari ID token. Itu BUG — custom claim menempel permanen ke
+// akun Firebase Auth, jadi begitu sekali di-set true, sesi login BERIKUTNYA
+// (setelah logout lalu login lagi) juga ikut kebaca true dan otomatis
+// melewati OTP. Custom claims sudah tidak dipakai sama sekali untuk status
+// verifikasi. Sekarang setiap kali fungsi ini jalan, ia bertanya ke backend
+// lewat /api/auth/check-session, yang membandingkan auth_time sesi login
+// SEKARANG dengan verifiedAuthTime yang tersimpan di Firestore (lihat
+// lib/otp.js). auth_time otomatis berganti tiap kali user benar-benar
+// sign-in ulang, jadi logout+login baru SELALU wajib OTP lagi, sementara
+// refresh di sesi yang sama tidak perlu OTP berkali-kali kalau memang
+// sudah pernah verified. Backend adalah satu-satunya sumber kebenaran;
+// frontend tidak pernah menganggap dirinya sendiri "sudah verified".
+async function runOtpGate(user) {
+  try {
+    const idToken = await user.getIdToken();
+    const res = await fetch('/api/auth/check-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + idToken },
+    });
+    const data = await res.json().catch(() => ({}));
+    const verified = !!(res.ok && data.verified === true);
+
+    if (verified) {
+      otpVerified = true;
+      otpGateUid = null;
+      stopOtpCountdown();
+      sessionStorage.removeItem('otpRequested_' + user.uid);
+      sessionStorage.removeItem('otpNextResendAt_' + user.uid);
+      updateNavUI();
+      showPage('home');
+      loadPublicData();
+      return;
+    }
+
+    otpVerified = false;
+    updateNavUI();
+    showOtpPage(user);
+
+    // Auto-kirim OTP hanya sekali per uid per sesi tab ini — supaya refresh
+    // halaman saat OTP belum selesai TIDAK memicu pengiriman email baru
+    // terus-menerus, dan TIDAK memberi akses tanpa OTP (test refresh).
+    const alreadyRequestedKey = 'otpRequested_' + user.uid;
+    if (!sessionStorage.getItem(alreadyRequestedKey)) {
+      sessionStorage.setItem(alreadyRequestedKey, '1');
+      await requestOtp(user, { silent: true });
+    } else {
+      // Halaman di-refresh saat OTP belum selesai — jangan kirim email baru,
+      // tapi lanjutkan countdown resend dari state yang tersimpan (bukan
+      // dari variabel JS yang sudah reset karena reload).
+      const storedNextResend = Number(sessionStorage.getItem('otpNextResendAt_' + user.uid) || 0);
+      if (storedNextResend > Date.now()) {
+        otpNextResendAt = storedNextResend;
+        startOtpCountdown(otpNextResendAt);
+      } else {
+        otpNextResendAt = storedNextResend;
+        const resendBtn = document.getElementById('otp-resend-btn');
+        if (resendBtn) { resendBtn.style.display = 'inline'; resendBtn.disabled = false; }
+      }
+    }
+  } catch (e) {
+    console.error('runOtpGate error:', e);
+    // Gagal-aman: kalau cek sesi ke backend error, tetap anggap belum
+    // verified dan tampilkan layar OTP — jangan pernah default ke "boleh masuk".
+    otpVerified = false;
+    showOtpPage(user);
+  }
+}
 
 async function loadPublicData() {
   await loadProducts();
@@ -182,9 +275,12 @@ function getDefaultSongs() {
 function showPage(page, sub) {
   document.getElementById('page-home').style.display = 'none';
   document.getElementById('page-auth').style.display = 'none';
+  const otpPageEl = document.getElementById('page-otp');
+  if (otpPageEl) otpPageEl.style.display = 'none';
 
   if (page === 'home') {
     if (!currentUser) { showPage('auth', 'login'); return; }
+    if (!otpVerified) { showPage('otp'); return; }
     document.getElementById('page-home').style.display = 'block';
     updateSettingsPanel();
     resizeHomeSlider();
@@ -193,6 +289,9 @@ function showPage(page, sub) {
     document.getElementById('page-auth').style.display = 'flex';
     if (sub) switchAuthTab(sub);
     document.getElementById('auth-back-home').style.display = currentUser ? 'block' : 'none';
+  }
+  if (page === 'otp' && otpPageEl) {
+    otpPageEl.style.display = 'flex';
   }
   document.getElementById('user-menu').style.display = 'none';
 }
@@ -282,7 +381,19 @@ async function handleRegister() {
 }
 
 async function handleLogout() {
+  // Simpan uid dulu SEBELUM signOut, supaya sessionStorage flag milik sesi
+  // login yang baru saja berakhir ikut dibersihkan. Ini murni untuk UX
+  // (supaya auto-send OTP jalan lagi kalau akun yang sama login ulang di
+  // tab yang sama) — bukan mekanisme keamanan. Keamanan sesungguhnya tetap
+  // dari backend: auth_time sesi baru tidak akan pernah cocok dengan
+  // verifiedAuthTime sesi lama, apapun isi sessionStorage di browser.
+  const signingOutUid = currentUser ? currentUser.uid : null;
   await signOut(auth);
+  if (signingOutUid) {
+    sessionStorage.removeItem('otpRequested_' + signingOutUid);
+    sessionStorage.removeItem('otpNextResendAt_' + signingOutUid);
+    sessionStorage.removeItem('otpEmailMasked_' + signingOutUid);
+  }
   showNotif('Berhasil keluar', 'success');
 }
 
@@ -297,6 +408,177 @@ function getAuthError(code) {
     'auth/network-request-failed': 'Koneksi gagal. Cek internet.',
   };
   return map[code] || 'Terjadi kesalahan. Coba lagi.';
+}
+
+async function handleGoogleLogin() {
+  const btn = document.getElementById('btn-google-login');
+  const errEl = document.getElementById('login-error');
+  if (errEl) errEl.style.display = 'none';
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
+  try {
+    await signInWithPopup(auth, googleProvider);
+    // Sisanya (cek OTP, buka halaman OTP, dst) ditangani otomatis oleh
+    // onAuthStateChanged -> runOtpGate(), supaya tidak ada listener auth
+    // yang duplikat.
+  } catch (e) {
+    // User membatalkan popup Google -> jangan crash, jangan tampilkan
+    // sebagai error keras, cukup diam-diam kembalikan tombol ke semula.
+    if (e && (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request')) {
+      // no-op
+    } else if (errEl) {
+      errEl.textContent = getAuthError(e && e.code);
+      errEl.style.display = 'block';
+    }
+  }
+  if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+}
+
+// ===== OTP VERIFICATION (2-STEP LOGIN) =====
+
+function showOtpPage(user) {
+  otpGateUid = user.uid;
+  const emailEl = document.getElementById('otp-email-masked');
+  const maskedFromCache = sessionStorage.getItem('otpEmailMasked_' + user.uid);
+  if (emailEl) emailEl.textContent = maskedFromCache || maskEmailClient(user.email || '');
+  const codeInput = document.getElementById('otp-code');
+  if (codeInput) codeInput.value = '';
+  const errEl = document.getElementById('otp-error');
+  if (errEl) errEl.style.display = 'none';
+  showPage('otp');
+}
+
+function maskEmailClient(email) {
+  const [user, domain] = String(email).split('@');
+  if (!user || !domain) return email;
+  return user.slice(0, 1) + '*'.repeat(Math.max(user.length - 1, 3)) + '@' + domain;
+}
+
+async function requestOtp(user, opts) {
+  opts = opts || {};
+  if (otpBusy) return;
+  otpBusy = true;
+  const resendBtn = document.getElementById('otp-resend-btn');
+  const errEl = document.getElementById('otp-error');
+  if (errEl) errEl.style.display = 'none';
+  if (resendBtn) resendBtn.disabled = true;
+
+  try {
+    const idToken = await user.getIdToken();
+    const res = await fetch('/api/auth/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + idToken },
+    });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok || !data.success) {
+      if (data.nextResendAt) {
+        otpNextResendAt = data.nextResendAt;
+        sessionStorage.setItem('otpNextResendAt_' + user.uid, String(otpNextResendAt));
+        startOtpCountdown(otpNextResendAt);
+      }
+      // Error selalu ditampilkan (termasuk saat auto-send silent) supaya
+      // user tidak "terjebak" tanpa penjelasan kalau email gagal terkirim.
+      // Yang di-skip untuk silent hanya notifikasi toast "berhasil".
+      if (errEl) {
+        errEl.textContent = data.error || 'Gagal mengirim kode verifikasi.';
+        errEl.style.display = 'block';
+      }
+      return;
+    }
+
+    if (data.emailMasked) {
+      sessionStorage.setItem('otpEmailMasked_' + user.uid, data.emailMasked);
+      const emailEl = document.getElementById('otp-email-masked');
+      if (emailEl) emailEl.textContent = data.emailMasked;
+    }
+    otpNextResendAt = data.nextResendAt || (Date.now() + 60000);
+    sessionStorage.setItem('otpNextResendAt_' + user.uid, String(otpNextResendAt));
+    startOtpCountdown(otpNextResendAt);
+    if (!opts.silent) showNotif('Kode verifikasi dikirim ke email Anda', 'success');
+  } catch (e) {
+    if (errEl) {
+      errEl.textContent = 'Gagal mengirim kode verifikasi. Cek koneksi Anda.';
+      errEl.style.display = 'block';
+    }
+  } finally {
+    otpBusy = false;
+  }
+}
+
+async function handleVerifyOtp() {
+  if (!currentUser) return;
+  const codeInput = document.getElementById('otp-code');
+  const errEl = document.getElementById('otp-error');
+  const btn = document.getElementById('btn-otp-verify');
+  const code = codeInput ? codeInput.value.trim() : '';
+  if (errEl) errEl.style.display = 'none';
+
+  if (!/^\d{6}$/.test(code)) {
+    if (errEl) { errEl.textContent = 'Masukkan 6 digit kode yang valid.'; errEl.style.display = 'block'; }
+    return;
+  }
+
+  if (btn) { btn.innerHTML = '<div class="spinner"></div>'; btn.disabled = true; }
+  try {
+    const idToken = await currentUser.getIdToken();
+    const res = await fetch('/api/auth/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + idToken },
+      body: JSON.stringify({ code }),
+    });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok || !data.success) {
+      if (errEl) { errEl.textContent = data.error || 'Kode verifikasi salah.'; errEl.style.display = 'block'; }
+      if (codeInput) codeInput.value = '';
+    } else {
+      sessionStorage.removeItem('otpRequested_' + currentUser.uid);
+      sessionStorage.removeItem('otpEmailMasked_' + currentUser.uid);
+      sessionStorage.removeItem('otpNextResendAt_' + currentUser.uid);
+      stopOtpCountdown();
+      showNotif('Berhasil masuk', 'success');
+      // Backend sudah menandai sesi login ini verified (verifiedAuthTime),
+      // panggil ulang runOtpGate untuk konfirmasi lewat check-session lalu
+      // baru buka halaman utama.
+      await runOtpGate(currentUser);
+    }
+  } catch (e) {
+    if (errEl) { errEl.textContent = 'Gagal memverifikasi kode. Cek koneksi Anda.'; errEl.style.display = 'block'; }
+  }
+  if (btn) { btn.innerHTML = '<span>Verifikasi</span>'; btn.disabled = false; }
+}
+
+async function handleResendOtp() {
+  if (!currentUser || Date.now() < otpNextResendAt) return;
+  await requestOtp(currentUser, { silent: false });
+}
+
+function startOtpCountdown(nextResendAt) {
+  stopOtpCountdown();
+  const label = document.getElementById('otp-resend-label');
+  const resendBtn = document.getElementById('otp-resend-btn');
+  if (resendBtn) resendBtn.style.display = 'none';
+
+  function tick() {
+    const secsLeft = Math.max(0, Math.ceil((nextResendAt - Date.now()) / 1000));
+    if (secsLeft <= 0) {
+      stopOtpCountdown();
+      if (label) label.style.display = 'none';
+      if (resendBtn) { resendBtn.style.display = 'inline'; resendBtn.disabled = false; }
+      return;
+    }
+    if (label) {
+      label.style.display = 'block';
+      label.textContent = 'Kirim ulang kode dalam ' + secsLeft + ' detik';
+    }
+  }
+
+  tick();
+  otpCooldownInterval = setInterval(tick, 1000);
+}
+
+function stopOtpCountdown() {
+  if (otpCooldownInterval) { clearInterval(otpCooldownInterval); otpCooldownInterval = null; }
 }
 
 // ===== PRODUCTS =====
