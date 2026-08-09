@@ -62,7 +62,20 @@
       </div>
     </div>
   </div>
+  <!-- Hamburger: link "Produk"/"Reseller" di .nav-links di atas cuma tampil
+       mulai 1024px (lihat media query di style.css). Sebelumnya di bawah
+       1024px link itu SIMPLY HILANG tanpa ada gantinya sama sekali — ini
+       tombolnya, cuma tampil di bawah 1024px, buka dropdown berisi link
+       yang sama supaya tetap bisa diakses di mobile/tablet. -->
+  <button class="nav-hamburger" id="nav-hamburger-btn" onclick="toggleMobileNav()" aria-label="Buka menu" aria-expanded="false">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
 </nav>
+
+<div class="nav-mobile-menu" id="nav-mobile-menu">
+  <a href="#products" onclick="closeMobileNav()">Produk</a>
+  <a href="#reseller" onclick="closeMobileNav()">Reseller</a>
+</div>
 
 <!-- MAIN -->
 <div class="main">
@@ -382,8 +395,8 @@
 
 
 <!-- ===== AUTH PAGE ===== -->
-<div id="page-auth" style="min-height:100vh;align-items:center;justify-content:center;padding:80px 16px 40px;">
-  <div class="auth-card">
+<div id="page-auth" style="position:fixed;inset:0;overflow:hidden;align-items:center;justify-content:center;padding:16px;">
+  <div class="auth-card" style="max-height:100%;overflow-y:auto;">
     <div class="auth-logo">ALIFTZY STORE</div>
     <div class="auth-subtitle">Masuk atau daftar untuk mulai berbelanja</div>
     <div class="auth-tabs">
@@ -431,8 +444,8 @@
      supaya struktur & flow login/register existing tidak berubah sama
      sekali. Mengikuti sistem responsive yang sama (flex center, breakpoint
      bawaan .auth-card di css/style.css). -->
-<div id="page-otp" style="display:none;min-height:100vh;align-items:center;justify-content:center;padding:80px 16px 40px;">
-  <div class="auth-card">
+<div id="page-otp" style="display:none;position:fixed;inset:0;overflow:hidden;align-items:center;justify-content:center;padding:16px;">
+  <div class="auth-card" style="max-height:100%;overflow-y:auto;">
     <div class="auth-logo">ALIFTZY STORE</div>
     <div class="auth-subtitle">Verifikasi Email</div>
     <p class="otp-desc">Kode verifikasi telah dikirim ke:<br><strong id="otp-email-masked">-</strong></p>
@@ -539,8 +552,8 @@
   #wi-particles{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
   .wi-particle{
     position:absolute; bottom:-10px; border-radius:50%;
-    background:rgba(96,165,250,.55);
-    box-shadow:0 0 6px rgba(96,165,250,.6);
+    background:rgba(0,240,255,.55);
+    box-shadow:0 0 6px rgba(0,240,255,.6);
     animation-name:wi-float; animation-timing-function:linear; animation-iteration-count:infinite;
   }
   @keyframes wi-float{
@@ -559,14 +572,14 @@
     padding:3px;
     opacity:0; transform:scale(.92);
     transition:opacity .6s cubic-bezier(.16,.8,.24,1), transform .6s cubic-bezier(.16,.8,.24,1);
-    box-shadow:0 0 40px rgba(59,130,246,.28), 0 0 80px rgba(59,130,246,.16), 0 30px 90px rgba(0,0,0,.55);
+    box-shadow:0 0 40px rgba(0,240,255,.28), 0 0 80px rgba(0,240,255,.16), 0 30px 90px rgba(0,0,0,.55);
   }
   #wi-overlay.wi-show #wi-card{ opacity:1; transform:scale(1); transition-delay:.15s; }
 
   #wi-card::before{
     content:""; position:absolute; inset:-1px; border-radius:24px; z-index:0;
     padding:1px;
-    background:linear-gradient(45deg,#3B82F6,#60A5FA,#2563EB,#60A5FA,#3B82F6);
+    background:linear-gradient(45deg,#00f0ff,#60fdf9,#0072ff,#60fdf9,#00f0ff);
     background-size:300% 300%;
     -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite:xor;
@@ -616,7 +629,7 @@
     background:rgba(15,20,35,.55);
     border:1px solid rgba(255,255,255,.18);
     -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
-    box-shadow:0 8px 24px rgba(0,0,0,.35), 0 0 0 1px rgba(96,165,250,.12);
+    box-shadow:0 8px 24px rgba(0,0,0,.35), 0 0 0 1px rgba(0,240,255,.12);
     font-family:'DM Sans', sans-serif;
     font-size:12px; font-weight:500; letter-spacing:.02em;
     color:#e8eaf0; white-space:nowrap;
@@ -626,8 +639,8 @@
   }
   #wi-hint.wi-hint-hide{ opacity:0; transform:translateX(-50%) translateY(8px); }
   @keyframes wi-hint-breathe{
-    0%,100%{ box-shadow:0 8px 24px rgba(0,0,0,.35), 0 0 0 1px rgba(96,165,250,.12); }
-    50%{ box-shadow:0 8px 24px rgba(0,0,0,.35), 0 0 0 1px rgba(96,165,250,.32); }
+    0%,100%{ box-shadow:0 8px 24px rgba(0,0,0,.35), 0 0 0 1px rgba(0,240,255,.12); }
+    50%{ box-shadow:0 8px 24px rgba(0,0,0,.35), 0 0 0 1px rgba(0,240,255,.32); }
   }
 
   #wi-heading{
@@ -642,7 +655,7 @@
   }
   #wi-overlay.wi-show #wi-heading{ opacity:1; transform:translateY(0); transition-delay:.9s; }
   #wi-heading .wi-grad{
-    background:linear-gradient(135deg,#3B82F6,#60A5FA,#2563EB);
+    background:linear-gradient(135deg,#fff,#00f0ff);
     -webkit-background-clip:text; background-clip:text; color:transparent;
     display:block;
   }
@@ -675,7 +688,7 @@
     opacity:0; transition:opacity .5s ease, background .2s ease, color .2s ease, transform .18s ease;
   }
   #wi-overlay.wi-show #wi-close{ opacity:1; transition-delay:1.4s; }
-  #wi-close:hover{ background:rgba(59,130,246,.25); color:#fff; }
+  #wi-close:hover{ background:rgba(0,240,255,.25); color:#fff; }
   #wi-close:active{ transform:scale(.92); }
 
   @media (max-width:640px){
