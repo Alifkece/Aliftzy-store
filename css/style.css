@@ -1326,6 +1326,17 @@ body::before {
   background-clip: text;
 }
 
+/* Sebelumnya TIDAK punya style sama sekali -> tampil pakai default
+   browser (hitam, tanpa spacing), gak nyambung sama tema gelap-neon. */
+.auth-subtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text2);
+  margin-top: 6px;
+  margin-bottom: 20px;
+}
+
 .auth-tabs { display: flex; background: var(--bg2); border-radius: 12px; padding: 4px; margin-bottom: 20px; border: 1px solid var(--border); }
 .auth-tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; cursor: pointer; color: var(--text2); border: none; background: transparent; }
 .auth-tab.active { background: var(--surface); color: var(--neon-cyan); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); }
