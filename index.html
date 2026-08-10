@@ -41,10 +41,6 @@
 <!-- NAVBAR -->
 <nav class="navbar d-flex align-items-center">
   <a class="nav-logo" href="#" onclick="showPage('home')">ALIFTZY STORE</a>
-  <ul class="nav-links">
-    <li><a href="#products">Produk</a></li>
-    <li><a href="#reseller">Reseller</a></li>
-  </ul>
   <div class="nav-spacer"></div>
   <div class="nav-auth" id="nav-auth" style="display:none;"></div>
   <div class="nav-bell hidden" id="nav-bell" onclick="openAnnPopup()" title="Pemberitahuan">
@@ -62,20 +58,9 @@
       </div>
     </div>
   </div>
-  <!-- Hamburger: link "Produk"/"Reseller" di .nav-links di atas cuma tampil
-       mulai 1024px (lihat media query di style.css). Sebelumnya di bawah
-       1024px link itu SIMPLY HILANG tanpa ada gantinya sama sekali — ini
-       tombolnya, cuma tampil di bawah 1024px, buka dropdown berisi link
-       yang sama supaya tetap bisa diakses di mobile/tablet. -->
-  <button class="nav-hamburger" id="nav-hamburger-btn" onclick="toggleMobileNav()" aria-label="Buka menu" aria-expanded="false">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-  </button>
 </nav>
 
-<div class="nav-mobile-menu" id="nav-mobile-menu">
-  <a href="#products" onclick="closeMobileNav()">Produk</a>
-  <a href="#reseller" onclick="closeMobileNav()">Reseller</a>
-</div>
+
 
 <!-- MAIN -->
 <div class="main">
