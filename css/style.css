@@ -1385,6 +1385,9 @@ body::before {
   padding: 24px;
   width: 100%;
   max-width: 440px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   position: relative;
   box-shadow: 0 20px 0 0 #05080e, 0 30px 60px rgba(0, 0, 0, 0.9), var(--glow-cyan);
 }
