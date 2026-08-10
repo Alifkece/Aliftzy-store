@@ -9,7 +9,8 @@ let storeProfile = { avatarUrl: "" };
 let pendingImgDataUrl = "";
 let pendingProductImgDataUrl = "";
 let currentOrderLink = "";
-let currentOrderPayment = null; // { amount, username } - untuk QRIS Railway
+let currentOrderPayment = null; // { amount, username, whatsapp } - untuk QRIS Railway
+let currentOrderWhatsapp = ''; // nomor WA yang sedang diketik/dipakai user di modal order aktif
 let currentOrderProduct = null;
 let currentOrderPackages = [];
 let currentSelectedPackageIndex = 0;
@@ -740,6 +741,35 @@ function orderProduct(id) {
   openModal('modal-order');
 }
 
+// ===== NOMOR WHATSAPP WAJIB SEBELUM QR DIBUAT =====
+// Field ini dipakai untuk kedua template modal order (multi-paket & single
+// paket) - dipisah jadi fungsi sendiri supaya tidak duplikasi markup.
+// Memakai class .field / .field label / .field input yang SUDAH ADA di
+// css/style.css (dipakai form registrasi) supaya tidak perlu menambah CSS
+// baru sama sekali.
+function renderOrderWhatsappFieldHtml() {
+  return `
+    <div class="field" id="order-wa-field" style="margin-bottom:14px;">
+      <label for="order-wa-input">Nomor WhatsApp</label>
+      <input type="tel" id="order-wa-input" inputmode="numeric" placeholder="08xxxxxxxxxx" autocomplete="tel" value="${escHtml(currentOrderWhatsapp || '')}">
+      <div id="order-wa-error" style="font-size:11.5px;color:var(--danger,#e15b5b);display:none;"></div>
+    </div>
+  `;
+}
+
+// Validasi + normalisasi nomor WhatsApp di sisi client (UX cepat).
+// Otoritas sebenarnya tetap di backend (lib/orders.js#normalizeWhatsapp,
+// pola dan regex-nya SENGAJA disamakan persis) - kalau backend menolak,
+// buyer tetap akan melihat pesan error dari response API.
+function normalizeWhatsappInput(raw) {
+  if (!raw) return null;
+  let val = String(raw).trim().replace(/[\s\-()]/g, '');
+  if (!/^(\+?62|0)8[0-9]{7,12}$/.test(val)) return null;
+  if (val.startsWith('0')) val = '62' + val.slice(1);
+  else if (val.startsWith('+62')) val = val.slice(1);
+  return val;
+}
+
 function renderOrderModalBody() {
   const p = currentOrderProduct;
   const pkgs = currentOrderPackages;
@@ -781,6 +811,7 @@ function renderOrderModalBody() {
       <span style="font-size:18px;font-weight:800;color:var(--accent);font-family:'Syne',sans-serif;">Rp${resolvedAmount.toLocaleString('id-ID')}<span style="font-size:11px;font-weight:400;font-family:'DM Sans';color:var(--text2);margin-left:3px;">/bulan</span></span>
     </div>
     ${selectedOutOfStock ? `<div style="font-size:12.5px;color:var(--danger,#e15b5b);font-weight:600;margin-bottom:10px;">Stock paket ini sedang habis.</div>` : ''}
+    ${renderOrderWhatsappFieldHtml()}
     <div id="order-qris-wrap"></div>
   ` : `
     <div style="margin-bottom:10px;">Anda akan memesan:</div>
@@ -790,6 +821,7 @@ function renderOrderModalBody() {
       <div style="font-size:18px;font-weight:800;color:var(--accent);font-family:'Syne',sans-serif;margin-top:8px;">Rp${resolvedAmount.toLocaleString('id-ID')}<span style="font-size:11px;font-weight:400;font-family:'DM Sans';color:var(--text2);margin-left:3px;">/bulan</span></div>
     </div>
     ${selectedOutOfStock ? `<div style="font-size:12.5px;color:var(--danger,#e15b5b);font-weight:600;margin-bottom:10px;">Stock paket ini sedang habis.</div>` : ''}
+    ${renderOrderWhatsappFieldHtml()}
     <div id="order-qris-wrap"></div>
     Klik tombol di bawah untuk membayar via QRIS.
   `;
@@ -809,6 +841,11 @@ function renderOrderModalBody() {
 }
 
 function selectPackage(i) {
+  // Simpan dulu apa yang sudah diketik user di kolom WhatsApp SEBELUM
+  // modal di-render ulang untuk paket baru — supaya nomor yang sudah
+  // diketik tidak hilang cuma karena user ganti pilihan paket.
+  const waInput = document.getElementById('order-wa-input');
+  if (waInput) currentOrderWhatsapp = waInput.value;
   currentSelectedPackageIndex = i;
   renderOrderModalBody();
 }
@@ -1007,6 +1044,28 @@ function goOrder() {
 
   // Jika ini order produk (punya data pembayaran), generate QRIS via backend Railway
   if (currentOrderPayment && currentOrderPayment.amount > 0) {
+    // ==== NOMOR WHATSAPP WAJIB SEBELUM QR DIBUAT ====
+    // Divalidasi di sini (SEBELUM generateQrisPayment/fetch ke backend)
+    // supaya user tidak perlu menunggu roundtrip network hanya untuk tahu
+    // nomornya kosong/salah format. Backend tetap memvalidasi ulang
+    // (lib/orders.js#normalizeWhatsapp) sebagai otoritas sebenarnya.
+    const waInput = document.getElementById('order-wa-input');
+    const waErrorEl = document.getElementById('order-wa-error');
+    const normalizedWa = normalizeWhatsappInput(waInput ? waInput.value : '');
+
+    if (!normalizedWa) {
+      if (waErrorEl) {
+        waErrorEl.textContent = 'Nomor WhatsApp wajib diisi dengan format yang benar (contoh: 08xxxxxxxxxx).';
+        waErrorEl.style.display = 'block';
+      }
+      if (waInput) waInput.focus();
+      showNotif('Nomor WhatsApp wajib diisi dengan benar', 'error');
+      return;
+    }
+    if (waErrorEl) waErrorEl.style.display = 'none';
+
+    currentOrderWhatsapp = normalizedWa;
+    currentOrderPayment.whatsapp = normalizedWa;
     generateQrisPayment();
     return;
   }
@@ -1065,6 +1124,11 @@ async function generateQrisPayment() {
     }
   }
 
+  // Kunci kolom WhatsApp selagi request ke backend berjalan, supaya nomor
+  // yang sudah divalidasi tidak diubah user di tengah proses.
+  const waInputEl = document.getElementById('order-wa-input');
+  if (waInputEl) waInputEl.disabled = true;
+
   btn.disabled = true;
   btn.innerHTML = 'Memproses...';
 
@@ -1084,7 +1148,8 @@ async function generateQrisPayment() {
         productId: currentOrderProduct ? currentOrderProduct.id : null,
         productName: currentOrderProduct ? currentOrderProduct.name : null,
         packageName: selectedPackage ? selectedPackage.name : null,
-        userId: currentUser ? currentUser.uid : null
+        userId: currentUser ? currentUser.uid : null,
+        whatsapp: paymentToSend.whatsapp || currentOrderWhatsapp || null
       })
     });
 
@@ -1096,13 +1161,18 @@ async function generateQrisPayment() {
       showNotif(result.error || 'Stok habis', 'error');
       btn.disabled = false;
       btn.innerHTML = originalBtnHtml;
+      if (waInputEl) waInputEl.disabled = false;
       return;
     }
 
     if (!res.ok || result.success === false || result.error) {
+      // Termasuk kasus nomor WhatsApp ditolak backend (400, lihat
+      // lib/orders.js#normalizeWhatsapp) - pesan error dari backend
+      // langsung ditampilkan ke user lewat showNotif di bawah.
       showNotif(result.error || 'Gagal membuat pembayaran QRIS', 'error');
       btn.disabled = false;
       btn.innerHTML = originalBtnHtml;
+      if (waInputEl) waInputEl.disabled = false;
       return;
     }
 
@@ -1112,6 +1182,7 @@ async function generateQrisPayment() {
       showNotif('Respons backend tidak berisi data QRIS', 'error');
       btn.disabled = false;
       btn.innerHTML = originalBtnHtml;
+      if (waInputEl) waInputEl.disabled = false;
       return;
     }
 
@@ -1146,6 +1217,11 @@ async function generateQrisPayment() {
 
     btn.style.display = 'none';
     cancelBtn.style.display = '';
+    // QR sudah tampil & nomor WA sudah tersimpan di order (backend) -
+    // sembunyikan kolomnya supaya tidak menyisakan input yang terkunci
+    // tapi masih terlihat di layar.
+    const waFieldEl = document.getElementById('order-wa-field');
+    if (waFieldEl) waFieldEl.style.display = 'none';
     currentOrderPayment = null; // cegah generate ulang ganda selagi QR masih tampil
 
     orderTransactionId = data.transaction_id || null;
@@ -1156,6 +1232,7 @@ async function generateQrisPayment() {
     showNotif('Gagal terhubung ke server pembayaran', 'error');
     btn.disabled = false;
     btn.innerHTML = originalBtnHtml;
+    if (waInputEl) waInputEl.disabled = false;
   }
 }
 
