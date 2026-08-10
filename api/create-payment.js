@@ -1,6 +1,19 @@
 import { getAvailableStockCount, createPendingOrder } from "../lib/orders.js";
+import { generateQris, qrStringToImageDataUrl } from "../lib/casaku.js";
 
-const SITRANSFER_GENERATE_URL = "https://rest.sitranfer.com/payment/api/generate";
+// MIGRASI PAYMENT GATEWAY: SiTransfer -> Casaku (lihat lib/casaku.js).
+//
+// CATATAN: endpoint ini (project Store) TIDAK dipanggil oleh js/app.js saat
+// ini — Frontend Store selalu memakai https://aliftzy-backend.vercel.app
+// (project backend terpisah). File ini tetap dimigrasikan atas permintaan
+// pemilik project supaya tidak ada endpoint live yang masih bergantung pada
+// SiTransfer, seandainya suatu saat dipakai lagi.
+//
+// Validasi stok, createPendingOrder, dan urutan logic lain TIDAK diubah -
+// hanya pemanggilan payment gateway yang diganti. Bentuk response
+// distandarkan mengikuti adapter yang sama dengan project backend
+// ({ success, data: { qris_image, transaction_id, amount, expired_at } })
+// supaya kedua endpoint konsisten kalau nanti dipakai kembali.
 
 export default async function handler(req, res) {
 
@@ -82,62 +95,48 @@ export default async function handler(req, res) {
       });
     }
 
-    const key = process.env.SITRANSFER_KEY;
-
-
-    if (!key) {
-      return res.status(500).json({
-        error: "SITRANSFER_KEY tidak terbaca di Vercel"
+    let casakuTrx;
+    try {
+      casakuTrx = await generateQris(cleanAmount);
+    } catch (casakuErr) {
+      console.error("CASAKU GENERATE ERROR:", casakuErr.message, casakuErr.raw || "");
+      return res.status(502).json({
+        success: false,
+        error: "Gagal membuat transaksi QRIS. Coba lagi sebentar lagi."
       });
     }
 
+    const qrisImageDataUrl = await qrStringToImageDataUrl(casakuTrx.qrString);
+    const expiredAt = new Date(
+      Date.now() + casakuTrx.expiredInMinutes * 60 * 1000
+    ).toISOString();
 
-    const response = await fetch(
-      SITRANSFER_GENERATE_URL,
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-          channel: "QRIS",
-          amount: cleanAmount,
-          player_username: username,
-          key: key
-        })
-      }
-    );
-
-
-    const result = await response.json();
-
-    if (!response.ok || result?.success === false || result?.error) {
-      return res.status(response.ok ? 400 : response.status).json(result);
-    }
-
-    const data = result.data || result;
-    const transactionId = data.transaction_id;
-
-    if (transactionId) {
+    if (casakuTrx.transactionId) {
       try {
         await createPendingOrder({
-          transactionId,
+          transactionId: casakuTrx.transactionId,
           userId,
           username,
           productId,
           productName,
-          price: cleanAmount,
+          price: casakuTrx.totalAmount,
           packageName,
-          expiredAt: data.expired_at || null
+          expiredAt
         });
       } catch (err) {
-        console.error("GAGAL SIMPAN ORDER PENDING:", transactionId, err);
+        console.error("GAGAL SIMPAN ORDER PENDING:", casakuTrx.transactionId, err);
       }
     }
 
-    return res.status(200).json(result);
+    return res.status(200).json({
+      success: true,
+      data: {
+        transaction_id: casakuTrx.transactionId,
+        qris_image: qrisImageDataUrl,
+        amount: casakuTrx.totalAmount,
+        expired_at: expiredAt
+      }
+    });
 
 
   } catch (err) {
