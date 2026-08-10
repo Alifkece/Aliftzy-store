@@ -60,8 +60,6 @@ window.handleLogout = handleLogout;
 window.handleGoogleLogin = handleGoogleLogin;
 window.handleVerifyOtp = handleVerifyOtp;
 window.handleResendOtp = handleResendOtp;
-window.toggleMobileNav = toggleMobileNav;
-window.closeMobileNav = closeMobileNav;
 window.toggleUserMenu = toggleUserMenu;
 window.filterProducts = filterProducts;
 window.closeModal = closeModal;
@@ -366,27 +364,6 @@ function toggleUserMenu() {
 
 document.addEventListener('click', e => {
   if (!e.target.closest('#nav-user')) document.getElementById('user-menu').style.display = 'none';
-});
-
-// ===== NAVBAR HAMBURGER (mobile/tablet < 1024px) =====
-// Sebelumnya link "Produk"/"Reseller" cuma disembunyikan di layar sempit
-// tanpa ada gantinya. Ini toggle buat dropdown penggantinya.
-function toggleMobileNav() {
-  const menu = document.getElementById('nav-mobile-menu');
-  const btn = document.getElementById('nav-hamburger-btn');
-  const isOpen = menu.classList.toggle('show');
-  btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-}
-
-function closeMobileNav() {
-  document.getElementById('nav-mobile-menu').classList.remove('show');
-  document.getElementById('nav-hamburger-btn').setAttribute('aria-expanded', 'false');
-}
-
-document.addEventListener('click', e => {
-  if (!e.target.closest('#nav-mobile-menu') && !e.target.closest('#nav-hamburger-btn')) {
-    closeMobileNav();
-  }
 });
 
 // ===== AUTH =====
