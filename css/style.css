@@ -125,11 +125,25 @@ body::before {
   border-bottom: 1px solid rgba(0, 240, 255, 0.2);
   display: flex;
   align-items: center;
+  justify-content: center;
   padding-left: max(16px, env(safe-area-inset-left));
   padding-right: max(16px, env(safe-area-inset-right));
   z-index: 9999 !important;
-  gap: 12px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(0, 240, 255, 0.3);
+}
+
+/* Navbar background tetap full-width (di atas), sedangkan isi navbar
+   (logo, menu, notifikasi, avatar) dipusatkan lewat wrapper ini supaya
+   di monitor lebar tidak "tersebar" dari ujung kiri sampai ujung kanan.
+   Nilai max-width mengikuti breakpoint .container di bawah agar navbar,
+   hero, music player, dan konten produk semuanya sejajar. */
+.nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
 }
 
 .nav-logo {
@@ -387,6 +401,9 @@ body::before {
   justify-content: flex-start;
   padding: 26px 16px;
   width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .banner-grid {
@@ -551,6 +568,9 @@ body::before {
   z-index: 10;
   min-height: 56px;
   width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .music-label {
@@ -688,7 +708,7 @@ body::before {
 
 .home-dashboard-nav::-webkit-scrollbar { display: none; }
 
-.home-nav-tabs { display: flex; padding: 0 10px; gap: 6px; min-width: max-content; }
+.home-nav-tabs { display: flex; padding: 0 10px; gap: 6px; min-width: max-content; margin: 0 auto; box-sizing: border-box; }
 
 .home-nav-tab {
   display: flex;
@@ -1540,6 +1560,7 @@ body::before {
 @media (min-width: 700px) {
   .navbar { padding-left: 24px; padding-right: 24px; }
   .container { max-width: 900px; padding-left: 24px; padding-right: 24px; }
+  .nav-inner, .banner-content, .music-section, .home-nav-tabs { max-width: 900px; }
   .product-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
   .membership-grid { grid-template-columns: repeat(2, 1fr); }
   .music-label { display: block; }
@@ -1547,6 +1568,7 @@ body::before {
 
 @media (min-width: 1024px) {
   .container { max-width: 1180px; }
+  .nav-inner, .banner-content, .music-section, .home-nav-tabs { max-width: 1180px; }
   .product-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 20px; }
 }
 
@@ -1626,10 +1648,12 @@ body::before {
    ===================================================================== */
 @media (min-width: 1440px) {
   .container { max-width: 1360px; }
+  .nav-inner, .banner-content, .music-section, .home-nav-tabs { max-width: 1360px; }
   .product-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 22px; }
 }
 
 @media (min-width: 1800px) {
   .container { max-width: 1640px; }
+  .nav-inner, .banner-content, .music-section, .home-nav-tabs { max-width: 1640px; }
   .product-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 24px; }
 }
