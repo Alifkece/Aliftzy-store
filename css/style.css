@@ -111,10 +111,11 @@ body::before {
 }
 
 /* =====================================================================
-   FIXED STICKY NAVBAR NASA STYLE (Selalu Nempel Pas di-Scroll)
+   FIXED NAVBAR — diam di tempat, tidak ikut ter-scroll (baik HP maupun
+   desktop). Background full-width, isinya dipusatkan lewat .nav-inner.
    ===================================================================== */
 .navbar {
-  position: fixed !important;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
@@ -128,7 +129,7 @@ body::before {
   justify-content: center;
   padding-left: max(16px, env(safe-area-inset-left));
   padding-right: max(16px, env(safe-area-inset-right));
-  z-index: 9999 !important;
+  z-index: 9999;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(0, 240, 255, 0.3);
 }
 
@@ -335,7 +336,7 @@ body::before {
 .main {
   position: relative;
   z-index: 1;
-  padding-top: 62px; /* Margin pas di bawah navbar fixed */
+  padding-top: 62px; /* Kompensasi tinggi navbar fixed di atas */
 }
 
 #page-home { display: none; }
@@ -399,7 +400,7 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 26px 16px;
+  padding: clamp(26px, 3vw, 56px) clamp(16px, 3vw, 40px);
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
@@ -444,13 +445,23 @@ body::before {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 16px;
+  gap: clamp(16px, 2vw, 32px);
   width: 100%;
 }
 
+/* Di layar lebar, kelompok avatar+teks toko tidak lagi melebar mepet ke
+   kiri mengikuti lebar penuh hero — dibatasi lebarnya dan dipusatkan
+   supaya "Welcome My Store" tampil di tengah, sesuai permintaan. */
+@media (min-width: 1024px) {
+  .banner-inner {
+    max-width: clamp(560px, 68%, 980px);
+    margin: 0 auto;
+  }
+}
+
 .store-avatar {
-  width: 82px;
-  height: 82px;
+  width: clamp(82px, 9vw, 170px);
+  height: clamp(82px, 9vw, 170px);
   border-radius: 22px;
   background: linear-gradient(135deg, var(--neon-cyan), var(--accent));
   display: flex;
@@ -477,7 +488,7 @@ body::before {
 .store-name {
   font-family: 'Orbitron', sans-serif;
   font-weight: 900;
-  font-size: 22px;
+  font-size: clamp(22px, 2.1vw, 38px);
   letter-spacing: 0.05em;
   color: #fff;
   line-height: 1.2;
@@ -486,7 +497,7 @@ body::before {
 }
 
 .store-tagline {
-  font-size: 11.5px;
+  font-size: clamp(11.5px, 0.9vw, 16px);
   color: var(--text2);
   line-height: 1.4;
 }
@@ -497,10 +508,10 @@ body::before {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 10px;
+  padding: clamp(3px, 0.3vw, 5px) clamp(10px, 1vw, 14px);
   border-radius: 100px;
   font-family: 'Orbitron', sans-serif;
-  font-size: 9.5px;
+  font-size: clamp(9.5px, 0.7vw, 12px);
   font-weight: 800;
   letter-spacing: 0.05em;
   border: 1px solid;
@@ -517,9 +528,9 @@ body::before {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: clamp(6px, 0.5vw, 9px) clamp(14px, 1.2vw, 20px);
   border-radius: 100px;
-  font-size: 11px;
+  font-size: clamp(11px, 0.8vw, 14px);
   font-weight: 700;
   text-decoration: none;
   border: 1px solid;
@@ -694,9 +705,10 @@ body::before {
 /* =====================================================================
    DASHBOARD TABS (STICKY DI BAWAH NAVBAR FIXED)
    ===================================================================== */
+/* Tab dashboard menempel persis di bawah navbar fixed saat discroll. */
 .home-dashboard-nav {
   position: sticky;
-  top: 62px; /* Nyambung persis sama navbar fixed di atas */
+  top: 62px;
   z-index: 900;
   background: rgba(11, 16, 29, 0.95);
   backdrop-filter: blur(14px);
