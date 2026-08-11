@@ -1,6 +1,6 @@
 import { auth, db } from "./firebase-config.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, doc, getDoc, getDocs, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, doc, getDoc, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let currentUser = null;
 let products = [];
@@ -27,7 +27,7 @@ let isPlaying = false;
 let stockItems = [];
 let stockFilter = 'all';
 let myOrders = [];
-let stockUnsubscribe = null;
+let stockPollTimer = null;
 let currentHomeTab = 0;
 
 // ===== 2-STEP LOGIN (Email OTP) STATE =====
@@ -90,7 +90,7 @@ onAuthStateChanged(auth, async user => {
     otpVerified = false;
     otpGateUid = null;
     stopOtpCountdown();
-    if (stockUnsubscribe) { stockUnsubscribe(); stockUnsubscribe = null; }
+    if (stockPollTimer) { clearInterval(stockPollTimer); stockPollTimer = null; }
     updateNavUI();
     showPage('auth', 'login');
   }
@@ -631,10 +631,21 @@ function stopOtpCountdown() {
 // Dipakai bersama oleh renderProducts() (badge/tombol) dan orderProduct()
 // (guard sebelum modal checkout dibuka), supaya aturan "stok kosong" selalu
 // konsisten di manapun dicek.
+// CATATAN AUDIT STOK: `stockItems` TIDAK LAGI berisi dokumen stock mentah
+// (yang punya field kredensial seperti email/password) — sekarang berisi
+// hasil agregat AMAN { productId, packageName, availableCount, totalCount }
+// dari endpoint backend /stock-availability (lihat loadStockPublic() di
+// bawah). Firestore Rules production memang membatasi collection "stock"
+// hanya bisa dibaca Admin, jadi membaca collection itu langsung dari
+// browser tidak akan pernah berhasil untuk user biasa - dan tetap berisiko
+// membocorkan kredensial kalau rule itu suatu saat dilonggarkan. Bentuk
+// return getProductStock()/getPackageStock() di bawah TIDAK diubah supaya
+// seluruh pemanggil (renderProducts, orderProduct, renderOrderModalBody,
+// dst) tidak perlu direvisi.
 function getProductStock(productId) {
-  const pStock = stockItems.filter(s => s.productId === productId);
-  const availableCount = pStock.filter(s => !s.sold).length;
-  const totalCount = pStock.length;
+  const entries = stockItems.filter(s => s.productId === productId);
+  const availableCount = entries.reduce((sum, e) => sum + (e.availableCount || 0), 0);
+  const totalCount = entries.reduce((sum, e) => sum + (e.totalCount || 0), 0);
   return {
     availableCount,
     totalCount,
@@ -650,9 +661,9 @@ function getProductStock(productId) {
 // tidak dianggap tersedia hanya karena paket lain dari produk yang sama
 // masih ada stok.
 function getPackageStock(productId, packageName) {
-  const pStock = stockItems.filter(s => s.productId === productId && s.packageName === packageName);
-  const availableCount = pStock.filter(s => !s.sold).length;
-  const totalCount = pStock.length;
+  const entry = stockItems.find(s => s.productId === productId && s.packageName === packageName);
+  const availableCount = entry ? (entry.availableCount || 0) : 0;
+  const totalCount = entry ? (entry.totalCount || 0) : 0;
   return {
     availableCount,
     totalCount,
@@ -722,7 +733,7 @@ function orderProduct(id) {
   // sebelumnya masih bisa membuka modal walau tombolnya sudah disabled.
   const { hasStock, hasStockData } = getProductStock(p.id);
   if (hasStockData && !hasStock) {
-    showNotif('Stok habis', 'error');
+    showNotif('STOCK SEDANG KOSONG. Hubungi admin untuk melakukan restock.', 'error');
     return;
   }
 
@@ -810,7 +821,7 @@ function renderOrderModalBody() {
       <span style="font-size:12.5px;color:var(--text2);">Total bayar</span>
       <span style="font-size:18px;font-weight:800;color:var(--accent);font-family:'Syne',sans-serif;">Rp${resolvedAmount.toLocaleString('id-ID')}<span style="font-size:11px;font-weight:400;font-family:'DM Sans';color:var(--text2);margin-left:3px;">/bulan</span></span>
     </div>
-    ${selectedOutOfStock ? `<div style="font-size:12.5px;color:var(--danger,#e15b5b);font-weight:600;margin-bottom:10px;">Stock paket ini sedang habis.</div>` : ''}
+    ${selectedOutOfStock ? `<div style="margin-bottom:10px;"><div style="font-size:12.5px;font-weight:700;color:var(--danger,#e15b5b);">STOCK SEDANG KOSONG</div><div style="font-size:11.5px;color:var(--text2);margin-top:2px;">Hubungi admin untuk melakukan restock.</div></div>` : ''}
     ${renderOrderWhatsappFieldHtml()}
     <div id="order-qris-wrap"></div>
   ` : `
@@ -820,7 +831,7 @@ function renderOrderModalBody() {
       <div style="font-size:12.5px;color:var(--text2);margin-top:3px;">${escHtml(p.desc || '')}</div>
       <div style="font-size:18px;font-weight:800;color:var(--accent);font-family:'Syne',sans-serif;margin-top:8px;">Rp${resolvedAmount.toLocaleString('id-ID')}<span style="font-size:11px;font-weight:400;font-family:'DM Sans';color:var(--text2);margin-left:3px;">/bulan</span></div>
     </div>
-    ${selectedOutOfStock ? `<div style="font-size:12.5px;color:var(--danger,#e15b5b);font-weight:600;margin-bottom:10px;">Stock paket ini sedang habis.</div>` : ''}
+    ${selectedOutOfStock ? `<div style="margin-bottom:10px;"><div style="font-size:12.5px;font-weight:700;color:var(--danger,#e15b5b);">STOCK SEDANG KOSONG</div><div style="font-size:11.5px;color:var(--text2);margin-top:2px;">Hubungi admin untuk melakukan restock.</div></div>` : ''}
     ${renderOrderWhatsappFieldHtml()}
     <div id="order-qris-wrap"></div>
     Klik tombol di bawah untuk membayar via QRIS.
@@ -832,7 +843,7 @@ function renderOrderModalBody() {
   btn.style.display = '';
   if (selectedOutOfStock) {
     btn.disabled = true;
-    btn.innerHTML = 'Stock Habis';
+    btn.innerHTML = 'Stock Kosong';
   } else {
     btn.disabled = false;
     btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Bayar Sekarang';
@@ -1111,7 +1122,7 @@ async function generateQrisPayment() {
   if (currentOrderProduct && selectedPackage) {
     const { hasStock, hasStockData } = getPackageStock(currentOrderProduct.id, selectedPackage.name);
     if (hasStockData && !hasStock) {
-      showNotif('Stock paket ini sedang habis.', 'error');
+      showNotif('STOCK SEDANG KOSONG. Hubungi admin untuk melakukan restock.', 'error');
       return;
     }
   }
@@ -1150,7 +1161,7 @@ async function generateQrisPayment() {
 
     // Backend Railway membungkus hasil SiTransfer di { success, data: { qris_image, transaction_id, amount } }
     if (res.status === 409 || result.outOfStock) {
-      showNotif(result.error || 'Stok habis', 'error');
+      showNotif(result.error || 'STOCK SEDANG KOSONG. Hubungi admin untuk melakukan restock.', 'error');
       btn.disabled = false;
       btn.innerHTML = originalBtnHtml;
       if (waInputEl) waInputEl.disabled = false;
@@ -1785,28 +1796,38 @@ function renderMyOrders() {
 // ===== STOCK SYSTEM =====
 
 // Load stock untuk display publik (hanya jumlah tersedia).
-// Realtime (onSnapshot), bukan getDocs sekali-jalan — supaya badge stok dan
-// guard "stok habis" di checkout selalu sesuai data terbaru selama user
-// masih buka halaman (konsisten dengan Dashboard Admin yang sync realtime).
-async function loadStockPublic() {
-  if (stockUnsubscribe) { stockUnsubscribe(); stockUnsubscribe = null; }
+//
+// REVISI AUDIT STOK: sebelumnya fungsi ini memakai onSnapshot LANGSUNG ke
+// collection Firestore "stock" — collection itu berisi field kredensial
+// (email/password akun) dan Firestore Rules production memang membatasi
+// baca collection ini hanya untuk Admin, jadi permintaan tsb SELALU gagal
+// (permission-denied) untuk user biasa dan badge/guard stok tidak pernah
+// dapat data. Sekarang diganti memanggil endpoint backend yang aman
+// (/stock-availability, lihat lib/orders.js#getStockAvailability di
+// project backend) yang HANYA mengirim balik angka agregat tersedia/total
+// per productId+packageName — tidak ada field dokumen stock asli yang ikut
+// terkirim ke browser.
+//
+// Tetap di-poll berkala (bukan realtime listener) selama halaman terbuka
+// supaya badge stok & guard "stok habis" di checkout mengikuti perubahan
+// terbaru (mis. setelah buyer lain berhasil checkout).
+const STOCK_POLL_INTERVAL_MS = 15000;
 
-  return new Promise((resolve) => {
-    let resolved = false;
-    stockUnsubscribe = onSnapshot(
-      collection(db, "stock"),
-      snap => {
-        stockItems = [];
-        snap.forEach(d => stockItems.push({ id: d.id, ...d.data() }));
-        if (products.length) renderProducts(
-          stockFilter === 'all' ? products : products.filter(p => p.category === stockFilter)
-        );
-        if (!resolved) { resolved = true; resolve(); }
-      },
-      () => {
-        stockItems = [];
-        if (!resolved) { resolved = true; resolve(); }
-      }
-    );
-  });
+async function fetchStockAvailability() {
+  try {
+    const res = await fetch('https://aliftzy-backend.vercel.app/stock-availability');
+    const result = await res.json();
+    stockItems = (result && result.success && Array.isArray(result.data)) ? result.data : [];
+  } catch (e) {
+    stockItems = [];
+  }
+  if (products.length) renderProducts(
+    stockFilter === 'all' ? products : products.filter(p => p.category === stockFilter)
+  );
+}
+
+async function loadStockPublic() {
+  if (stockPollTimer) { clearInterval(stockPollTimer); stockPollTimer = null; }
+  await fetchStockAvailability();
+  stockPollTimer = setInterval(fetchStockAvailability, STOCK_POLL_INTERVAL_MS);
 }
