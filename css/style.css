@@ -1774,6 +1774,33 @@ body::before {
   word-break: break-all;
 }
 
+/* Tombol "Download QRIS" dibuat full-width & konsisten dengan tombol
+   Tutup / Batalkan Pembelian di bawahnya (lihat aturan #modal-order
+   .modal-actions), supaya ketiganya terlihat rapi sejajar sebagai satu
+   grup tombol, bukan berantakan/acak. */
+.payment-download-btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: 14px !important;
+}
+
+/* =====================================================================
+   Tombol aksi khusus di MODAL ORDER/PAYMENT (Tutup, Batalkan Pembelian,
+   Bayar Sekarang) — dibuat full-width bertumpuk rapi (bukan flex-wrap
+   default .modal-actions yang bisa membuat tombol terakhir "nyasar"
+   sendirian). Scoped ke #modal-order saja supaya modal lain yang juga
+   memakai .modal-actions tidak ikut berubah.
+   ===================================================================== */
+#modal-order .modal-actions {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+#modal-order .modal-actions .btn {
+  width: 100%;
+  justify-content: center;
+}
+
 @media (max-width: 480px) {
   .payment-card-wrap { max-width: 220px; }
   .payment-info { max-width: 100%; }
