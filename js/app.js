@@ -913,7 +913,13 @@ function fillFittedText(ctx, text, centerX, y, maxWidth, weight, maxFontSize, mi
   ctx.fillText(displayText, centerX, y);
 }
 
-function drawPaymentCard(canvas, { templateImg, qrImg, amount, transactionId, remainingSeconds, status }) {
+// CATATAN (revisi tampilan QRIS): nominal, ID transaksi, dan countdown
+// SENGAJA TIDAK LAGI digambar/"dibakar" ke dalam canvas. Canvas sekarang
+// HANYA berisi template + QR dinamis di kotak putih template, supaya
+// hasilnya terlihat sebagai satu foto utuh. Nominal & countdown
+// ditampilkan sebagai elemen HTML terpisah DI BAWAH foto (lihat
+// generateQrisPayment() dan updatePaymentCountdownText()).
+function drawPaymentCard(canvas, { templateImg, qrImg }) {
   if (!canvas || !templateImg) return;
   const size = templateImg.naturalWidth || 1254; // >= 1200px sesuai ketentuan resolusi minimal
   canvas.width = size;
@@ -941,57 +947,33 @@ function drawPaymentCard(canvas, { templateImg, qrImg, amount, transactionId, re
   if (qrImg) {
     ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
   }
-
-  // ==== Info pembayaran di bawah QR, masih di dalam kotak putih ====
-  const textCenterX = (box.x0 + box.x1) / 2;
-  const textMaxWidth = (box.x1 - box.x0) - 80; // margin aman kiri/kanan, lihat catatan fillFittedText
-  let ty = qrY + qrSize + 46;
-
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-
-  ctx.fillStyle = '#12143a';
-  fillFittedText(ctx, `Rp${Number(amount || 0).toLocaleString('id-ID')}`, textCenterX, ty, textMaxWidth, 700, 40, 24, "Poppins, 'Segoe UI', sans-serif");
-
-  ty += 40;
-  ctx.fillStyle = '#5b5e78';
-  fillFittedText(ctx, `ID Transaksi: ${transactionId || '-'}`, textCenterX, ty, textMaxWidth, 500, 21, 13, "Poppins, 'Segoe UI', sans-serif");
-
-  ty += 38;
-  if (status === 'paid') {
-    ctx.fillStyle = '#16a34a';
-    ctx.font = "700 26px Poppins, 'Segoe UI', sans-serif";
-    ctx.fillText('Pembayaran Berhasil', textCenterX, ty);
-  } else if (status === 'expired') {
-    ctx.fillStyle = '#e11d48';
-    ctx.font = "700 26px Poppins, 'Segoe UI', sans-serif";
-    ctx.fillText('Pembayaran Kadaluarsa', textCenterX, ty);
-  } else if (remainingSeconds != null) {
-    const mm = String(Math.max(0, Math.floor(remainingSeconds / 60))).padStart(2, '0');
-    const ss = String(Math.max(0, Math.floor(remainingSeconds % 60))).padStart(2, '0');
-    ctx.fillStyle = '#2b3fe0';
-    ctx.font = "700 26px Poppins, 'Segoe UI', sans-serif";
-    ctx.fillText(`Bayar dalam ${mm}:${ss}`, textCenterX, ty);
-  }
 }
 
-// Digambar ulang setiap detik oleh countdown (murah — cuma re-draw canvas
-// dari gambar yang sudah di-cache, tidak fetch ulang apapun) supaya
-// countdown ikut ter-"bake" di dalam gambar kartu, bukan cuma teks
-// terpisah di luar gambar.
-function redrawPaymentCard(statusOverride) {
+// Canvas sekarang statis (cuma template + QR, tidak ada teks yang berubah
+// tiap detik), jadi tidak perlu di-redraw tiap tick countdown lagi -
+// dipanggil sekali saat QR siap, lalu hanya dipanggil ulang kalau memang
+// perlu (mis. dipaksa refresh state).
+function redrawPaymentCard() {
   const canvas = document.getElementById('payment-card-canvas');
   if (!canvas || !paymentCardState) return;
+  drawPaymentCard(canvas, paymentCardState);
+}
 
-  let remainingSeconds = null;
-  if (orderExpiredAt) {
-    remainingSeconds = Math.floor((new Date(orderExpiredAt).getTime() - Date.now()) / 1000);
-  }
+// Format detik sisa jadi "mm:ss", dipakai bareng oleh countdown HTML.
+function formatCountdownMMSS(remainingSeconds) {
+  const safe = Math.max(0, Math.floor(remainingSeconds || 0));
+  const mm = String(Math.floor(safe / 60)).padStart(2, '0');
+  const ss = String(safe % 60).padStart(2, '0');
+  return `${mm}:${ss}`;
+}
 
-  let status = statusOverride || paymentCardState.status || 'pending';
-  if (status === 'pending' && remainingSeconds != null && remainingSeconds <= 0) status = 'expired';
-
-  drawPaymentCard(canvas, { ...paymentCardState, remainingSeconds, status });
+// Update teks countdown "Bayar dalam mm:ss" di elemen HTML terpisah di
+// bawah foto template (BUKAN digambar ke canvas).
+function updatePaymentCountdownText(remainingSeconds) {
+  const el = document.getElementById('payment-countdown-text');
+  if (!el) return;
+  el.textContent = formatCountdownMMSS(remainingSeconds);
+  el.classList.remove('is-expired');
 }
 
 function downloadPaymentCard(txId) {
@@ -1186,11 +1168,29 @@ async function generateQrisPayment() {
       return;
     }
 
+    const displayAmount = Number(data.amount || paymentToSend.amount || 0);
+
+    // Foto pembayaran (template + QR dinamis) TETAP satu foto utuh di
+    // canvas. Nominal, countdown, dan ID transaksi sekarang elemen HTML
+    // TERPISAH di bawah foto — tidak lagi digambar ke dalam canvas.
     wrap.innerHTML = `
-      <div style="margin-top:6px;margin-bottom:14px;text-align:center;">
-        <div style="font-size:13px;color:var(--text2);margin-bottom:10px;">Scan QRIS untuk membayar</div>
-        <canvas id="payment-card-canvas" width="1254" height="1254" style="max-width:260px;width:100%;border-radius:12px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.15);"></canvas>
-        <button type="button" class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="downloadPaymentCard('${data.transaction_id || 'qris'}')">
+      <div class="payment-card-block">
+        <div class="payment-card-scan-hint">Scan QRIS untuk membayar</div>
+        <div class="payment-card-wrap">
+          <canvas id="payment-card-canvas" width="1254" height="1254" class="payment-card-canvas"></canvas>
+        </div>
+        <div class="payment-info">
+          <div class="payment-info-row">
+            <span class="payment-info-label">Total bayar</span>
+            <span class="payment-info-amount">Rp${displayAmount.toLocaleString('id-ID')}<span class="payment-info-suffix">/bulan</span></span>
+          </div>
+          <div class="payment-info-row">
+            <span class="payment-info-label">Bayar dalam</span>
+            <span id="payment-countdown-text" class="payment-info-countdown">--:--</span>
+          </div>
+        </div>
+        ${data.transaction_id ? `<div class="payment-txid">ID Transaksi: ${escHtml(data.transaction_id)}</div>` : ''}
+        <button type="button" class="btn btn-ghost btn-sm" style="margin-top:12px;" onclick="downloadPaymentCard('${data.transaction_id || 'qris'}')">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download QRIS
         </button>
@@ -1206,7 +1206,7 @@ async function generateQrisPayment() {
       paymentCardState = {
         templateImg,
         qrImg,
-        amount: data.amount || paymentToSend.amount,
+        amount: displayAmount,
         transactionId: data.transaction_id || null,
         status: 'pending'
       };
@@ -1237,20 +1237,19 @@ async function generateQrisPayment() {
 }
 
 // ===== COUNTDOWN PEMBAYARAN =====
-// Countdown sekarang ikut "dibakar" ke dalam gambar kartu pembayaran
-// (lihat drawPaymentCard/redrawPaymentCard) — bukan lagi teks terpisah di
-// luar gambar, sesuai permintaan tampilan kartu QRIS baru. Redraw canvas
-// per detik itu murah (cuma re-draw dari gambar yang sudah di-cache).
+// Countdown adalah elemen HTML terpisah DI BAWAH foto template (lihat
+// updatePaymentCountdownText) — canvas-nya sendiri statis (cuma template +
+// QR), jadi tiap detik cukup update teks HTML, tidak perlu redraw canvas.
 function stopPaymentCountdown() {
   if (orderCountdownInterval) { clearInterval(orderCountdownInterval); orderCountdownInterval = null; }
 }
 
 function startPaymentCountdown(expiredAt) {
   stopPaymentCountdown();
-  if (!expiredAt) { redrawPaymentCard(); return; }
+  if (!expiredAt) { return; }
 
   const expiredTime = new Date(expiredAt).getTime();
-  if (isNaN(expiredTime)) { redrawPaymentCard(); return; }
+  if (isNaN(expiredTime)) { return; }
 
   const tick = () => {
     const remainMs = expiredTime - Date.now();
@@ -1260,7 +1259,7 @@ function startPaymentCountdown(expiredAt) {
       markPaymentExpired();
       return;
     }
-    redrawPaymentCard();
+    updatePaymentCountdownText(remainMs / 1000);
   };
   tick();
   orderCountdownInterval = setInterval(tick, 1000);
@@ -1275,7 +1274,11 @@ function markPaymentExpired() {
   const btn = document.getElementById('btn-order-go');
   if (btn) btn.style.display = 'none';
   if (paymentCardState) paymentCardState.status = 'expired';
-  redrawPaymentCard('expired');
+  const countdownEl = document.getElementById('payment-countdown-text');
+  if (countdownEl) {
+    countdownEl.textContent = 'Kadaluarsa';
+    countdownEl.classList.add('is-expired');
+  }
   const canvas = document.getElementById('payment-card-canvas');
   if (canvas) canvas.style.opacity = '0.55';
 }
@@ -1305,12 +1308,13 @@ async function checkPaymentStatus(transactionId) {
       stopStatusPolling();
       stopPaymentCountdown();
       if (paymentCardState) paymentCardState.status = 'paid';
-      redrawPaymentCard('paid');
       const statusEl = document.getElementById('order-status-msg');
       if (statusEl) {
         statusEl.style.color = 'var(--success)';
         statusEl.textContent = 'Pembayaran Berhasil';
       }
+      const countdownEl = document.getElementById('payment-countdown-text');
+      if (countdownEl) countdownEl.textContent = '00:00';
       const cancelBtn = document.getElementById('btn-order-cancel');
       if (cancelBtn) cancelBtn.textContent = 'Tutup';
     } else if (status === 'expired' || status === 'failed') {
