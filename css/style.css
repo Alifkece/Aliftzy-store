@@ -1779,25 +1779,17 @@ body::before {
    .modal-actions), supaya ketiganya terlihat rapi sejajar sebagai satu
    grup tombol, bukan berantakan/acak. */
 .payment-download-btn {
-  width: 100%;
-  justify-content: center;
   margin-top: 14px !important;
 }
 
 /* =====================================================================
-   Tombol aksi khusus di MODAL ORDER/PAYMENT (Tutup, Batalkan Pembelian,
-   Bayar Sekarang) — dibuat full-width bertumpuk rapi (bukan flex-wrap
-   default .modal-actions yang bisa membuat tombol terakhir "nyasar"
-   sendirian). Scoped ke #modal-order saja supaya modal lain yang juga
-   memakai .modal-actions tidak ikut berubah.
+   Tombol aksi di MODAL ORDER/PAYMENT (Tutup, Batalkan Pembelian, Bayar
+   Sekarang) — dijajarkan rapi DI TENGAH (bukan nempel ke kanan seperti
+   .modal-actions default), supaya kalau cuma ada 2 tombol nggak ada yang
+   "nyempil" sendirian ke satu sisi. Scoped ke #modal-order saja supaya
+   modal lain yang juga memakai .modal-actions tidak ikut berubah.
    ===================================================================== */
 #modal-order .modal-actions {
-  flex-direction: column;
-  align-items: stretch;
-}
-
-#modal-order .modal-actions .btn {
-  width: 100%;
   justify-content: center;
 }
 
