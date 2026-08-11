@@ -859,9 +859,13 @@ function selectPackage(i) {
 // quiet zone rapi, dan tidak pernah keluar dari frame.
 // =====================================================================
 const PAYMENT_CARD_BOX = { x0: 594, y0: 217, x1: 1176, y1: 800 }; // area putih di template
-const PAYMENT_CARD_QR_PAD_H = 90;   // jarak QR dari tepi kiri/kanan kotak putih
-const PAYMENT_CARD_QR_PAD_TOP = 40; // jarak QR dari tepi atas kotak putih
-const PAYMENT_CARD_QUIET_ZONE = 14; // margin putih ekstra di sekeliling QR
+// Sebelumnya QR disisakan ruang kosong besar di kotak putih (untuk teks
+// nominal/ID/countdown yang dulu ikut digambar di bawah QR). Sekarang teks
+// itu sudah pindah jadi HTML terpisah di luar foto (lihat catatan di
+// drawPaymentCard), jadi QR boleh memenuhi HAMPIR SELURUH kotak putih -
+// cuma disisakan quiet zone tipis & seragam di semua sisi supaya QR besar,
+// pas di kotak, dan tetap mudah discan.
+const PAYMENT_CARD_QR_QUIET_ZONE = 26; // jarak QR dari tepi kotak putih (uniform di 4 sisi)
 
 function loadImageEl(src) {
   return new Promise((resolve, reject) => {
@@ -930,18 +934,24 @@ function drawPaymentCard(canvas, { templateImg, qrImg }) {
   ctx.drawImage(templateImg, 0, 0, size, size);
 
   const box = PAYMENT_CARD_BOX;
-  const qrSize = (box.x1 - box.x0) - PAYMENT_CARD_QR_PAD_H * 2;
-  const qrX = box.x0 + PAYMENT_CARD_QR_PAD_H;
-  const qrY = box.y0 + PAYMENT_CARD_QR_PAD_TOP;
+  const boxW = box.x1 - box.x0;
+  const boxH = box.y1 - box.y0;
+  // QR dibuat sebesar mungkin (persegi, mengikuti sisi terpendek kotak)
+  // lalu diposisikan tepat di TENGAH kotak putih, dengan quiet zone tipis
+  // seragam di semua sisi - jadi QR terlihat besar & pas di kotak, bukan
+  // kecil dengan banyak ruang kosong di sekelilingnya.
+  const qrSize = Math.min(boxW, boxH) - PAYMENT_CARD_QR_QUIET_ZONE * 2;
+  const qrX = box.x0 + (boxW - qrSize) / 2;
+  const qrY = box.y0 + (boxH - qrSize) / 2;
 
-  // Lapisan putih bersih + quiet zone di sekeliling QR, jaga-jaga kalau
-  // warna putih template sedikit berbeda dari putih murni.
+  // Lapisan putih bersih tipis di sekeliling QR (quiet zone), jaga-jaga
+  // kalau warna putih template sedikit berbeda dari putih murni.
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(
-    qrX - PAYMENT_CARD_QUIET_ZONE,
-    qrY - PAYMENT_CARD_QUIET_ZONE,
-    qrSize + PAYMENT_CARD_QUIET_ZONE * 2,
-    qrSize + PAYMENT_CARD_QUIET_ZONE * 2
+    qrX - PAYMENT_CARD_QR_QUIET_ZONE,
+    qrY - PAYMENT_CARD_QR_QUIET_ZONE,
+    qrSize + PAYMENT_CARD_QR_QUIET_ZONE * 2,
+    qrSize + PAYMENT_CARD_QR_QUIET_ZONE * 2
   );
 
   if (qrImg) {
@@ -1190,7 +1200,7 @@ async function generateQrisPayment() {
           </div>
         </div>
         ${data.transaction_id ? `<div class="payment-txid">ID Transaksi: ${escHtml(data.transaction_id)}</div>` : ''}
-        <button type="button" class="btn btn-ghost btn-sm" style="margin-top:12px;" onclick="downloadPaymentCard('${data.transaction_id || 'qris'}')">
+        <button type="button" class="btn btn-ghost btn-sm payment-download-btn" onclick="downloadPaymentCard('${data.transaction_id || 'qris'}')">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download QRIS
         </button>
