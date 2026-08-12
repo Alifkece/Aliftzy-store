@@ -20,7 +20,7 @@
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
   <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" />
   <img src="https://img.shields.io/badge/Railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white" />
-  <img src="https://img.shields.io/badge/SiTransfer-0099FF?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Casaku-0099FF?style=for-the-badge" />
   <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" />
 </p>
 
@@ -307,7 +307,7 @@ Dashboard Admin dikembangkan pada repository terpisah agar keamanan, struktur pr
 <img src="https://cdn.simpleicons.org/railway/0B0D0E" width="40" /><br /><sub><b>Railway</b></sub>
 </td>
 <td align="center" width="120">
-<img src="https://api.iconify.design/lucide:credit-card.svg?color=%230099FF" width="40" /><br /><sub><b>SiTransfer</b></sub>
+<img src="https://api.iconify.design/lucide:credit-card.svg?color=%230099FF" width="40" /><br /><sub><b>Casaku</b></sub>
 </td>
 </tr>
 <tr>
