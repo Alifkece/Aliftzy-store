@@ -111,14 +111,12 @@ body::before {
 }
 
 /* =====================================================================
-   FIXED NAVBAR — diam di tempat, tidak ikut ter-scroll (baik HP maupun
-   desktop). Background full-width, isinya dipusatkan lewat .nav-inner.
+   NAVBAR — bagian normal dari document flow, ikut ter-scroll bersama
+   konten (baik HP maupun desktop). Background full-width, isinya
+   dipusatkan lewat .nav-inner.
    ===================================================================== */
 .navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  position: static;
   height: 62px;
   background: rgba(6, 9, 17, 0.85);
   backdrop-filter: blur(16px);
@@ -336,7 +334,34 @@ body::before {
 .main {
   position: relative;
   z-index: 1;
-  padding-top: 62px; /* Kompensasi tinggi navbar fixed di atas */
+}
+
+/* =====================================================================
+   SCROLL REVEAL — mengaktifkan sistem .reveal/.reveal-left/.reveal-right
+   yang sudah dikaitkan lewat IntersectionObserver di js/app.js (fungsi
+   initScrollReveal / applyRevealToCards) tapi sebelumnya belum punya
+   style, sehingga class tersebut belum memberi efek apa pun.
+   ===================================================================== */
+.reveal, .reveal-left, .reveal-right {
+  opacity: 0;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal { transform: translateY(20px); }
+.reveal-left { transform: translateX(-24px); }
+.reveal-right { transform: translateX(24px); }
+
+.reveal.visible, .reveal-left.visible, .reveal-right.visible {
+  opacity: 1;
+  transform: translateY(0) translateX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal-left, .reveal-right {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 #page-home { display: none; }
@@ -703,12 +728,13 @@ body::before {
 .track-item.active { background: rgba(0, 240, 255, 0.2); color: var(--neon-cyan); font-weight: 700; }
 
 /* =====================================================================
-   DASHBOARD TABS (STICKY DI BAWAH NAVBAR FIXED)
+   DASHBOARD TABS (STICKY DI ATAS VIEWPORT SAAT DISCROLL)
    ===================================================================== */
-/* Tab dashboard menempel persis di bawah navbar fixed saat discroll. */
+/* Navbar sudah bukan fixed lagi, jadi tab dashboard menempel ke paling
+   atas viewport (bukan lagi di bawah navbar) saat discroll. */
 .home-dashboard-nav {
   position: sticky;
-  top: 62px;
+  top: 0;
   z-index: 900;
   background: rgba(11, 16, 29, 0.95);
   backdrop-filter: blur(14px);
