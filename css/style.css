@@ -344,20 +344,42 @@ body::before {
    ===================================================================== */
 .reveal, .reveal-left, .reveal-right {
   opacity: 0;
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.reveal { transform: translateY(20px); }
-.reveal-left { transform: translateX(-24px); }
-.reveal-right { transform: translateX(24px); }
+.reveal { transform: translateY(56px) scale(0.94); }
+.reveal-left { transform: translateX(-90px) rotate(-3deg); }
+.reveal-right { transform: translateX(90px) rotate(3deg); }
 
 .reveal.visible, .reveal-left.visible, .reveal-right.visible {
   opacity: 1;
-  transform: translateY(0) translateX(0);
+  transform: translateY(0) translateX(0) scale(1) rotate(0deg);
 }
 
+/* Subtitle menyusul title dengan sedikit jeda supaya terasa berurutan/hidup */
+.section-subtitle.reveal { transition-delay: 0.12s; }
+
+/* Stagger internal di dalam product-card: begitu card-nya sendiri visible
+   (class .visible ditambahkan lewat IntersectionObserver di js/app.js),
+   nama produk, deskripsi, dan footer (harga+tombol) ikut fade+slide masuk
+   satu per satu, jadi kartu terasa lebih hidup, bukan cuma geser polos. */
+.product-card .product-name,
+.product-card .product-desc,
+.product-card .product-footer {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.product-card.visible .product-name { opacity: 1; transform: translateY(0); transition-delay: 0.12s; }
+.product-card.visible .product-desc { opacity: 1; transform: translateY(0); transition-delay: 0.22s; }
+.product-card.visible .product-footer { opacity: 1; transform: translateY(0); transition-delay: 0.32s; }
+
 @media (prefers-reduced-motion: reduce) {
-  .reveal, .reveal-left, .reveal-right {
+  .reveal, .reveal-left, .reveal-right,
+  .product-card .product-name,
+  .product-card .product-desc,
+  .product-card .product-footer {
     opacity: 1;
     transform: none;
     transition: none;
@@ -813,7 +835,7 @@ body::before {
   border: 1px solid rgba(88, 101, 242, 0.3);
   border-radius: 18px;
   overflow: hidden;
-  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.25s ease;
   cursor: pointer;
   position: relative;
   display: flex;
@@ -993,7 +1015,7 @@ body::before {
   position: relative;
   overflow: hidden;
   border: 1px solid var(--border);
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
   box-shadow: var(--shadow-3d);
 }
 
