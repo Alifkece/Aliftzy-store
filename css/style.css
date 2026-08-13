@@ -192,6 +192,19 @@ body::before {
   white-space: nowrap;
 }
 
+/* Navbar mepet di layar sempit: logo "ALIFTZY STORE" + Masuk + Daftar +
+   bell butuh ~420px kalau ukuran default dipakai semua — lebih lebar dari
+   kebanyakan layar HP (360-390px), jadi navbar overflow ke samping (bell
+   kepotong). Perkecil supaya semuanya muat dalam satu baris tanpa scroll
+   horizontal. */
+@media (max-width: 420px) {
+  .nav-logo { font-size: 14px; letter-spacing: 0.04em; }
+  .nav-inner { gap: 6px; }
+  .nav-auth { gap: 5px; }
+  .nav-auth-btn { padding: 6px 10px; font-size: 10.5px; border-radius: 8px; }
+  .nav-bell, .avatar-sm { width: 32px; height: 32px; }
+}
+
 .nav-auth-btn-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.18); background: var(--surface2); }
 
 .nav-auth-btn-primary {
@@ -620,9 +633,9 @@ body::before {
   white-space: nowrap;
 }
 
-.badge-blue { background: rgba(0, 240, 255, 0.12); border-color: rgba(0, 240, 255, 0.16); color: var(--neon-cyan); }
-.badge-purple { background: rgba(171, 0, 255, 0.12); border-color: rgba(171, 0, 255, 0.4); color: #d680ff; }
-.badge-gold { background: rgba(254, 231, 92, 0.12); border-color: rgba(254, 231, 92, 0.16); color: var(--gold); }
+.badge-blue { background: rgba(111, 227, 212, 0.1); border-color: rgba(111, 227, 212, 0.22); color: var(--neon-cyan); }
+.badge-purple { background: var(--surface2); border-color: var(--border); color: var(--text2); }
+.badge-gold { background: var(--surface2); border-color: var(--border); color: var(--text2); }
 
 .social-btns { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
 
@@ -638,36 +651,25 @@ body::before {
   font-size: clamp(11px, 0.8vw, 14px);
   font-weight: 700;
   text-decoration: none;
-  border: 1px solid;
-  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  transition: transform 0.2s var(--ease-premium), background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   cursor: pointer;
-  box-shadow: 0 3px 0 0 #05080e;
-}
-
-.social-btn-wa {
-  background: rgba(87, 242, 135, 0.15);
-  border-color: rgba(87, 242, 135, 0.16);
-  color: var(--success);
 }
 
 .social-btn-wa:hover {
-  background: var(--success);
-  color: #000;
+  background: rgba(79, 212, 138, 0.14);
+  border-color: rgba(79, 212, 138, 0.35);
+  color: var(--success);
   transform: translateY(-2px);
-  box-shadow: 0 5px 0 0 #05080e, 0 0 15px rgba(87, 242, 135, 0.2);
-}
-
-.social-btn-ig {
-  background: rgba(235, 69, 158, 0.15);
-  border-color: rgba(235, 69, 158, 0.16);
-  color: #eb459e;
 }
 
 .social-btn-ig:hover {
-  background: #eb459e;
-  color: #fff;
+  background: rgba(111, 227, 212, 0.12);
+  border-color: rgba(111, 227, 212, 0.3);
+  color: var(--neon-cyan);
   transform: translateY(-2px);
-  box-shadow: 0 5px 0 0 #05080e, 0 0 15px rgba(235, 69, 158, 0.2);
 }
 
 /* =====================================================================
