@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <script>
   // FIX (revisi): script sebelumnya nge-timpa viewport DI SETIAP kondisi,
   // termasuk saat tampilan mobile normal — itu yang bikin halaman kelihatan
@@ -17,7 +17,7 @@
       var real = screen.width;
       var rendered = document.documentElement.clientWidth;
       if (rendered > real * 1.4) {
-        vp.setAttribute('content', 'width=' + real + ', initial-scale=1.0, maximum-scale=1.0');
+        vp.setAttribute('content', 'width=' + real + ', initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no');
       }
     }
     window.addEventListener('load', fixDesktopModeZoom);
