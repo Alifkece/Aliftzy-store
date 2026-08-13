@@ -4,15 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <script>
-  // Chrome Android's "Desktop site" toggle ignores width=device-width and
-  // forces a ~980px virtual viewport, then zooms the whole page out to fit
-  // the phone screen — breaking every media query on the page. Re-writing
-  // the viewport with the device's real screen width neutralizes that,
-  // regardless of which UA/desktop-mode the browser reports.
+  // FIX (revisi): script sebelumnya nge-timpa viewport DI SETIAP kondisi,
+  // termasuk saat tampilan mobile normal — itu yang bikin halaman kelihatan
+  // ke-zoom/aneh. Sekarang cuma dijalankan KALAU beneran kedeteksi gejala
+  // "Desktop site" Chrome Android (viewport ke-render jauh lebih lebar dari
+  // layar asli device). Kondisi normal dibiarkan pakai width=device-width
+  // bawaan, tidak disentuh sama sekali.
   (function(){
-    var vp = document.querySelector('meta[name="viewport"]');
-    if (!vp || !window.screen || !screen.width) return;
-    vp.setAttribute('content', 'width=' + screen.width + ', initial-scale=1.0, maximum-scale=1.0');
+    function fixDesktopModeZoom(){
+      var vp = document.querySelector('meta[name="viewport"]');
+      if (!vp || !window.screen || !screen.width) return;
+      var real = screen.width;
+      var rendered = document.documentElement.clientWidth;
+      if (rendered > real * 1.4) {
+        vp.setAttribute('content', 'width=' + real + ', initial-scale=1.0, maximum-scale=1.0');
+      }
+    }
+    window.addEventListener('load', fixDesktopModeZoom);
   })();
 </script>
 <title>ALIFTZY STORE</title>
