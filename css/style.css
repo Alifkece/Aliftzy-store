@@ -1,37 +1,50 @@
 /* =====================================================================
-   ALIFTZY STORE - NASA CYBERPUNK 3D NEON THEME (FULL OVERHAUL)
+   ALIFTZY STORE - MODERN PREMIUM DARK THEME
    ===================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Orbitron:wght@600;800;900&family=Syne:wght@700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&family=Syne:wght@700;800&display=swap');
 
 :root {
-  /* NASA Cyberpunk & Discord Palette */
-  --bg: #060911;
-  --bg2: #0b101d;
-  --surface: #111726;
-  --surface2: #192238;
-  --border: rgba(88, 101, 242, 0.25);
-  
-  /* Cyber Neon Accents */
-  --accent: #5865f2;         /* Discord Blurple */
-  --neon-cyan: #00f0ff;      /* NASA Cyber Cyan */
-  --neon-blue: #0072ff;
-  --neon-purple: #ab00ff;
-  --gold: #fee75c;
-  --text: #f6f6fe;
-  --text2: #8f9cae;
-  --text3: #4e5058;
-  --danger: #ed4245;
-  --success: #57f287;
-  
+  /* Premium dark surface system */
+  --bg: #08090d;
+  --bg2: #0d0f15;
+  --surface: #12141b;
+  --surface2: #191c25;
+  --border: rgba(255, 255, 255, 0.08);
+
+  /* Controlled accent — used sparingly for CTA / active state / highlight */
+  --accent: #5865f2;
+  --neon-cyan: #6fe3d4;      /* restrained accent teal, replaces neon cyan everywhere via var() */
+  --neon-blue: #5b8def;
+  --neon-purple: #8f7bf0;
+  --gold: #e8c26a;
+  --text: #f4f5f7;
+  --text2: #8b93a3;
+  --text3: #565c6b;
+  --danger: #ef5a5f;
+  --success: #4fd48a;
+
   --radius: 16px;
   --radius-sm: 10px;
 
-  /* 3D Dynamic Shadows */
-  --shadow-3d: 0 10px 0 0 #070a12, 0 15px 30px rgba(0, 240, 255, 0.15);
-  --shadow-3d-active: 0 2px 0 0 #070a12, 0 5px 15px rgba(0, 240, 255, 0.3);
-  --glow-cyan: 0 0 20px rgba(0, 240, 255, 0.6);
-  --glow-accent: 0 0 20px rgba(88, 101, 242, 0.6);
+  /* Soft, purposeful depth — no chunky game-button offsets, no all-over glow */
+  --shadow-3d: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset, 0 12px 28px rgba(0, 0, 0, 0.45);
+  --shadow-3d-active: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset, 0 6px 16px rgba(0, 0, 0, 0.4);
+  --glow-cyan: 0 0 0 1px rgba(111, 227, 212, 0.25), 0 8px 24px rgba(111, 227, 212, 0.12);
+  --glow-accent: 0 0 0 1px rgba(88, 101, 242, 0.3), 0 8px 24px rgba(88, 101, 242, 0.18);
+
+  /* Motion tokens — used by the GSAP choreography at the end of this file */
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 *, *::before, *::after {
@@ -146,7 +159,7 @@ body::before {
 }
 
 .nav-logo {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 900;
   font-size: 17px;
   letter-spacing: 0.1em;
@@ -157,13 +170,37 @@ body::before {
   text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
-  text-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
   text-transform: uppercase;
 }
 
 .nav-spacer { flex: 1; min-width: 0; }
 
-.nav-auth { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+.nav-auth { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+
+.nav-auth-btn {
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  transition: transform 0.2s var(--ease-premium), background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.nav-auth-btn-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.18); background: var(--surface2); }
+
+.nav-auth-btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
+
+.nav-auth-btn-primary:hover { background: #4752c4; transform: translateY(-1px); }
 
 .nav-bell {
   position: relative;
@@ -171,7 +208,7 @@ body::before {
   height: 38px;
   border-radius: 12px;
   background: var(--surface);
-  border: 1px solid rgba(0, 240, 255, 0.3);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -222,7 +259,7 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 800;
   font-size: 14px;
   color: #000;
@@ -244,7 +281,7 @@ body::before {
   gap: 8px;
   padding: 10px 18px;
   border-radius: 12px;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.05em;
@@ -286,7 +323,7 @@ body::before {
 
 .btn-primary:hover {
   top: -2px;
-  box-shadow: 0 6px 0 0 #28328c, 0 0 25px rgba(88, 101, 242, 0.8);
+  box-shadow: 0 6px 0 0 #28328c, 0 0 25px rgba(88, 101, 242, 0.28);
 }
 
 .btn-primary:active {
@@ -297,12 +334,12 @@ body::before {
 .btn-gold {
   background: linear-gradient(135deg, var(--gold), #e0a800);
   color: #000;
-  box-shadow: 0 4px 0 0 #8c6e00, 0 0 15px rgba(254, 231, 92, 0.4);
+  box-shadow: 0 4px 0 0 #8c6e00, 0 0 15px rgba(254, 231, 92, 0.16);
 }
 
 .btn-gold:hover {
   top: -2px;
-  box-shadow: 0 6px 0 0 #8c6e00, 0 0 25px rgba(254, 231, 92, 0.7);
+  box-shadow: 0 6px 0 0 #8c6e00, 0 0 25px rgba(254, 231, 92, 0.25);
 }
 
 .btn-gold:active {
@@ -318,7 +355,7 @@ body::before {
 
 .btn-danger:hover {
   top: -2px;
-  box-shadow: 0 6px 0 0 #8a2123, 0 0 15px rgba(237, 66, 69, 0.5);
+  box-shadow: 0 6px 0 0 #8a2123, 0 0 15px rgba(237, 66, 69, 0.2);
 }
 
 .btn-danger:active {
@@ -386,10 +423,14 @@ body::before {
   }
 }
 
-#page-home { display: none; }
+/* Default: toko tampil langsung tanpa perlu login (guest browsing).
+   page-auth default disembunyikan; JS yang menampilkannya lewat
+   showPage('auth', ...) saat tombol Masuk/Daftar ditekan, atau saat
+   sesi login butuh verifikasi OTP. */
+#page-home { display: block; }
 
 #page-auth {
-  display: flex;
+  display: none;
   min-height: calc(100vh - 62px);
   align-items: center;
   justify-content: center;
@@ -415,7 +456,7 @@ body::before {
 }
 
 .section-title {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 800;
   font-size: 20px;
   letter-spacing: 0.05em;
@@ -444,6 +485,7 @@ body::before {
 
 .banner-content {
   position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -454,12 +496,25 @@ body::before {
   box-sizing: border-box;
 }
 
+/* Three.js hero visual — satu objek abstrak low-poly, ambient, di
+   belakang teks (z-index 0), murni dekoratif (aria-hidden). Lihat
+   initHero3D() di index.html. */
+.hero-three-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
 .banner-grid {
   position: absolute;
   inset: 0;
   background-image: 
-    linear-gradient(rgba(0, 240, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.08) 1px, transparent 1px);
+    linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
   background-size: 24px 24px;
   pointer-events: none;
 }
@@ -533,14 +588,14 @@ body::before {
 }
 
 .store-name {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 900;
   font-size: clamp(22px, 2.1vw, 38px);
   letter-spacing: 0.05em;
   color: #fff;
   line-height: 1.2;
   text-transform: uppercase;
-  text-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+  text-shadow: 0 0 15px rgba(0, 240, 255, 0.22);
 }
 
 .store-tagline {
@@ -557,7 +612,7 @@ body::before {
   gap: 4px;
   padding: clamp(3px, 0.3vw, 5px) clamp(10px, 1vw, 14px);
   border-radius: 100px;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: clamp(9.5px, 0.7vw, 12px);
   font-weight: 800;
   letter-spacing: 0.05em;
@@ -565,11 +620,14 @@ body::before {
   white-space: nowrap;
 }
 
-.badge-blue { background: rgba(0, 240, 255, 0.12); border-color: rgba(0, 240, 255, 0.4); color: var(--neon-cyan); }
+.badge-blue { background: rgba(0, 240, 255, 0.12); border-color: rgba(0, 240, 255, 0.16); color: var(--neon-cyan); }
 .badge-purple { background: rgba(171, 0, 255, 0.12); border-color: rgba(171, 0, 255, 0.4); color: #d680ff; }
-.badge-gold { background: rgba(254, 231, 92, 0.12); border-color: rgba(254, 231, 92, 0.4); color: var(--gold); }
+.badge-gold { background: rgba(254, 231, 92, 0.12); border-color: rgba(254, 231, 92, 0.16); color: var(--gold); }
 
 .social-btns { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+
+/* Magnetic pull target (desktop-only JS in index.html) — smooth settle. */
+.magnetic-el { transition: transform 0.2s ease-out; }
 
 .social-btn {
   display: inline-flex;
@@ -588,7 +646,7 @@ body::before {
 
 .social-btn-wa {
   background: rgba(87, 242, 135, 0.15);
-  border-color: rgba(87, 242, 135, 0.4);
+  border-color: rgba(87, 242, 135, 0.16);
   color: var(--success);
 }
 
@@ -596,12 +654,12 @@ body::before {
   background: var(--success);
   color: #000;
   transform: translateY(-2px);
-  box-shadow: 0 5px 0 0 #05080e, 0 0 15px rgba(87, 242, 135, 0.5);
+  box-shadow: 0 5px 0 0 #05080e, 0 0 15px rgba(87, 242, 135, 0.2);
 }
 
 .social-btn-ig {
   background: rgba(235, 69, 158, 0.15);
-  border-color: rgba(235, 69, 158, 0.4);
+  border-color: rgba(235, 69, 158, 0.16);
   color: #eb459e;
 }
 
@@ -609,7 +667,7 @@ body::before {
   background: #eb459e;
   color: #fff;
   transform: translateY(-2px);
-  box-shadow: 0 5px 0 0 #05080e, 0 0 15px rgba(235, 69, 158, 0.5);
+  box-shadow: 0 5px 0 0 #05080e, 0 0 15px rgba(235, 69, 158, 0.2);
 }
 
 /* =====================================================================
@@ -633,7 +691,7 @@ body::before {
 
 .music-label {
   display: none;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.1em;
@@ -675,7 +733,7 @@ body::before {
 }
 
 .music-title {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 12px;
   font-weight: 700;
   color: #fff;
@@ -724,7 +782,7 @@ body::before {
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--neon-cyan);
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
@@ -750,18 +808,16 @@ body::before {
 .track-item.active { background: rgba(0, 240, 255, 0.2); color: var(--neon-cyan); font-weight: 700; }
 
 /* =====================================================================
-   DASHBOARD TABS (STICKY DI ATAS VIEWPORT SAAT DISCROLL)
+   DASHBOARD TABS (NORMAL DOCUMENT FLOW — ikut naik saat discroll,
+   TIDAK sticky dan TIDAK fixed, sesuai permintaan)
    ===================================================================== */
-/* Navbar sudah bukan fixed lagi, jadi tab dashboard menempel ke paling
-   atas viewport (bukan lagi di bawah navbar) saat discroll. */
 .home-dashboard-nav {
-  position: sticky;
-  top: 0;
+  position: static;
   z-index: 900;
-  background: rgba(11, 16, 29, 0.95);
+  background: rgba(13, 15, 21, 0.95);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+  border-bottom: 1px solid var(--border);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -775,7 +831,7 @@ body::before {
   align-items: center;
   gap: 8px;
   padding: 14px 16px;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 12px;
   font-weight: 700;
   color: var(--text2);
@@ -801,7 +857,7 @@ body::before {
 .cat-tab {
   padding: 8px 16px;
   border-radius: 10px;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
@@ -832,10 +888,10 @@ body::before {
 
 .product-card {
   background: var(--surface);
-  border: 1px solid rgba(88, 101, 242, 0.3);
+  border: 1px solid var(--border);
   border-radius: 18px;
   overflow: hidden;
-  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  transition: opacity 0.75s var(--ease-premium), transform 0.25s var(--ease-premium), box-shadow 0.25s var(--ease-premium), border-color 0.25s ease, background 0.25s ease;
   cursor: pointer;
   position: relative;
   display: flex;
@@ -845,9 +901,15 @@ body::before {
 }
 
 .product-card:hover {
-  transform: translateY(-6px) scale(1.02);
-  border-color: var(--neon-cyan);
-  box-shadow: 0 14px 0 0 #05080e, 0 20px 35px rgba(0, 240, 255, 0.3);
+  transform: translateY(-4px);
+  border-color: rgba(111, 227, 212, 0.35);
+  background: var(--surface2);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(111, 227, 212, 0.15);
+}
+
+.product-card:hover .product-thumb,
+.product-card:hover .product-thumb-placeholder {
+  transform: scale(1.04);
 }
 
 .product-thumb, .product-thumb-placeholder {
@@ -859,6 +921,7 @@ body::before {
   justify-content: center;
   background: var(--bg2);
   color: var(--text3);
+  transition: transform 0.35s var(--ease-premium);
 }
 
 .product-badge {
@@ -867,7 +930,7 @@ body::before {
   right: 6px;
   padding: 3px 8px;
   border-radius: 6px;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 8.5px;
   font-weight: 800;
   background: rgba(254, 231, 92, 0.2);
@@ -911,7 +974,7 @@ body::before {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 8.5px;
   font-weight: 800;
   padding: 3px 8px;
@@ -947,7 +1010,7 @@ body::before {
 }
 
 .product-price {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 12px;
   font-weight: 800;
   color: var(--neon-cyan);
@@ -956,7 +1019,7 @@ body::before {
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.16);
 }
 
 .product-price span {
@@ -971,7 +1034,7 @@ body::before {
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #fff;
   border-radius: 8px;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 10px;
   font-weight: 800;
   cursor: pointer;
@@ -1032,7 +1095,7 @@ body::before {
 }
 
 .membership-tier {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.15em;
@@ -1043,9 +1106,9 @@ body::before {
 .membership-tier-owner { color: var(--gold); }
 
 .membership-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: #fff; }
-.membership-price { font-family: 'Orbitron', sans-serif; font-size: 30px; font-weight: 900; margin: 12px 0; }
+.membership-price { font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 900; margin: 12px 0; }
 .membership-price-reseller { color: var(--neon-cyan); text-shadow: var(--glow-cyan); }
-.membership-price-owner { color: var(--gold); text-shadow: 0 0 15px rgba(254, 231, 92, 0.5); }
+.membership-price-owner { color: var(--gold); text-shadow: 0 0 15px rgba(254, 231, 92, 0.2); }
 
 .membership-benefits { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
 .membership-benefits li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--text2); }
@@ -1149,7 +1212,7 @@ body::before {
   justify-content: space-between;
   font-size: 9.5px;
   color: var(--text3);
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .volume-wrap {
@@ -1197,7 +1260,7 @@ body::before {
 .track-num {
   width: 18px;
   flex-shrink: 0;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 10px;
   color: var(--text3);
 }
@@ -1262,7 +1325,7 @@ body::before {
 
 .order-status-chip {
   flex-shrink: 0;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -1368,7 +1431,7 @@ body::before {
 }
 
 .auth-logo {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 900;
   font-size: 22px;
   letter-spacing: 0.1em;
@@ -1389,13 +1452,22 @@ body::before {
   margin-bottom: 20px;
 }
 
-.auth-tabs { display: flex; background: var(--bg2); border-radius: 12px; padding: 4px; margin-bottom: 20px; border: 1px solid var(--border); }
-.auth-tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; cursor: pointer; color: var(--text2); border: none; background: transparent; }
-.auth-tab.active { background: var(--surface); color: var(--neon-cyan); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); }
+.auth-switch {
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--text2);
+  margin-top: 16px;
+}
+.auth-switch a { color: var(--neon-cyan); font-weight: 700; text-decoration: none; }
+.auth-switch a:hover { text-decoration: underline; }
+
+.auth-back { text-align: center; margin-top: 10px; }
+.auth-back a { font-size: 12px; color: var(--text3); text-decoration: none; }
+.auth-back a:hover { color: var(--text2); }
 
 .field-group { display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; }
 .field { display: flex; flex-direction: column; gap: 6px; }
-.field label { font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 800; color: var(--text2); letter-spacing: 0.05em; }
+.field label { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 800; color: var(--text2); letter-spacing: 0.05em; }
 
 .field input {
   background: var(--bg2);
@@ -1440,7 +1512,7 @@ body::before {
   box-shadow: 0 20px 0 0 #05080e, 0 30px 60px rgba(0, 0, 0, 0.9), var(--glow-cyan);
 }
 
-.modal-title, .ann-popup-title { font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 800; color: #fff; }
+.modal-title, .ann-popup-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 800; color: #fff; }
 .modal-close, .ann-close-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); flex-shrink: 0; }
 .modal-close:hover, .ann-close-btn:hover { background: var(--danger); color: #fff; }
 
@@ -1479,7 +1551,7 @@ body::before {
   gap: 4px;
   padding: 3px 9px;
   border-radius: 100px;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -1569,7 +1641,7 @@ body::before {
   border: 1px solid var(--neon-cyan);
   border-radius: 14px;
   padding: 12px 20px;
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 12px;
   font-weight: 700;
   color: #fff;
@@ -1785,7 +1857,7 @@ body::before {
 }
 
 .payment-info-amount {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 800;
   font-size: 18px;
   color: var(--neon-cyan);
@@ -1801,7 +1873,7 @@ body::before {
 }
 
 .payment-info-countdown {
-  font-family: 'Orbitron', sans-serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
   font-size: 16px;
   color: var(--accent);
