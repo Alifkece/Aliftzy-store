@@ -92,7 +92,10 @@ onAuthStateChanged(auth, async user => {
     stopOtpCountdown();
     if (stockPollTimer) { clearInterval(stockPollTimer); stockPollTimer = null; }
     updateNavUI();
-    showPage('auth', 'login');
+    // Guest: langsung tampilkan toko, tidak dipaksa ke halaman login dulu.
+    // Order/checkout tetap minta login sendiri lewat guard di orderProduct/goOrder.
+    showPage('home');
+    loadPublicData();
   }
 });
 
@@ -318,16 +321,16 @@ function showPage(page, sub) {
   if (otpPageEl) otpPageEl.style.display = 'none';
 
   if (page === 'home') {
-    if (!currentUser) { showPage('auth', 'login'); return; }
-    if (!otpVerified) { showPage('otp'); return; }
+    // Toko bisa dijelajahi tanpa login. Kalau user sudah login tapi
+    // sesinya belum lolos OTP, tetap wajib selesaikan OTP dulu.
+    if (currentUser && !otpVerified) { showPage('otp'); return; }
     document.getElementById('page-home').style.display = 'block';
     updateSettingsPanel();
     resizeHomeSlider();
   }
   if (page === 'auth') {
     document.getElementById('page-auth').style.display = 'flex';
-    if (sub) switchAuthTab(sub);
-    document.getElementById('auth-back-home').style.display = currentUser ? 'block' : 'none';
+    switchAuthTab(sub || 'login');
   }
   if (page === 'otp' && otpPageEl) {
     otpPageEl.style.display = 'flex';
@@ -369,10 +372,8 @@ document.addEventListener('click', e => {
 
 // ===== AUTH =====
 function switchAuthTab(tab) {
-  document.getElementById('auth-login').style.display = tab === 'login' ? 'block' : 'none';
-  document.getElementById('auth-register').style.display = tab === 'register' ? 'block' : 'none';
-  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
-  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('auth-view-login').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('auth-view-register').style.display = tab === 'register' ? 'block' : 'none';
 }
 
 async function handleLogin() {
@@ -1562,7 +1563,6 @@ function initParticles() {
 
 // Init on page load
 document.addEventListener('DOMContentLoaded', () => {
-  initParticles();
   initScrollReveal();
 });
 
