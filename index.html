@@ -34,7 +34,6 @@
 
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
-<div class="bg-particles" id="bg-particles"></div>
 
 <div class="notif" id="notif"><span id="notif-text"></span></div>
 
@@ -43,7 +42,10 @@
   <div class="nav-inner">
     <a class="nav-logo" href="#" onclick="showPage('home')">ALIFTZY STORE</a>
     <div class="nav-spacer"></div>
-    <div class="nav-auth" id="nav-auth" style="display:none;"></div>
+    <div class="nav-auth hidden" id="nav-auth">
+      <button class="nav-auth-btn nav-auth-btn-ghost" onclick="showPage('auth','login')">Masuk</button>
+      <button class="nav-auth-btn nav-auth-btn-primary magnetic-el" onclick="showPage('auth','register')">Daftar</button>
+    </div>
     <div class="nav-bell hidden" id="nav-bell" onclick="openAnnPopup()" title="Pemberitahuan">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <div class="nav-bell-dot" id="nav-bell-dot"></div>
@@ -102,14 +104,15 @@
   <!-- HERO BANNER -->
   <div class="hero-banner">
     <div class="banner-ratio" id="banner-bg">
+      <canvas id="hero-three" class="hero-three-canvas" aria-hidden="true"></canvas>
       <div class="banner-grid"></div>
       <div class="banner-glow-left"></div>
       <div class="banner-glow-right"></div>
       <div class="banner-content">
         <div class="banner-inner">
           
-          <div class="store-avatar" id="-wrap">
-            
+          <div class="store-avatar" id="-wrap" data-hero="visual">
+
             <video autoplay loop muted playsinline style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1;">
               <source src="https://smail.my.id/cloud/mOXyBUbl1" type="video/mp4">
             </video>
@@ -123,10 +126,10 @@
           </div>
 
 
-          <div class="store-info reveal-left">
-            <div class="store-name">WELCOME MY STORE</div>
-            <div class="store-tagline">Premium App Subscription — Terpercaya dan Bergaransi</div>
-            <div class="store-badges d-flex flex-wrap">
+          <div class="store-info">
+            <div class="store-name" data-hero="heading">WELCOME MY STORE</div>
+            <div class="store-tagline" data-hero="sub">Premium App Subscription — Terpercaya dan Bergaransi</div>
+            <div class="store-badges d-flex flex-wrap" data-hero="badges">
               <span class="badge badge-blue">
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 Bergaransi
@@ -140,13 +143,13 @@
                 Open Reseller
               </span>
             </div>
-            <div class="social-btns d-flex flex-wrap">
+            <div class="social-btns d-flex flex-wrap" data-hero="cta">
               <!-- GANTI LINK WA DAN IG DI SINI -->
-              <a class="social-btn social-btn-wa" href="https://whatsapp.com/channel/0029VbAbqrkBvvseV1Cpk73p" target="_blank" rel="noopener">
+              <a class="social-btn social-btn-wa magnetic-el" href="https://whatsapp.com/channel/0029VbAbqrkBvvseV1Cpk73p" target="_blank" rel="noopener">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.555 4.122 1.524 5.855L0 24l6.335-1.508A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.891 0-3.659-.498-5.191-1.371l-.372-.22-3.861.919.976-3.768-.242-.388A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
                 Saluran WA
               </a>
-              <a class="social-btn social-btn-ig" href="https://instagram.com/stwrbry20" target="_blank" rel="noopener">
+              <a class="social-btn social-btn-ig magnetic-el" href="https://instagram.com/stwrbry20" target="_blank" rel="noopener">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                 Instagram
               </a>
@@ -382,14 +385,14 @@
 
 
 <!-- ===== AUTH PAGE ===== -->
+<!-- Login dan Daftar dipisah jadi dua "layar" sendiri-sendiri (bukan satu
+     kartu dengan tab switcher) — showPage('auth','login'|'register')
+     langsung menampilkan layar yang dimaksud lewat switchAuthTab(). -->
 <div id="page-auth" style="position:fixed;inset:0;overflow:hidden;align-items:center;justify-content:center;padding:16px;">
-  <div class="auth-card" style="max-height:100%;overflow-y:auto;">
+
+  <div class="auth-card" id="auth-view-login" style="max-height:100%;overflow-y:auto;">
     <div class="auth-logo">ALIFTZY STORE</div>
-    <div class="auth-subtitle">Masuk atau daftar untuk mulai berbelanja</div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Masuk</button>
-      <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Daftar</button>
-    </div>
+    <div class="auth-subtitle">Masuk untuk melanjutkan belanja</div>
 
     <div id="auth-login">
       <div class="field-group">
@@ -402,7 +405,22 @@
       </button>
     </div>
 
-    <div id="auth-register" style="display:none;">
+    <button type="button" class="btn-google-auth full-btn" id="btn-google-login" onclick="handleGoogleLogin()">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.84 2.09-1.79 2.73v2.27h2.9c1.7-1.56 2.69-3.87 2.69-6.64z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.17l-2.9-2.27c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.96v2.34C2.44 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 013.67 9c0-.59.1-1.17.28-1.7V4.96H.96A9 9 0 000 9c0 1.45.35 2.83.96 4.04l2.99-2.34z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l2.99 2.34C4.66 5.17 6.65 3.58 9 3.58z"/></svg>
+      <span>Masuk dengan Google</span>
+    </button>
+
+    <div class="auth-switch">Belum punya akun? <a href="#" onclick="event.preventDefault();switchAuthTab('register')">Daftar</a></div>
+    <div class="auth-back" id="auth-back-home-login">
+      <a href="#" onclick="event.preventDefault();showPage('home')">Kembali ke Toko</a>
+    </div>
+  </div>
+
+  <div class="auth-card" id="auth-view-register" style="max-height:100%;overflow-y:auto;display:none;">
+    <div class="auth-logo">ALIFTZY STORE</div>
+    <div class="auth-subtitle">Buat akun baru untuk mulai berbelanja</div>
+
+    <div id="auth-register">
       <div class="field-group">
         <div class="field"><label>Nama</label><input type="text" id="reg-name" placeholder="Nama lengkap" autocomplete="name"></div>
         <div class="field"><label>Email</label><input type="email" id="reg-email" placeholder="nama@email.com" autocomplete="email"></div>
@@ -415,15 +433,12 @@
       </button>
     </div>
 
-    <button type="button" class="btn-google-auth full-btn" id="btn-google-login" onclick="handleGoogleLogin()">
-      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.84 2.09-1.79 2.73v2.27h2.9c1.7-1.56 2.69-3.87 2.69-6.64z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.17l-2.9-2.27c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.96v2.34C2.44 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 013.67 9c0-.59.1-1.17.28-1.7V4.96H.96A9 9 0 000 9c0 1.45.35 2.83.96 4.04l2.99-2.34z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l2.99 2.34C4.66 5.17 6.65 3.58 9 3.58z"/></svg>
-      <span>Masuk dengan Google</span>
-    </button>
-
-    <div class="auth-back" id="auth-back-home" style="display:none;">
-      <a href="#" onclick="showPage('home')">Kembali ke Toko</a>
+    <div class="auth-switch">Sudah punya akun? <a href="#" onclick="event.preventDefault();switchAuthTab('login')">Masuk</a></div>
+    <div class="auth-back" id="auth-back-home-register">
+      <a href="#" onclick="event.preventDefault();showPage('home')">Kembali ke Toko</a>
     </div>
   </div>
+
 </div>
 
 <!-- ===== OTP VERIFICATION PAGE (2-step login) ===== -->
@@ -486,6 +501,147 @@
 
 <!-- Logic aplikasi dipisah ke js/ — lihat js/firebase-config.js dan js/app.js -->
 <script type="module" src="js/app.js"></script>
+
+<!-- GSAP — dipakai TERBATAS untuk hero entrance choreography + parallax
+     halus pada visual hero (lihat script di bawah). Tidak menyentuh
+     sistem scroll-reveal (.reveal/.reveal-left/.reveal-right) yang
+     sudah ada di js/app.js — itu tetap dipakai apa adanya. -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script type="module">
+(function(){
+  function playHero(){
+    var wrap = document.getElementById('page-home');
+    var av = document.querySelector('[data-hero="visual"]');
+    var heading = document.querySelector('[data-hero="heading"]');
+    var sub = document.querySelector('[data-hero="sub"]');
+    var badges = document.querySelector('[data-hero="badges"]');
+    var cta = document.querySelector('[data-hero="cta"]');
+    if (!heading || !wrap || wrap.style.display === 'none' || window.__aliftzyHeroPlayed) return;
+    window.__aliftzyHeroPlayed = true;
+
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!window.gsap || reduced) return; // markup is visible by default — no JS, no problem
+
+    gsap.set(av, { opacity: 0, scale: 0.92, y: 14 });
+    gsap.set([heading, sub, badges, cta], { opacity: 0, y: 22 });
+
+    var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    tl.to(heading, { opacity: 1, y: 0, duration: 0.65 })
+      .to(sub, { opacity: 1, y: 0, duration: 0.5 }, '-=0.32')
+      .to(badges, { opacity: 1, y: 0, duration: 0.45 }, '-=0.28')
+      .to(cta, { opacity: 1, y: 0, duration: 0.45 }, '-=0.28')
+      .to(av, { opacity: 1, scale: 1, y: 0, duration: 0.75, ease: 'back.out(1.5)' }, '-=0.5');
+
+    // Subtle scroll parallax on the hero visual — desktop only, transform-only (cheap).
+    if (window.ScrollTrigger && window.matchMedia('(min-width: 1024px)').matches) {
+      gsap.registerPlugin(ScrollTrigger);
+      gsap.to(av, {
+        y: 26,
+        ease: 'none',
+        scrollTrigger: { trigger: '.hero-banner', start: 'top top', end: 'bottom top', scrub: true }
+      });
+    }
+  }
+
+  // Magnetic pull — desktop pointer only, disabled on touch per spec.
+  function initMagnetic(){
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    document.querySelectorAll('.magnetic-el').forEach(function(el){
+      el.addEventListener('mousemove', function(e){
+        var r = el.getBoundingClientRect();
+        var x = (e.clientX - r.left - r.width / 2) * 0.25;
+        var y = (e.clientY - r.top - r.height / 2) * 0.35;
+        el.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+      });
+      el.addEventListener('mouseleave', function(){ el.style.transform = ''; });
+    });
+  }
+
+  // Hero should only ever play once the home page is actually on screen
+  // (post-login), so we wrap the existing global showPage instead of
+  // duplicating its navigation logic.
+  var _showPage = window.showPage;
+  if (typeof _showPage === 'function') {
+    window.showPage = function(page, sub){
+      _showPage(page, sub);
+      if (page === 'home') requestAnimationFrame(playHero);
+    };
+  }
+
+  // Satu objek 3D abstrak, purposeful, di belakang teks hero — bukan
+  // "spinning sphere generik penuh layar". Auto-rotate pelan + parallax
+  // mouse tipis di desktop; di mobile hanya auto-rotate (tanpa mouse
+  // tracking). prefers-reduced-motion -> render 1 frame statis, tanpa loop.
+  function initHero3D(){
+    var canvas = document.getElementById('hero-three');
+    if (!canvas || !window.THREE || !window.WebGLRenderingContext) return;
+
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var isDesktop = window.matchMedia('(min-width: 1024px) and (hover: hover) and (pointer: fine)').matches;
+
+    var renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+    } catch (e) { return; }
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+    camera.position.z = 6;
+
+    var geo = new THREE.IcosahedronGeometry(1.7, 1);
+    var mat = new THREE.MeshStandardMaterial({ color: 0x6fe3d4, wireframe: true, transparent: true, opacity: 0.5 });
+    var mesh = new THREE.Mesh(geo, mat);
+    scene.add(mesh);
+
+    var key = new THREE.PointLight(0x6fe3d4, 1.4);
+    key.position.set(3, 3, 4);
+    scene.add(key);
+    scene.add(new THREE.AmbientLight(0x404040, 1.2));
+
+    function resize(){
+      var parent = canvas.parentElement;
+      var w = parent.clientWidth, h = parent.clientHeight;
+      if (!w || !h) return;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    if (reduced) {
+      mesh.rotation.set(0.4, 0.6, 0);
+      renderer.render(scene, camera);
+      return;
+    }
+
+    var targetX = 0, targetY = 0;
+    if (isDesktop) {
+      window.addEventListener('mousemove', function(e){
+        targetX = (e.clientX / window.innerWidth - 0.5) * 0.7;
+        targetY = (e.clientY / window.innerHeight - 0.5) * 0.7;
+      });
+    }
+
+    (function animate(){
+      mesh.rotation.y += 0.0022;
+      mesh.rotation.x += 0.0007;
+      mesh.position.x += (targetX - mesh.position.x) * 0.03;
+      mesh.position.y += (-targetY - mesh.position.y) * 0.03;
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    })();
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    initMagnetic();
+    initHero3D();
+  });
+})();
+</script>
 
 
 <!-- ===== ANNOUNCEMENT POPUP ===== -->
