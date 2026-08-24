@@ -491,6 +491,9 @@ function showOtpPage(user) {
   if (codeInput) codeInput.value = '';
   const errEl = document.getElementById('otp-error');
   if (errEl) errEl.style.display = 'none';
+  // UI 6 slot OTP (js/otp-slots.js) — reset tampilan slot & fokus ke slot
+  // pertama. Defensif: kalau file itu tak termuat, tidak berpengaruh.
+  if (typeof window.otpSlotsReset === 'function') window.otpSlotsReset();
   showPage('otp');
 }
 
@@ -562,10 +565,14 @@ async function handleVerifyOtp() {
 
   if (!/^\d{6}$/.test(code)) {
     if (errEl) { errEl.textContent = 'Masukkan 6 digit kode yang valid.'; errEl.style.display = 'block'; }
+    if (typeof window.otpSlotsError === 'function') window.otpSlotsError();
     return;
   }
 
   if (btn) { btn.innerHTML = '<div class="spinner"></div>'; btn.disabled = true; }
+  // UI 6 slot OTP: kunci slot + animasi orbit verifying. Murni tampilan,
+  // tidak mempengaruhi request/response di bawah ini.
+  if (typeof window.otpSlotsSetVerifying === 'function') window.otpSlotsSetVerifying(true);
   try {
     const idToken = await currentUser.getIdToken();
     const res = await fetch('/api/auth/verify-otp', {
@@ -578,12 +585,20 @@ async function handleVerifyOtp() {
     if (!res.ok || !data.success) {
       if (errEl) { errEl.textContent = data.error || 'Kode verifikasi salah.'; errEl.style.display = 'block'; }
       if (codeInput) codeInput.value = '';
+      if (typeof window.otpSlotsError === 'function') window.otpSlotsError();
     } else {
       sessionStorage.removeItem('otpRequested_' + currentUser.uid);
       sessionStorage.removeItem('otpEmailMasked_' + currentUser.uid);
       sessionStorage.removeItem('otpNextResendAt_' + currentUser.uid);
       stopOtpCountdown();
       showNotif('Berhasil masuk', 'success');
+      // Animasi sukses singkat (kalau UI slot tersedia) SEBELUM pindah
+      // halaman, supaya transisi tidak terasa kasar/tiba-tiba. Sepenuhnya
+      // tampilan — tidak menunda atau mengubah verifikasi itu sendiri,
+      // yang sudah selesai di atas.
+      if (typeof window.otpSlotsSuccess === 'function') {
+        try { await window.otpSlotsSuccess(); } catch (e) { /* abaikan, jangan blokir redirect */ }
+      }
       // Backend sudah menandai sesi login ini verified (verifiedAuthTime),
       // panggil ulang runOtpGate untuk konfirmasi lewat check-session lalu
       // baru buka halaman utama.
@@ -591,8 +606,10 @@ async function handleVerifyOtp() {
     }
   } catch (e) {
     if (errEl) { errEl.textContent = 'Gagal memverifikasi kode. Cek koneksi Anda.'; errEl.style.display = 'block'; }
+    if (typeof window.otpSlotsError === 'function') window.otpSlotsError();
   }
   if (btn) { btn.innerHTML = '<span>Verifikasi</span>'; btn.disabled = false; }
+  if (typeof window.otpSlotsSetVerifying === 'function') window.otpSlotsSetVerifying(false);
 }
 
 async function handleResendOtp() {
