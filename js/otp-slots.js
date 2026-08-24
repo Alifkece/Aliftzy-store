@@ -26,10 +26,15 @@
   var slots = [];
   var hiddenInput = null;
   var wrap = null;
-  var orbit = null;
+  var stage = null;
+  var hub = null;
   var errorResetTimer = null;
+  var animGen = 0; // dinaikkan tiap reset supaya loop rAF lama berhenti sendiri
 
   function byId(id) { return document.getElementById(id); }
+  function prefersReducedMotion() {
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
 
   function init() {
     wrap = byId('otp-slots');
@@ -38,7 +43,8 @@
     if (!slots.length) return;
 
     hiddenInput = byId('otp-code');
-    orbit = byId('otp-orbit');
+    stage = byId('otp-stage');
+    hub = byId('otp-hub');
 
     slots.forEach(function (input, idx) {
       input.addEventListener('input', function (e) { onSlotInput(input, idx, e); });
@@ -148,16 +154,147 @@
 
   // ---- Hook opsional yang dipanggil dari js/app.js (defensif) ----
 
+  // ---- Orbit sukses: kotak OTP itu sendiri yang mengorbit -------------
+  // Dipanggil hanya setelah backend menyatakan kode BENAR (lihat
+  // handleVerifyOtp di js/app.js). Alurnya:
+  //   1) FORM   — tiap slot bergerak dari posisi grid saat ini menuju
+  //               formasi lingkaran (FLIP-style: posisi awal diukur
+  //               dulu lewat getBoundingClientRect, jadi transisinya
+  //               smooth, bukan teleport).
+  //   2) SPIN   — keenam slot berputar bersama mengelilingi #otp-hub
+  //               tepat satu putaran penuh (360°), lalu berhenti persis
+  //               di formasi yang sama (tidak ada snap/jump).
+  //   3) SETTLE — glow sukses per-slot + hub berubah jadi centang.
+  // Hanya `translate()` yang dipakai pada tiap slot (posisi dihitung
+  // ulang tiap frame dari sudut+radius) — bukan `rotate()` pada elemen
+  // slot itu sendiri — sehingga angka di dalamnya otomatis tetap
+  // upright/terbaca sepanjang animasi (setara efek counter-rotation).
+  function computeOrbitMetrics() {
+    var stageRect = stage.getBoundingClientRect();
+    var slotRect = slots[0].getBoundingClientRect();
+    var slotSize = Math.max(slotRect.width, slotRect.height, 38);
+    var available = Math.min(stageRect.width, 232); // batas atas ukuran orbit
+    var size = Math.max(150, available); // stage jadi persegi seukuran ini
+    var radius = Math.max(36, size / 2 - slotSize / 2 - 10);
+    return { size: size, radius: radius };
+  }
+
+  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+  function easeInOutCubic(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+
+  function runOrbitSuccessSequence(resolve) {
+    var myGen = animGen;
+    var stageRect = stage.getBoundingClientRect();
+    var centerX = stageRect.left + stageRect.width / 2;
+    var centerY = stageRect.top + stageRect.height / 2;
+
+    // 1. Ukur posisi tiap slot SEKARANG (masih dalam grid biasa) relatif
+    //    ke titik tengah stage — ini titik awal animasi FLIP.
+    var startOffsets = slots.map(function (s) {
+      var r = s.getBoundingClientRect();
+      return { x: (r.left + r.width / 2) - centerX, y: (r.top + r.height / 2) - centerY };
+    });
+
+    // 2. Kunci tinggi stage ke nilai px saat ini supaya transisi tinggi
+    //    berikutnya (ke ukuran orbit) punya titik awal yang jelas.
+    stage.style.height = stageRect.height + 'px';
+    void stage.offsetHeight; // reflow
+
+    wrap.classList.add('is-orbit-mode');
+    var metrics = computeOrbitMetrics();
+    var targetAngles = slots.map(function (_, idx) { return (idx * 60 - 90) * Math.PI / 180; });
+
+    slots.forEach(function (s, idx) {
+      s.style.transform = 'translate(-50%,-50%) translate(' + startOffsets[idx].x + 'px,' + startOffsets[idx].y + 'px)';
+    });
+
+    stage.classList.add('is-orbiting');
+    requestAnimationFrame(function () {
+      if (myGen !== animGen) return;
+      stage.style.height = metrics.size + 'px';
+    });
+
+    if (prefersReducedMotion()) {
+      // Langsung ke formasi akhir + sukses, tanpa animasi bertahap.
+      slots.forEach(function (s, idx) {
+        var x = Math.cos(targetAngles[idx]) * metrics.radius;
+        var y = Math.sin(targetAngles[idx]) * metrics.radius;
+        s.style.transform = 'translate(-50%,-50%) translate(' + x + 'px,' + y + 'px)';
+      });
+      settleSuccess(myGen, resolve);
+      return;
+    }
+
+    var FORM_MS = 550;
+    var formStart = null;
+    function formStep(now) {
+      if (myGen !== animGen) return;
+      if (formStart === null) formStart = now;
+      var t = Math.min(1, (now - formStart) / FORM_MS);
+      var e = easeOutCubic(t);
+      slots.forEach(function (s, idx) {
+        var tx = startOffsets[idx].x * (1 - e) + Math.cos(targetAngles[idx]) * metrics.radius * e;
+        var ty = startOffsets[idx].y * (1 - e) + Math.sin(targetAngles[idx]) * metrics.radius * e;
+        s.style.transform = 'translate(-50%,-50%) translate(' + tx + 'px,' + ty + 'px)';
+      });
+      if (t < 1) {
+        requestAnimationFrame(formStep);
+      } else {
+        startSpinPhase(myGen, metrics, targetAngles, resolve);
+      }
+    }
+    requestAnimationFrame(formStep);
+  }
+
+  function startSpinPhase(myGen, metrics, targetAngles, resolve) {
+    var SPIN_MS = 900;
+    var spinStart = null;
+    function spinStep(now) {
+      if (myGen !== animGen) return;
+      if (spinStart === null) spinStart = now;
+      var t = Math.min(1, (now - spinStart) / SPIN_MS);
+      var e = easeInOutCubic(t);
+      var spinAngle = e * Math.PI * 2; // tepat 1 putaran penuh -> settle tanpa snap
+      slots.forEach(function (s, idx) {
+        var a = targetAngles[idx] + spinAngle;
+        var x = Math.cos(a) * metrics.radius;
+        var y = Math.sin(a) * metrics.radius;
+        s.style.transform = 'translate(-50%,-50%) translate(' + x + 'px,' + y + 'px)';
+      });
+      if (t < 1) {
+        requestAnimationFrame(spinStep);
+      } else {
+        settleSuccess(myGen, resolve);
+      }
+    }
+    requestAnimationFrame(spinStep);
+  }
+
+  function settleSuccess(myGen, resolve) {
+    if (myGen !== animGen) return;
+    if (stage) stage.classList.add('is-success');
+    slots.forEach(function (s) { s.classList.add('is-orbit-success'); });
+    setTimeout(function () {
+      if (myGen !== animGen) return;
+      resolve();
+    }, 380);
+  }
+
   window.otpSlotsReset = function () {
     if (!slots.length) return;
+    animGen++; // batalkan loop rAF orbit yang mungkin masih berjalan
     clearTimeout(errorResetTimer);
     slots.forEach(function (s) {
       s.value = '';
       s.disabled = false;
-      s.classList.remove('is-filled', 'otp-pop');
+      s.classList.remove('is-filled', 'otp-pop', 'is-orbit-success');
+      s.style.transform = '';
     });
-    if (wrap) wrap.classList.remove('is-error', 'is-verifying', 'is-success');
-    if (orbit) orbit.classList.remove('is-verifying', 'is-success');
+    if (wrap) wrap.classList.remove('is-error', 'is-verifying', 'is-orbit-mode');
+    if (stage) {
+      stage.classList.remove('is-orbiting', 'is-success');
+      stage.style.height = '';
+    }
     syncHidden();
     slots[0].focus();
   };
@@ -166,7 +303,6 @@
     if (!slots.length) return;
     slots.forEach(function (s) { s.disabled = !!isVerifying; });
     if (wrap) wrap.classList.toggle('is-verifying', !!isVerifying);
-    if (orbit) orbit.classList.toggle('is-verifying', !!isVerifying);
   };
 
   window.otpSlotsError = function () {
@@ -185,9 +321,8 @@
 
   window.otpSlotsSuccess = function () {
     return new Promise(function (resolve) {
-      if (wrap) wrap.classList.add('is-success');
-      if (orbit) orbit.classList.add('is-success');
-      setTimeout(resolve, 650);
+      if (!stage || !slots.length) { resolve(); return; }
+      runOrbitSuccessSequence(resolve);
     });
   };
 
