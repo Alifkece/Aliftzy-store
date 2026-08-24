@@ -1750,111 +1750,71 @@ body::before {
   font-size: 13.5px;
   line-height: 1.6;
   color: var(--text2);
-  margin: 0 0 18px;
+  margin: 0 0 16px;
 }
 .otp-desc strong { color: #fff; }
 
 /* =====================================================================
-   OTP — BADGE ORBIT DEKORATIF
-   Aksen "hidup" di atas kartu OTP: dua cincin putus-putus berputar
-   berlawanan arah (murni transform, ringan di mobile) mengelilingi ikon
-   inti statis. TIDAK terkait dengan tata letak slot digit di bawahnya,
-   jadi tidak pernah mengganggu keterbacaan kode / memicu overflow.
-   Dinonaktifkan otomatis oleh rule prefers-reduced-motion di awal file.
+   OTP CARD — scoped tidy-up (vertical rhythm only, tidak menyentuh
+   .auth-card/.field generik supaya login & register tidak ikut berubah)
    ===================================================================== */
-.otp-orbit {
-  position: relative;
-  width: 60px;
-  height: 60px;
-  margin: 4px auto 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.otp-orbit-ring {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 1.5px dashed rgba(111, 227, 212, 0.32);
-  animation: otpOrbitSpin 13s linear infinite;
-}
-.otp-orbit-ring--outer { animation-duration: 13s; }
-.otp-orbit-ring--inner {
-  inset: 11px;
-  border-color: rgba(143, 123, 240, 0.28);
-  animation-duration: 9s;
-  animation-direction: reverse;
-}
-.otp-orbit-node {
-  position: absolute;
-  top: -2.5px;
-  left: 50%;
-  width: 5px;
-  height: 5px;
-  margin-left: -2.5px;
-  border-radius: 50%;
-  background: var(--neon-cyan);
-  box-shadow: 0 0 7px 2px rgba(111, 227, 212, 0.55);
-}
-.otp-orbit-ring--inner .otp-orbit-node { background: var(--neon-purple); box-shadow: 0 0 6px 2px rgba(143, 123, 240, 0.5); }
-.otp-orbit-core {
-  position: relative;
-  z-index: 1;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--neon-cyan);
-  animation: otpCorePulse 3.2s ease-in-out infinite;
-  transition: color 0.25s ease, border-color 0.25s ease;
-}
-.otp-orbit-icon--check { display: none; }
-
-@keyframes otpOrbitSpin { to { transform: rotate(360deg); } }
-@keyframes otpCorePulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(111, 227, 212, 0.22); }
-  50% { box-shadow: 0 0 0 6px rgba(111, 227, 212, 0); }
-}
-
-/* Verifying: cincin mempercepat putarannya + pulsa inti lebih cepat —
-   memberi rasa "sedang bekerja" tanpa elemen baru. */
-.otp-orbit.is-verifying .otp-orbit-ring--outer { animation-duration: 2.6s; }
-.otp-orbit.is-verifying .otp-orbit-ring--inner { animation-duration: 1.8s; }
-.otp-orbit.is-verifying .otp-orbit-core { animation-duration: 0.9s; }
-
-/* Success: cincin berhenti di warna sukses, ikon bertukar ke centang. */
-.otp-orbit.is-success .otp-orbit-ring { animation-play-state: paused; border-color: rgba(79, 212, 138, 0.45); }
-.otp-orbit.is-success .otp-orbit-node { background: var(--success); box-shadow: 0 0 7px 2px rgba(79, 212, 138, 0.5); }
-.otp-orbit.is-success .otp-orbit-core {
-  color: var(--success);
-  border-color: rgba(79, 212, 138, 0.4);
-  animation: otpCoreSuccessPop 0.45s var(--ease-snap);
-}
-.otp-orbit.is-success .otp-orbit-icon--mail { display: none; }
-.otp-orbit.is-success .otp-orbit-icon--check { display: block; }
-@keyframes otpCoreSuccessPop {
-  0% { transform: scale(0.8); }
-  55% { transform: scale(1.18); }
-  100% { transform: scale(1); }
-}
+.otp-card { padding: 26px 22px; }
+.otp-field { margin-bottom: 14px; }
+.otp-card .auth-error:not(:empty) { margin-bottom: 4px; }
+.otp-card .otp-resend { margin-top: 14px; }
+.otp-card .auth-back { margin-top: 12px; }
 
 /* =====================================================================
-   OTP — 6 SLOT DIGIT
+   OTP — 6 SLOT DIGIT + STAGE ORBIT
    Selector ditulis sebagai `.otp-slots .otp-slot` (bukan cuma `.otp-slot`)
    supaya spesifisitasnya sengaja melebihi rule generik `.field input`
    yang sudah ada (dipakai bareng oleh form login/register) — jadi rule
    itu tidak perlu disentuh sama sekali, dan style di sini pasti menang.
+
+   `.otp-stage` membungkus `.otp-slots` + `.otp-hub`. Dalam kondisi idle
+   ia hanya "auto height" mengikuti tinggi baris 6 slot (grid biasa, TIDAK
+   ada orbit). Begitu OTP benar, js/otp-slots.js:
+     1) mengunci tinggi stage ke nilai px saat ini (supaya bisa transisi),
+     2) menambah class `is-orbit-mode` pada .otp-slots — slot lepas dari
+        grid dan jadi position:absolute di dalam stage,
+     3) menghitung ulang metrik lingkaran lalu meng-animasi tinggi stage
+        ke ukuran persegi orbit,
+     4) tiap frame (requestAnimationFrame) menghitung transform
+        translate(x,y) tiap slot dari posisi grid awal menuju posisi
+        melingkar (FLIP-style, jadi bukan teleport), lalu memutarnya,
+        lalu settle. Karena hanya translate (bukan rotate) yang dipakai
+        pada elemen slot itu sendiri, angka di dalamnya otomatis tetap
+        upright walau posisinya mengorbit.
    ===================================================================== */
+.otp-stage {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 16px;
+  transition: height 0.55s cubic-bezier(0.22, 0.98, 0.42, 1);
+}
 .otp-slots {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 6px;
   width: 100%;
+}
+/* Mode orbit: slot keluar dari grid flow, jadi bebas diposisikan lewat
+   transform yang dihitung di JS (lihat otpSlotsSuccess di otp-slots.js). */
+.otp-slots.is-orbit-mode {
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+.otp-slots.is-orbit-mode .otp-slot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(38px, 10.5vw, 48px);
+  height: clamp(38px, 10.5vw, 48px);
+  margin: 0;
 }
 .otp-slots .otp-slot {
   width: 100%;
@@ -1873,12 +1833,57 @@ body::before {
   -webkit-appearance: none;
   appearance: none;
   transition: border-color 0.2s var(--ease-premium), box-shadow 0.2s var(--ease-premium),
-              transform 0.15s var(--ease-snap), background 0.2s ease, color 0.2s ease;
+              background 0.2s ease, color 0.2s ease;
 }
 .otp-slots .otp-slot:focus { border-color: var(--neon-cyan); box-shadow: var(--glow-cyan); background: var(--surface2); transform: translateY(-2px); }
+.otp-slots.is-orbit-mode .otp-slot:focus { box-shadow: none; }
 .otp-slots .otp-slot.is-filled { border-color: rgba(111, 227, 212, 0.45); background: var(--surface2); }
 .otp-slots .otp-slot:disabled { opacity: 0.85; cursor: default; }
 .otp-slots .otp-slot::selection { background: rgba(111, 227, 212, 0.35); }
+
+/* Titik pusat orbit ("hub"). Tersembunyi total saat idle, muncul halus
+   begitu stage masuk mode orbit, lalu berubah jadi indikator sukses
+   (centang) saat verifikasi selesai. */
+.otp-hub {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: var(--neon-cyan);
+  box-shadow: 0 0 10px 3px rgba(111, 227, 212, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #04120e;
+  opacity: 0;
+  transform: scale(0.4);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s var(--ease-snap), width 0.3s var(--ease-snap),
+              height 0.3s var(--ease-snap), margin 0.3s var(--ease-snap), background 0.25s ease, box-shadow 0.25s ease;
+}
+.otp-hub-check { display: none; }
+.otp-stage.is-orbiting .otp-hub { opacity: 1; transform: scale(1); }
+.otp-stage.is-success .otp-hub {
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  background: var(--success);
+  box-shadow: 0 0 14px 4px rgba(79, 212, 138, 0.6);
+}
+.otp-stage.is-success .otp-hub-check { display: block; }
+
+/* Glow sukses per-slot — sengaja TIDAK memakai `transform`/`animation`
+   supaya tidak menimpa transform posisi orbit yang di-set lewat JS
+   pada elemen yang sama. */
+.otp-slot.is-orbit-success {
+  border-color: var(--success);
+  background: rgba(79, 212, 138, 0.14);
+  color: var(--success);
+  box-shadow: 0 0 0 1px rgba(79, 212, 138, 0.3), 0 0 16px rgba(79, 212, 138, 0.35);
+}
 
 /* Feedback kecil saat digit masuk (box "pop" — bukan gimmick, langsung
    selesai dalam sepersekian detik dan tidak mengganggu keterbacaan). */
@@ -1913,27 +1918,12 @@ body::before {
   40%, 60% { transform: translateX(4px); }
 }
 
-/* Success: tiap slot bertukar ke hijau sukses dengan pop kecil beruntun
-   kiri-ke-kanan (bukan reposisi/orbit literal pada input — tetap dalam
-   baris supaya tidak ada risiko overflow atau layout jumping). */
-.otp-slots.is-success .otp-slot {
-  border-color: var(--success);
-  background: rgba(79, 212, 138, 0.12);
-  color: var(--success);
-  box-shadow: 0 0 0 1px rgba(79, 212, 138, 0.3), 0 6px 16px rgba(79, 212, 138, 0.16);
-  animation: otpSuccessPop 0.45s var(--ease-snap) both;
-}
-.otp-slots.is-success .otp-slot:nth-child(1) { animation-delay: 0s; }
-.otp-slots.is-success .otp-slot:nth-child(2) { animation-delay: 0.05s; }
-.otp-slots.is-success .otp-slot:nth-child(3) { animation-delay: 0.1s; }
-.otp-slots.is-success .otp-slot:nth-child(4) { animation-delay: 0.15s; }
-.otp-slots.is-success .otp-slot:nth-child(5) { animation-delay: 0.2s; }
-.otp-slots.is-success .otp-slot:nth-child(6) { animation-delay: 0.25s; }
-@keyframes otpSuccessPop {
-  0% { transform: scale(1); }
-  45% { transform: scale(1.12); }
-  100% { transform: scale(1); }
-}
+/* NOTE: state sukses per-slot yang sebenarnya sekarang dipegang oleh
+   `.otp-slot.is-orbit-success` (didefinisikan di atas, dekat .otp-hub)
+   karena slot yang sama juga menerima transform posisi orbit lewat JS
+   tiap frame — kelas lama `.otp-slots.is-success .otp-slot` yang memakai
+   `animation: transform: scale(...)` sengaja DIHAPUS dari sini supaya
+   tidak menimpa/berebut properti `transform` dengan posisi orbit. */
 
 .otp-resend {
   margin-top: 16px;
@@ -1944,6 +1934,16 @@ body::before {
 }
 .otp-resend a { color: var(--neon-cyan); text-decoration: none; font-weight: 600; cursor: pointer; }
 .otp-resend a:hover { text-decoration: underline; }
+
+/* Tombol verifikasi — versi lebih ringkas & proporsional khusus untuk
+   card OTP (tidak menyentuh .btn/.btn-primary generik supaya tombol
+   lain di seluruh situs tidak ikut berubah). */
+.otp-btn-verify {
+  margin-top: 4px;
+  padding: 11px 18px;
+  font-size: 12px;
+  border-radius: 12px;
+}
 
 /* =====================================================================
    LAYAR DESKTOP LEBAR / ULTRAWIDE (>= 1440px & >= 1800px)
