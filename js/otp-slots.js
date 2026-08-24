@@ -78,8 +78,16 @@
     // Autofill (iOS QuickType / Android) kadang menaruh SELURUH kode ke
     // satu slot walau maxlength="1" — deteksi lalu sebar ke slot lain,
     // sama seperti perilaku paste.
+    //
+    // REVISI: beberapa keyboard/WebView Android melakukan paste lewat
+    // event 'input' (bukan event 'paste' dengan clipboardData), sehingga
+    // sebelumnya kode tersebar mulai dari slot yang sedang fokus (idx)
+    // -> kalau user paste sambil fokus di kotak ke-3, hasilnya jadi
+    // "[ ][ ][4][7][1][7]" yang membingungkan. Sekarang disamakan dengan
+    // perilaku paste: kode 6 digit yang lengkap SELALU disebar mulai dari
+    // slot pertama, apa pun slot yang sedang fokus saat itu terjadi.
     if (digits.length > 1) {
-      distribute(digits, idx);
+      distribute(digits, 0);
       return;
     }
 
